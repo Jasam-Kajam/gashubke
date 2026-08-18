@@ -5,12 +5,13 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase
 
 // TODO: Replace with your project's fragile config credentials
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+ apiKey: "AIzaSyBHxLJOZ5bdApAhSKOn2v9GtgrbsIxK_6A",
+  authDomain: "gashub-917f2.firebaseapp.com",
+  projectId: "gashub-917f2",
+  storageBucket: "gashub-917f2.firebasestorage.app",
+  messagingSenderId: "738809329471",
+  appId: "1:738809329471:web:7eeebcc400b2ea1b71c58a",
+  measurementId: "G-DLB7ZQ1E7F"
 };
 
 // Initialize Firebase
