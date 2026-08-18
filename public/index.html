@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>GasMarket Pro - Buy & Sell Cooking Gas Refills, Cylinders & Accessories Online</title>
+    <meta name="description" content="Find the best cooking gas prices, refills, cylinders, and burners from verified local suppliers and retailers. Fast delivery and secure ordering on GasMarket Pro.">
+    <meta name="keywords" content="cooking gas delivery, gas refill near me, 6kg gas cylinder, 13kg gas price, cooking gas marketplace, LPG suppliers Kenya">
+    <meta name="author" content="GasMarket Pro">
+    <link rel="canonical" href="https://gasmarketpro.com/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gasmarketpro.com/">
+    <meta property="og:title" content="GasMarket Pro - Cooking Gas Marketplace">
+    <meta property="og:description" content="Connect with trusted cooking gas suppliers and retailers for fast delivery on refills and cylinders.">
+    <meta property="og:image" content="https://gasmarketpro.com/assets/og-banner.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GasMarket Pro - Cooking Gas Marketplace">
+    <meta name="twitter:description" content="Compare prices and order cooking gas cylinders and refills directly from verified local suppliers.">
+    <meta name="twitter:image" content="https://gasmarketpro.com/assets/twitter-banner.jpg">
+
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "GasMarket Pro",
+      "url": "https://gasmarketpro.com/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://gasmarketpro.com/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">GasMarket Pro</div>
+        <div class="search-bar">
+            <input type="search" id="searchInput" placeholder="Search 6kg, 13kg gas cylinders, burners..." aria-label="Search listings">
+            <button id="searchBtn">Search</button>
+        </div>
+        <nav class="nav-links" id="navLinks" aria-label="Main Navigation">
+            <a href="#" id="homeLink">Home</a>
+            <a href="#" id="vendorDashboardLink" style="display:none;">Vendor Dashboard</a>
+            <a href="#" id="authLink">Sign In</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section id="marketplaceView" class="view">
+            <aside class="filters" aria-label="Filter Options">
+                <h2>Filter Gas Products</h2>
+                <label for="filterSize">Cylinder Size</label>
+                <select id="filterSize">
+                    <option value="">All Sizes</option>
+                    <option value="3kg">3 Kg</option>
+                    <option value="6kg">6 Kg</option>
+                    <option value="13kg">13 Kg</option>
+                    <option value="50kg">50 Kg</option>
+                </select>
+                <label for="filterCategory">Category</label>
+                <select id="filterCategory">
+                    <option value="">All Categories</option>
+                    <option value="refill">Gas Refill</option>
+                    <option value="cylinder_complete">Complete Cylinder + Gas</option>
+                    <option value="accessories">Accessories & Burners</option>
+                </select>
+            </aside>
+            <div class="product-grid" id="productGrid" aria-live="polite">
+                </div>
+        </section>
+
+        <section id="vendorView" class="view" style="display:none;">
+            <h2>Vendor Management Console</h2>
+            <form id="listingForm" class="card">
+                <h3>Post New Listing</h3>
+                <input type="text" id="itemTitle" placeholder="Product Title (e.g. 13kg Total Gas Refill)" required>
+                <select id="itemSize" required>
+                    <option value="3kg">3 Kg</option>
+                    <option value="6kg">6 Kg</option>
+                    <option value="13kg">13 Kg</option>
+                    <option value="50kg">50 Kg</option>
+                </select>
+                <select id="itemCategory" required>
+                    <option value="refill">Gas Refill</option>
+                    <option value="cylinder_complete">Complete Cylinder</option>
+                    <option value="accessories">Accessories</option>
+                </select>
+                <input type="number" id="itemPrice" placeholder="Price (KES)" required>
+                <input type="text" id="itemLocation" placeholder="Location / Delivery Zone" required>
+                <textarea id="itemDescription" placeholder="Description & delivery terms" required></textarea>
+                <button type="submit" class="btn-primary">Publish Listing</button>
+            </form>
+            <div class="my-listings">
+                <h3>Your Active Listings</h3>
+                <div id="vendorListingsGrid"></div>
+            </div>
+        </section>
+
+        <div id="authModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
+            <div class="modal-content">
+                <span id="closeModal" class="close" role="button" aria-label="Close modal">&times;</span>
+                <h2 id="authModalTitle">Sign In</h2>
+                <form id="authForm">
+                    <input type="email" id="authEmail" placeholder="Email Address" required>
+                    <input type="password" id="authPassword" placeholder="Password" required>
+                    <div id="vendorFields" style="display:none;">
+                        <input type="text" id="businessName" placeholder="Business / Supplier Name">
+                        <select id="userRole">
+                            <option value="customer">Customer</option>
+                            <option value="vendor">Supplier / Retailer</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="authSubmitBtn" class="btn-primary">Sign In</button>
+                    <p id="toggleAuthMode" style="cursor:pointer; margin-top:1rem; font-size:0.9rem;">Need an account? Register</p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="./js/firebase-config.js"></script>
+    <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="./js/marketplace.js"></script>
+    <script type="module" src="./js/vendor.js"></script>
+</body>
+</html>
