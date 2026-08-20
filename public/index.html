@@ -55,7 +55,8 @@
         
         <nav class="nav-links" id="navLinks" aria-label="Main Navigation">
             <a href="#" id="homeLink">Home</a>
-            <a href="#" id="vendorDashboardLink" style="display:none;">Vendor Dashboard</a>
+            <a href="#" id="vendorDashboardLink" style="display:none;">Vendor Console</a>
+            <a href="#" id="supplierDashboardNavLink" style="display:none;">Supplier Dashboard</a>
             <a href="#" id="cartLink">Cart (<span id="cartCount">0</span>)</a>
             <a href="#" id="authLink">Sign In</a>
         </nav>
@@ -87,7 +88,7 @@
             </div>
         </section>
 
-        <!-- Vendor Dashboard View -->
+        <!-- Legacy Vendor Management Console View -->
         <section id="vendorView" class="view" style="display:none;">
             <h2>Vendor Management Console</h2>
             <form id="listingForm" class="card">
@@ -112,6 +113,70 @@
             <div class="my-listings">
                 <h3>Your Active Listings</h3>
                 <div id="vendorListingsGrid"></div>
+            </div>
+        </section>
+
+        <!-- Supplier Dashboard View (Metrics, Inventory & Customer Orders) -->
+        <section id="supplierDashboardView" class="view" style="display:none;">
+            <h2>Supplier Dashboard & Analytics</h2>
+            
+            <!-- Metrics Summary Cards -->
+            <div class="supplier-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="card" style="padding: 1.25rem;">
+                    <h4 style="font-size: 0.9rem; color: #64748b;">Total Orders Received</h4>
+                    <p id="statTotalOrders" style="font-size: 1.5rem; font-weight: bold; margin-top: 0.5rem; color: var(--primary);">0</p>
+                </div>
+                <div class="card" style="padding: 1.25rem;">
+                    <h4 style="font-size: 0.9rem; color: #64748b;">Active Listings</h4>
+                    <p id="statActiveListings" style="font-size: 1.5rem; font-weight: bold; margin-top: 0.5rem; color: var(--primary);">0</p>
+                </div>
+                <div class="card" style="padding: 1.25rem;">
+                    <h4 style="font-size: 0.9rem; color: #64748b;">Total Revenue (KES)</h4>
+                    <p id="statRevenue" style="font-size: 1.5rem; font-weight: bold; margin-top: 0.5rem; color: var(--primary);">0</p>
+                </div>
+            </div>
+
+            <!-- Tabs to Toggle Between Listings Management and Orders -->
+            <div class="supplier-tabs" style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                <button type="button" class="btn-primary" id="tabListingsBtn" onclick="window.switchSupplierTab('listings')">Manage Inventory</button>
+                <button type="button" class="btn-secondary" id="tabOrdersBtn" onclick="window.switchSupplierTab('orders')" style="background:#e2e8f0; color:#1e293b;">Customer Orders</button>
+            </div>
+
+            <!-- Tab Content: Inventory Management -->
+            <div id="supplierListingsTabContent">
+                <form id="supplierListingForm" class="card" style="margin-bottom: 1.5rem;">
+                    <h3>Post New Listing</h3>
+                    <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. 13kg Total Gas Refill)" required>
+                    <select id="supplierItemSize" required>
+                        <option value="3kg">3 Kg</option>
+                        <option value="6kg">6 Kg</option>
+                        <option value="13kg">13 Kg</option>
+                        <option value="50kg">50 Kg</option>
+                    </select>
+                    <select id="supplierItemCategory" required>
+                        <option value="refill">Gas Refill</option>
+                        <option value="cylinder_complete">Complete Cylinder</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                    <input type="number" id="supplierItemPrice" placeholder="Price (KES)" required>
+                    <input type="text" id="supplierItemLocation" placeholder="Location / Delivery Zone" required>
+                    <textarea id="supplierItemDescription" placeholder="Description & delivery terms" required></textarea>
+                    <button type="submit" class="btn-primary">Publish Listing</button>
+                </form>
+                <div class="my-listings">
+                    <h3>Your Active Listings</h3>
+                    <div id="supplierListingsGrid" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Customer Orders -->
+            <div id="supplierOrdersTabContent" style="display: none;">
+                <div class="card">
+                    <h3>Incoming Customer Orders</h3>
+                    <div id="supplierOrdersList" style="margin-top: 1rem;">
+                        <p>No customer orders received yet.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -231,5 +296,6 @@
     <script type="module" src="./js/auth.js"></script>
     <script type="module" src="./js/marketplace.js"></script>
     <script type="module" src="./js/vendor.js"></script>
+    <script type="module" src="./js/supplier-dashboard.js"></script>
 </body>
 </html>
