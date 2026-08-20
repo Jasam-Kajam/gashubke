@@ -40,18 +40,29 @@
 <body>
     <header class="navbar">
         <div class="logo">GasMarket Pro</div>
+        
+        <!-- Hamburger Toggle Button for Mobile -->
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
         <div class="search-bar">
             <input type="search" id="searchInput" placeholder="Search 6kg, 13kg gas cylinders, burners..." aria-label="Search listings">
             <button id="searchBtn">Search</button>
         </div>
+        
         <nav class="nav-links" id="navLinks" aria-label="Main Navigation">
             <a href="#" id="homeLink">Home</a>
             <a href="#" id="vendorDashboardLink" style="display:none;">Vendor Dashboard</a>
+            <a href="#" id="cartLink">Cart (<span id="cartCount">0</span>)</a>
             <a href="#" id="authLink">Sign In</a>
         </nav>
     </header>
 
     <main class="container">
+        <!-- Marketplace View -->
         <section id="marketplaceView" class="view">
             <aside class="filters" aria-label="Filter Options">
                 <h2>Filter Gas Products</h2>
@@ -72,9 +83,11 @@
                 </select>
             </aside>
             <div class="product-grid" id="productGrid" aria-live="polite">
-                </div>
+                <!-- Dynamic listings load here -->
+            </div>
         </section>
 
+        <!-- Vendor Dashboard View -->
         <section id="vendorView" class="view" style="display:none;">
             <h2>Vendor Management Console</h2>
             <form id="listingForm" class="card">
@@ -102,6 +115,45 @@
             </div>
         </section>
 
+        <!-- Cart & Checkout View -->
+        <section id="cartView" class="view" style="display:none;">
+            <h2>Your Shopping Cart & Checkout</h2>
+            <div class="cart-container-grid">
+                <div class="cart-items-card card">
+                    <h3>Review Items</h3>
+                    <div id="cartItemsList" style="margin-top: 1rem;">
+                        <p>Your cart is currently empty.</p>
+                    </div>
+                </div>
+
+                <div class="cart-summary-card card">
+                    <h3>Order Summary</h3>
+                    <div class="summary-row" style="margin-top: 1rem;">
+                        <span>Subtotal</span>
+                        <span id="cartSubtotal">KES 0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Estimated Delivery</span>
+                        <span>KES 200</span>
+                    </div>
+                    <hr style="margin: 1rem 0; border:0; border-top:1px solid var(--border-color);">
+                    <div class="summary-row total-row">
+                        <strong>Total</strong>
+                        <strong id="cartTotal">KES 200</strong>
+                    </div>
+
+                    <form id="checkoutForm" style="margin-top: 1.5rem;">
+                        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">Delivery Details</h4>
+                        <input type="text" id="deliveryName" placeholder="Full Name" required>
+                        <input type="tel" id="deliveryPhone" placeholder="Phone Number (e.g. 0712345678)" required>
+                        <input type="text" id="deliveryAddress" placeholder="Delivery Location / Estate / House No." required>
+                        <button type="submit" class="btn-primary" style="margin-top: 0.5rem;">Place Order & Pay via M-Pesa</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Auth Modal -->
         <div id="authModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
             <div class="modal-content">
                 <span id="closeModal" class="close" role="button" aria-label="Close modal">&times;</span>
@@ -147,10 +199,34 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 GasMarket Pro. All rights reserved.</p>
+            <p>&copy; <span id="currentYear"></span> GasMarket Pro. All rights reserved.</p>
         </div>
     </footer>
 
+    <!-- UI Scripts Control -->
+    <script>
+        // Set dynamic copyright year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Hamburger Menu Toggle Logic
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburgerBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburgerBtn.classList.toggle('open');
+        });
+
+        // Close menu automatically on mobile link click
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                hamburgerBtn.classList.remove('open');
+            });
+        });
+    </script>
+
+    <!-- Firebase Script Modules -->
     <script type="module" src="./js/firebase-config.js"></script>
     <script type="module" src="./js/auth.js"></script>
     <script type="module" src="./js/marketplace.js"></script>
