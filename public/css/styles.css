@@ -320,3 +320,42 @@ body {
     font-size: 0.85rem;
     color: #94a3b8;
 }
+
+/* Cart Layout Styles */
+#cartView {
+    display: none;
+}
+
+@media (min-width: 900px) {
+    #cartView {
+        grid-template-columns: 1fr 380px;
+    }
+}
+
+.cart-items-card, .cart-summary-card {
+    height: fit-content;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.total-row {
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+
+.cart-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cart-item-row:last-child {
+    border-bottom: none;
+}
