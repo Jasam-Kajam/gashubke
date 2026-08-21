@@ -289,6 +289,48 @@
                 hamburgerBtn.classList.remove('open');
             });
         });
+
+        // View Switching Control for Navigation Links
+        const homeLink = document.getElementById('homeLink');
+        const cartLink = document.getElementById('cartLink');
+        const vendorDashboardLink = document.getElementById('vendorDashboardLink');
+        const supplierDashboardNavLink = document.getElementById('supplierDashboardNavLink');
+
+        function hideAllViews() {
+            document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+        }
+
+        if (homeLink) {
+            homeLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+            });
+        }
+
+        if (cartLink) {
+            cartLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('cartView').style.display = 'block';
+            });
+        }
+
+        if (vendorDashboardLink) {
+            vendorDashboardLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('vendorView').style.display = 'block';
+            });
+        }
+
+        if (supplierDashboardNavLink) {
+            supplierDashboardNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('supplierDashboardView').style.display = 'block';
+            });
+        }
     </script>
 
     <!-- Firebase Script Modules -->
