@@ -226,13 +226,25 @@
                 <form id="authForm">
                     <input type="email" id="authEmail" placeholder="Email Address" required>
                     <input type="password" id="authPassword" placeholder="Password" required>
+                    
+                    <!-- Updated Vendor/Supplier Registration Fields with County & Area Selectors -->
                     <div id="vendorFields" style="display:none;">
                         <input type="text" id="businessName" placeholder="Business / Supplier Name">
+                        
+                        <select id="supplierCounty">
+                            <option value="">Select County</option>
+                        </select>
+                        
+                        <select id="supplierArea">
+                            <option value="">Select Town / Area First</option>
+                        </select>
+
                         <select id="userRole">
                             <option value="customer">Customer</option>
                             <option value="vendor">Supplier / Retailer</option>
                         </select>
                     </div>
+
                     <button type="submit" id="authSubmitBtn" class="btn-primary">Sign In</button>
                     <p id="toggleAuthMode" style="cursor:pointer; margin-top:1rem; font-size:0.9rem;">Need an account? Register</p>
                 </form>
@@ -333,9 +345,10 @@
         }
     </script>
 
-    <!-- Firebase Script Modules -->
+    <!-- Firebase & Feature Script Modules -->
     <script type="module" src="./js/firebase-config.js"></script>
     <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="./js/counties.js"></script>
     <script type="module" src="./js/marketplace.js"></script>
     <script type="module" src="./js/vendor.js"></script>
     <script type="module" src="./js/supplier-dashboard.js"></script>
