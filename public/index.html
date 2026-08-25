@@ -106,7 +106,11 @@
                     <option value="accessories">Accessories</option>
                 </select>
                 <input type="number" id="itemPrice" placeholder="Price (KES)" required>
-                <input type="text" id="itemLocation" placeholder="Location / Delivery Zone" required>
+                
+                <!-- Product Image Upload Input -->
+                <label for="itemImage" style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem; display:block;">Product Image</label>
+                <input type="file" id="itemImage" accept="image/*" required>
+
                 <textarea id="itemDescription" placeholder="Description & delivery terms" required></textarea>
                 <button type="submit" class="btn-primary">Publish Listing</button>
             </form>
@@ -159,7 +163,11 @@
                         <option value="accessories">Accessories</option>
                     </select>
                     <input type="number" id="supplierItemPrice" placeholder="Price (KES)" required>
-                    <input type="text" id="supplierItemLocation" placeholder="Location / Delivery Zone" required>
+                    
+                    <!-- Supplier Dashboard Product Image Upload Input -->
+                    <label for="supplierItemImage" style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem; display:block;">Product Image</label>
+                    <input type="file" id="supplierItemImage" accept="image/*" required>
+
                     <textarea id="supplierItemDescription" placeholder="Description & delivery terms" required></textarea>
                     <button type="submit" class="btn-primary">Publish Listing</button>
                 </form>
