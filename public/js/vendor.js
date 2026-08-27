@@ -30,7 +30,7 @@ if (listingForm) {
     listingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (!auth.currentUser) {
-            alert("Please sign in as a vendor first.");
+            alert("Please sign in as a supplier first.");
             return;
         }
 
@@ -42,19 +42,19 @@ if (listingForm) {
         const imageInput = document.getElementById("itemImage");
 
         try {
-            // Fetch registered vendor profile data to get county and area automatically
+            // Fetch registered supplier profile data to get county and area automatically
             const userDocRef = doc(db, "users", auth.currentUser.uid);
             const userDoc = await getDoc(userDocRef);
 
             let supplierCounty = "Nairobi";
             let supplierArea = "CBD";
-            let businessName = "Registered Vendor";
+            let businessName = "Registered Supplier";
 
             if (userDoc.exists()) {
                 const userData = userDoc.data();
                 supplierCounty = userData.county || "Nairobi";
                 supplierArea = userData.area || "CBD";
-                businessName = userData.businessName || "Registered Vendor";
+                businessName = userData.businessName || "Registered Supplier";
             }
 
             // Process up to 5 image files if attached
@@ -137,7 +137,7 @@ async function loadVendorListings() {
             vendorListingsGrid.appendChild(div);
         });
     } catch (err) {
-        console.error("Error loading vendor listings:", err);
+        console.error("Error loading supplier listings:", err);
         vendorListingsGrid.innerHTML = "<p>Failed to load your listings.</p>";
     }
 }
