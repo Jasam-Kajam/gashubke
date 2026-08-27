@@ -3,298 +3,704 @@
    ========================================== */
 
 :root {
-  --primary: #f97316; /* Vibrant marketplace orange */
-  --primary-dark: #ea580c;
-  --text-main: #1e293b; /* Dark slate text */
-  --text-muted: #64748b;
-  --bg-card: #ffffff;
-  --border-color: #e2e8f0;
-  --bg-body: #f8fafc;
+    --primary: #f26522;          /* Exact vibrant orange from the GasHubKE logo / Buy Now buttons */
+    --primary-dark: #d64d12;     /* Deeper hover orange */
+    --text-main: #1f2937;        /* Clean dark slate text */
+    --text-muted: #4b5563;       /* Secondary grey text for locations and subtitles */
+    --bg-light: #f8fafc;         /* Light, cool background wrapper */
+    --white: #ffffff;            /* Pure white card backgrounds */
+    --border-color: #e5e7eb;     /* Subtle light grey borders */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --radius: 12px;
 }
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  color: var(--text-main);
-  background-color: var(--bg-body);
-  line-height: 1.5;
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Layout Containers */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-
-/* Navbar & Header */
+/* =========================================
+   Responsive Navigation Bar
+   ========================================= */
 .navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  background: #fff;
-  border-bottom: 1px solid var(--border-color);
-  gap: 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-}
-
-.logo-container {
-  flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+    padding: 1rem 5%;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .logo-container img {
-  height: 40px;
-  object-fit: contain;
+    height: 42px;
+    object-fit: contain;
 }
 
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-left: auto;
-}
-
-.nav-links a {
-  font-weight: 500;
-  color: var(--text-main);
-  text-decoration: none;
-  transition: color 0.2s;
-  font-size: 0.95rem;
-}
-
-.nav-links a:hover {
-  color: var(--primary);
-}
-
-/* Hamburger Toggle Button (Hidden on Desktop) */
+/* Hamburger Toggle Button */
 .hamburger {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  flex-direction: column;
-  gap: 5px;
-  padding: 4px;
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 110;
 }
 
 .hamburger span {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: var(--text-main);
-  transition: all 0.3s ease;
+    width: 100%;
+    height: 3px;
+    background: var(--text-main);
+    border-radius: 2px;
+    transition: all 0.3s ease;
 }
 
-/* Marketplace Hero Section */
+/* Search Bar Component */
+.search-bar {
+    display: flex;
+    flex: 1;
+    min-width: 220px;
+    max-width: 420px;
+    order: 3;
+    background: #f1f5f9;
+    border-radius: 24px;
+    padding: 0.3rem 0.75rem;
+    align-items: center;
+    border: 1px solid transparent;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.search-bar:focus-within {
+    background: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(242, 101, 34, 0.1);
+}
+
+@media (min-width: 768px) {
+    .search-bar {
+        order: 2;
+    }
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 0.4rem;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.search-bar button {
+    display: none;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    order: 2;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .nav-links {
+        order: 3;
+        margin-left: auto;
+    }
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.nav-links a:hover {
+    color: var(--primary);
+}
+
+.nav-links a span, 
+.cart-badge {
+    background-color: #1e3a8a;
+    color: var(--white);
+    border-radius: 9999px;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* =========================================
+   Main Container Layout & Views
+   ========================================= */
+.container {
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    flex: 1;
+}
+
+.view {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* =========================================
+   Marketplace Layout & Hero Banner
+   ========================================= */
 .marketplace-hero {
-  margin-bottom: 2rem;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-height: 380px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
 }
 
 .marketplace-hero img {
-  width: 100%;
-  max-height: 300px;
-  object-fit: cover;
-  display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
-/* Marketplace Main Content Layout */
-.marketplace-layout {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
+#marketplaceView {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-/* Filters Sidebar */
-.filters {
-  min-width: 240px;
-  background: #fff;
-  padding: 1.25rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  height: fit-content;
+@media (min-width: 992px) {
+    #marketplaceView {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        align-items: start;
+        gap: 2rem;
+    }
 }
 
-.filters h2 {
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  color: var(--text-main);
+/* =========================================
+   Filters Component & Layout
+   ========================================= */
+aside.filters {
+    background: var(--white);
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    height: fit-content;
+    min-width: 220px;
+    box-shadow: var(--shadow-sm);
 }
 
-.filters label {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text-muted);
+aside.filters h2 {
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
 }
 
-.filters select {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-  background: #fff;
-  font-size: 0.9rem;
-  color: var(--text-main);
+aside.filters label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
 }
 
-/* Product Grid & Item Card Orientation (Vertical Stack) */
+aside.filters select {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--white);
+    font-size: 0.95rem;
+    color: var(--text-main);
+    outline: none;
+}
+
+aside.filters select:focus {
+    border-color: var(--primary);
+}
+
+/* =========================================
+   Responsive Product Grid & Cards
+   ========================================= */
 .product-grid {
-  flex-grow: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem;
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
 }
 
 .product-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 0;
 }
 
 .product-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
-/* Image Frame Container */
-.product-card .image-container {
-  background-color: #f8fafc;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  padding: 1rem;
+.product-card img, 
+.product-card .card-img-container {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    background-color: var(--white);
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.product-card img {
-  max-height: 100%;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-/* Card Content Area */
-.product-card .content-area {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+.product-card .card-body,
+.product-card > div:not(.card-img-container) {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
 }
 
 .product-card h4 {
-  font-size: 0.95rem;
-  color: var(--text-main);
-  margin-bottom: 0.35rem;
-  font-weight: 600;
-  line-height: 1.3;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.3rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .product-card .price {
-  font-weight: 700;
-  color: var(--primary);
-  font-size: 1.1rem;
-  margin-bottom: 0.35rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0.2rem 0;
 }
 
 .product-card .location {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
-.product-card .action-area {
-  padding: 0 1rem 1rem 1rem;
-}
-
-/* Buttons & Elements */
+/* =========================================
+   Buttons and Form Elements
+   ========================================= */
 .btn-primary {
-  background-color: var(--primary);
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  text-align: center;
-  display: inline-block;
-  text-decoration: none;
-  font-size: 0.9rem;
+    background: linear-gradient(to bottom, #f26522, #e65c19);
+    color: var(--white);
+    border: none;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    font-size: 0.95rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(242, 101, 34, 0.2);
+    transition: filter 0.2s ease, background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-dark);
+    filter: brightness(0.95);
+    background: linear-gradient(to bottom, #e65c19, #d64d12);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: var(--text-main);
+    border: none;
+    padding: 0.65rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
 }
 
 .card {
-  background: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    background: var(--white);
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
 }
 
-/* General View Sections */
-.view {
-  display: block;
+@media (min-width: 768px) {
+    .card {
+        padding: 2rem;
+    }
 }
 
-/* Responsive Media Queries */
-@media (max-width: 768px) {
-  .hamburger {
+.card input, .card select, .card textarea,
+#authForm input, #authForm select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    outline: none;
+    background: var(--white);
+    color: var(--text-main);
+    transition: border-color 0.2s;
+}
+
+.card input:focus, .card select:focus, .card textarea:focus,
+#authForm input:focus, #authForm select:focus {
+    border-color: var(--primary);
+}
+
+/* =========================================
+   Modal Window
+   ========================================= */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
     display: flex;
-  }
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    z-index: 1000;
+}
 
-  .nav-links {
-    display: none;
-    flex-direction: column;
+.modal-content {
+    background: var(--white);
+    padding: 2rem 1.5rem 1.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.close {
     position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: #fff;
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    gap: 1rem;
-    margin-left: 0;
-  }
+    right: 1.25rem; top: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
 
-  .nav-links.active {
+.close:hover {
+    color: var(--text-main);
+}
+
+/* =========================================
+   Responsive Footer
+   ========================================= */
+.site-footer {
+    background: #0f172a;
+    color: #fff;
+    padding: 3rem 1.5rem 1.5rem;
+    margin-top: auto;
+    border-top: 1px solid #1e293b;
+}
+
+.footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
     display: flex;
-  }
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: space-between;
+}
 
-  .marketplace-hero img {
-    height: 180px;
-  }
+.footer-col {
+    flex: 1;
+    min-width: 240px;
+    max-width: 300px;
+}
 
-  .marketplace-layout {
-    flex-direction: column;
-  }
+.footer-col h3, .footer-col h4 {
+    color: var(--white);
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+}
 
-  .filters {
-    width: 100%;
-  }
+.footer-col p {
+    color: #94a3b8;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 0.6rem;
+}
+
+.footer-col ul li a {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-col ul li a:hover {
+    color: var(--white);
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #1e293b;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+/* =========================================
+   Cart & Checkout Grid Layouts
+   ========================================= */
+.cart-container-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 900px) {
+    .cart-container-grid {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.total-row {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.total-row span:last-child {
+    color: var(--primary);
+}
+
+.cart-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cart-item-row:last-child {
+    border-bottom: none;
+}
+
+/* =========================================
+   Mobile Optimization & Floating Filter Bar (< 768px)
+   ========================================= */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .navbar {
+        position: relative;
+    }
+
+    /* Hide nav-links by default on mobile, show when active */
+    .nav-links {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--white);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        gap: 0.75rem;
+        align-items: stretch !important;
+    }
+
+    .nav-links.active {
+        display: flex !important;
+    }
+
+    .nav-links.active a {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        width: 100%;
+        margin: 0 !important;
+        font-size: 1rem;
+    }
+
+    /* Tighten container padding and configure floating filter bar */
+    .container {
+        padding: 0.75rem !important;
+        padding-bottom: 5rem !important; /* Prevents overlap with floating bar */
+    }
+
+    .marketplace-hero {
+        max-height: 180px !important;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    #marketplaceView {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* Floating Mobile Filter Bar at the Bottom */
+    aside.filters {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: var(--white);
+        z-index: 998;
+        padding: 0.6rem 1rem;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        border-top: 1px solid var(--border-color);
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0;
+        min-width: 0;
+    }
+
+    aside.filters h2,
+    aside.filters label {
+        display: none;
+    }
+
+    aside.filters select {
+        flex: 1;
+        margin-bottom: 0;
+        padding: 0.45rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+
+    /* Perfect 2-Column Product Grid for Mobile */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem !important;
+        width: 100%;
+    }
+
+    .product-card {
+        border-radius: 8px;
+        font-size: 0.85rem;
+    }
+
+    .product-card img, 
+    .product-card .card-img-container {
+        height: 120px !important;
+        padding: 0.5rem !important;
+    }
+
+    .product-card .card-body,
+    .product-card > div:not(.card-img-container) {
+        padding: 0.75rem !important;
+    }
+
+    .product-card h4 {
+        font-size: 0.85rem !important;
+        line-height: 1.2;
+        margin-bottom: 0.2rem;
+    }
+
+    .product-card .price {
+        font-size: 0.95rem !important;
+    }
+
+    .product-card .location {
+        font-size: 0.75rem !important;
+        margin-bottom: 0.6rem;
+    }
+
+    .product-card .btn-primary {
+        padding: 0.45rem 0.5rem !important;
+        font-size: 0.8rem !important;
+        border-radius: 6px;
+    }
+}
+
+/* Extra Small Screens Fallback */
+@media (max-width: 380px) {
+    .product-grid {
+        grid-template-columns: 1fr !important;
+    }
 }
