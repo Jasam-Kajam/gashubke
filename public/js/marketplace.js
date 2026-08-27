@@ -68,7 +68,7 @@ function updateCartUI() {
                     <circle cx="20" cy="21" r="1"></circle>
                     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                 </svg>
-                ${totalCount > 0 ? `<span id="cartCount" style="position: absolute; top: -8px; right: -10px; background-color: #f97316; color: #fff; font-size: 0.7rem; font-weight: bold; padding: 1px 5px; border-radius: 50%; min-width: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">${totalCount}</span>` : ''}
+                ${totalCount > 0 ? `<span id="cartCount" class="cart-badge" style="position: absolute; top: -8px; right: -10px;">${totalCount}</span>` : ''}
             </span>
         `;
         cartLink.innerHTML = cartSvgIcon;
@@ -79,6 +79,8 @@ function renderCartView() {
     const cartItemsList = document.getElementById("cartItemsList");
     const cartSubtotal = document.getElementById("cartSubtotal");
     const cartTotal = document.getElementById("cartTotal");
+    
+    if (!cartItemsList) return;
     
     let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
     
@@ -96,16 +98,16 @@ function renderCartView() {
         const itemTotal = item.price * item.quantity;
         subtotal += itemTotal;
         html += `
-            <div class="cart-item-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid #e2e8f0;">
+            <div class="cart-item-row">
                 <div>
                     <strong>${item.title}</strong>
-                    <p style="font-size:0.85rem; color:#64748b;">KES ${item.price} each</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">KES ${item.price} each</p>
                 </div>
                 <div style="display:flex; align-items:center; gap:0.5rem;">
-                    <button type="button" onclick="window.updateCartQuantity('${item.id}', -1)" style="padding:2px 8px;">-</button>
+                    <button type="button" class="btn-secondary" style="padding:2px 10px;" onclick="window.updateCartQuantity('${item.id}', -1)">-</button>
                     <span>${item.quantity}</span>
-                    <button type="button" onclick="window.updateCartQuantity('${item.id}', 1)" style="padding:2px 8px;">+</button>
-                    <button type="button" onclick="window.removeFromCart('${item.id}')" style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-left:0.5rem;">Remove</button>
+                    <button type="button" class="btn-secondary" style="padding:2px 10px;" onclick="window.updateCartQuantity('${item.id}', 1)">+</button>
+                    <button type="button" onclick="window.removeFromCart('${item.id}')" style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-left:0.5rem; font-size:0.85rem;">Remove</button>
                 </div>
             </div>
         `;
@@ -117,6 +119,8 @@ function renderCartView() {
 }
 
 async function loadListings() {
+    if (!productGrid) return;
+    
     productGrid.innerHTML = "<p>Loading gas suppliers & inventory...</p>";
     try {
         let q = collection(db, "listings");
@@ -135,9 +139,9 @@ async function loadListings() {
             const item = docSnap.data();
             const itemId = docSnap.id;
             
-            // Apply Filters
-            if (filterSize.value && item.size !== filterSize.value) return;
-            if (filterCategory.value && item.category !== filterCategory.value) return;
+            // Apply Filters safely if elements exist
+            if (filterSize && filterSize.value && item.size !== filterSize.value) return;
+            if (filterCategory && filterCategory.value && item.category !== filterCategory.value) return;
 
             // Apply Search Query matching (Title, Description, or Location)
             if (searchQuery) {
@@ -149,11 +153,7 @@ async function loadListings() {
 
             matchCount++;
             const card = document.createElement("div");
-            card.className = "product-card card";
-            card.style.overflow = "hidden";
-            card.style.display = "flex";
-            card.style.flexDirection = "column";
-            card.style.justifyContent = "space-between";
+            card.className = "product-card";
 
             // Professional SVG Map Marker Icon
             const mapPinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
@@ -164,16 +164,16 @@ async function loadListings() {
 
             card.innerHTML = `
                 <div>
-                    ${primaryImage ? `<div style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: center; align-items: center;"><img src="${primaryImage}" alt="${item.title}" style="width: 100%; height: 240px; object-fit: contain;"></div>` : ''}
-                    <div style="padding: 1rem;">
-                        <h4 style="margin-bottom: 0.25rem;">${item.title}</h4>
-                        <p class="price" style="font-weight: bold; color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem;">KES ${item.price} <span style="font-size:0.8rem; font-weight:normal; color:#64748b;">(${item.size})</span></p>
-                        <p class="location" style="font-size: 0.85rem; color: #475569; margin-bottom: 0.5rem; display: flex; align-items: center;">${mapPinSvg} ${item.location || 'Local Delivery'}</p>
-                        <p style="font-size:0.85rem; color:#64748b; margin-bottom:1rem; line-height:1.4;">${item.description || ''}</p>
+                    ${primaryImage ? `<div class="card-img-container"><img src="${primaryImage}" alt="${item.title}"></div>` : ''}
+                    <div class="card-body">
+                        <h4>${item.title}</h4>
+                        <p class="price">KES ${item.price} <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted);">(${item.size})</span></p>
+                        <p class="location">${mapPinSvg} ${item.location || 'Local Delivery'}</p>
+                        <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.4;">${item.description || ''}</p>
                     </div>
                 </div>
                 <div style="padding: 0 1rem 1rem 1rem;">
-                    <button class="btn-primary" style="width:100%;" onclick="window.addToListingCart('${itemId}', '${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.location || ''}')">Order Now</button>
+                    <button class="btn-primary" onclick="window.addToListingCart('${itemId}', '${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.location || ''}')">Order Now</button>
                 </div>
             `;
             productGrid.appendChild(card);
@@ -189,17 +189,20 @@ async function loadListings() {
     }
 }
 
-// Navigation event links setup
+// Navigation and Event Listeners Setup
 document.addEventListener("DOMContentLoaded", () => {
     updateCartUI();
 
     const homeLink = document.getElementById("homeLink");
     const cartLink = document.getElementById("cartLink");
+    const hamburger = document.querySelector(".hamburger");
+    const navLinks = document.querySelector(".nav-links");
 
     if (homeLink) {
         homeLink.addEventListener("click", (e) => {
             e.preventDefault();
             switchView("marketplaceView");
+            if (navLinks) navLinks.classList.remove("active");
         });
     }
 
@@ -208,17 +211,29 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             renderCartView();
             switchView("cartView");
+            if (navLinks) navLinks.classList.remove("active");
+        });
+    }
+
+    // Responsive Mobile Hamburger Menu Toggle
+    if (hamburger && navLinks) {
+        hamburger.addEventListener("click", () => {
+            navLinks.classList.toggle("active");
         });
     }
 });
 
-filterSize.addEventListener("change", loadListings);
-filterCategory.addEventListener("change", loadListings);
-searchBtn.addEventListener("click", loadListings);
-searchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        loadListings();
-    }
-});
+// Filter & Search Event Listeners with Null Safeguards
+if (filterSize) filterSize.addEventListener("change", loadListings);
+if (filterCategory) filterCategory.addEventListener("change", loadListings);
+if (searchBtn) searchBtn.addEventListener("click", loadListings);
+if (searchInput) {
+    searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            loadListings();
+        }
+    });
+}
 
+// Initial Data Load
 loadListings();
