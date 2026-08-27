@@ -82,7 +82,7 @@ function renderCartView() {
         const itemTotal = item.price * item.quantity;
         subtotal += itemTotal;
         html += `
-            <div class="cart-item-row">
+            <div class="cart-item-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid #e2e8f0;">
                 <div>
                     <strong>${item.title}</strong>
                     <p style="font-size:0.85rem; color:#64748b;">KES ${item.price} each</p>
@@ -114,26 +114,54 @@ async function loadListings() {
             return;
         }
 
+        const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : "";
+        let matchCount = 0;
+
         querySnapshot.forEach((docSnap) => {
             const item = docSnap.data();
             const itemId = docSnap.id;
             
+            // Apply Filters
             if (filterSize.value && item.size !== filterSize.value) return;
             if (filterCategory.value && item.category !== filterCategory.value) return;
 
+            // Apply Search Query matching (Title, Description, or Location)
+            if (searchQuery) {
+                const matchTitle = item.title && item.title.toLowerCase().includes(searchQuery);
+                const matchDesc = item.description && item.description.toLowerCase().includes(searchQuery);
+                const matchLocation = item.location && item.location.toLowerCase().includes(searchQuery);
+                if (!matchTitle && !matchDesc && !matchLocation) return;
+            }
+
+            matchCount++;
             const card = document.createElement("div");
-            card.className = "product-card";
+            card.className = "product-card card";
+            card.style.overflow = "hidden";
+            card.style.display = "flex";
+            card.style.flexDirection = "column";
+            card.style.justifyContent = "space-between";
+
             card.innerHTML = `
                 <div>
-                    <h4>${item.title}</h4>
-                    <p class="price">KES ${item.price}</p>
-                    <p class="location">Location: ${item.location}</p>
-                    <p style="font-size:0.85rem; color:#475569; margin-bottom:0.5rem;">${item.description}</p>
+                    ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 160px; object-fit: cover;">` : ''}
+                    <div style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.25rem;">${item.title}</h4>
+                        <p class="price" style="font-weight: bold; color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem;">KES ${item.price} <span style="font-size:0.8rem; font-weight:normal; color:#64748b;">(${item.size})</span></p>
+                        <p class="location" style="font-size: 0.85rem; color: #475569; margin-bottom: 0.5rem;">📍 ${item.location || 'Local Delivery'}</p>
+                        <p style="font-size:0.85rem; color:#64748b; margin-bottom:1rem; line-height:1.4;">${item.description || ''}</p>
+                    </div>
                 </div>
-                <button class="btn-primary" onclick="window.addToListingCart('${itemId}', '${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.location}')">Add to Cart</button>
+                <div style="padding: 0 1rem 1rem 1rem;">
+                    <button class="btn-primary" style="width:100%;" onclick="window.addToListingCart('${itemId}', '${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.location || ''}')">Add to Cart</button>
+                </div>
             `;
             productGrid.appendChild(card);
         });
+
+        if (matchCount === 0) {
+            productGrid.innerHTML = "<p>No listings match your search criteria.</p>";
+        }
+
     } catch (err) {
         productGrid.innerHTML = "<p>Error loading marketplace inventory.</p>";
         console.error(err);
@@ -166,5 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
 filterSize.addEventListener("change", loadListings);
 filterCategory.addEventListener("change", loadListings);
 searchBtn.addEventListener("click", loadListings);
+searchInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        loadListings();
+    }
+});
 
 loadListings();
