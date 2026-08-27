@@ -33,7 +33,7 @@ closeModal.addEventListener("click", () => authModal.style.display = "none");
 toggleAuthMode.addEventListener("click", () => {
     isRegistering = !isRegistering;
     if (isRegistering) {
-        authModalTitle.innerText = "Register Marketplace Account";
+        authModalTitle.innerText = "Register Platform Account";
         authSubmitBtn.innerText = "Sign Up";
         toggleAuthMode.innerText = "Already have an account? Sign In";
         vendorFields.style.display = "block";
