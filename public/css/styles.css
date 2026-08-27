@@ -1,10 +1,14 @@
 :root {
-    --primary: #d9381e;
-    --primary-dark: #b52b14;
-    --text-main: #2c3e50;
-    --bg-light: #f8f9fa;
-    --border-color: #e2e8f0;
+    --primary: #f97316;       /* Vibrant orange e-commerce accent */
+    --primary-dark: #ea580c;  /* Deep hover shade */
+    --text-main: #1e293b;     /* Deep slate text for readability */
+    --text-muted: #64748b;    /* Secondary grey text */
+    --bg-light: #f8fafc;      /* Crisp clean background surface */
     --white: #ffffff;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --radius: 8px;
 }
 
 * {
@@ -22,7 +26,9 @@ body {
     min-height: 100vh;
 }
 
-/* Responsive Navigation Bar */
+/* =========================================
+   Responsive Navigation Bar
+   ========================================= */
 .navbar {
     display: flex;
     flex-wrap: wrap;
@@ -35,10 +41,11 @@ body {
     top: 0;
     z-index: 100;
     gap: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .logo-container img {
-    height: 45px;
+    height: 42px;
     object-fit: contain;
 }
 
@@ -77,9 +84,9 @@ body {
         position: absolute;
         top: 100%;
         left: 0;
-        padding: 1rem 1.5rem;
+        padding: 1.25rem 1.5rem;
         border-bottom: 1px solid var(--border-color);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-md);
         gap: 1rem;
         align-items: flex-start !important;
     }
@@ -90,19 +97,31 @@ body {
 
     .nav-links a {
         margin-left: 0 !important;
+        width: 100%;
+        padding: 0.50rem 0;
+        border-bottom: 1px solid #f1f5f9;
     }
 }
 
+/* Search Bar Component */
 .search-bar {
     display: flex;
     flex: 1;
     min-width: 220px;
-    max-width: 400px;
+    max-width: 420px;
     order: 3;
     background: #f1f5f9;
-    border-radius: 6px;
-    padding: 0.2rem 0.5rem;
+    border-radius: 24px;
+    padding: 0.3rem 0.75rem;
     align-items: center;
+    border: 1px solid transparent;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.search-bar:focus-within {
+    background: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 @media (min-width: 768px) {
@@ -116,8 +135,9 @@ body {
     border: none;
     background: transparent;
     outline: none;
-    padding: 0.5rem;
+    padding: 0.4rem;
     font-size: 0.95rem;
+    color: var(--text-main);
 }
 
 .search-bar button {
@@ -143,18 +163,21 @@ body {
     color: var(--text-main);
     font-weight: 500;
     font-size: 0.95rem;
+    transition: color 0.2s;
 }
 
 .nav-links a:hover {
     color: var(--primary);
 }
 
-/* Main Container Layout */
+/* =========================================
+   Main Container Layout & Views
+   ========================================= */
 .container {
-    max-width: 1200px;
+    max-width: 1280px;
     width: 100%;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 2rem 1.5rem;
     flex: 1;
 }
 
@@ -164,91 +187,118 @@ body {
     gap: 1.5rem;
 }
 
-/* Filters Component & Layout adjustments */
+/* =========================================
+   Filters Component & Layout
+   ========================================= */
 aside.filters {
     background: var(--white);
     padding: 1.25rem;
-    border-radius: 8px;
+    border-radius: var(--radius);
     border: 1px solid var(--border-color);
     height: fit-content;
     min-width: 220px;
+    box-shadow: var(--shadow-sm);
 }
 
 aside.filters h2 {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     margin-bottom: 1rem;
+    font-weight: 600;
 }
 
 aside.filters label {
     display: block;
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    color: var(--text-muted);
 }
 
 aside.filters select {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.6rem;
     margin-bottom: 1rem;
-    border-radius: 4px;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
     background: var(--white);
+    font-size: 0.95rem;
+    color: var(--text-main);
+    outline: none;
 }
 
-/* Responsive Product Grid */
+aside.filters select:focus {
+    border-color: var(--primary);
+}
+
+/* =========================================
+   Responsive Product Grid & Cards (Fixed)
+   ========================================= */
 .product-grid {
     flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1.5rem;
+    width: 100%;
 }
 
 .product-card {
     background: var(--white);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1rem;
+    border-radius: var(--radius);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .product-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 .product-card h4 {
-    font-size: 1rem;
-    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-main);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .product-card .price {
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--primary);
-    margin: 0.4rem 0;
+    margin: 0.25rem 0;
 }
 
 .product-card .location {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--text-muted);
     margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
 }
 
-/* Buttons and Form elements */
+/* =========================================
+   Buttons and Form Elements
+   ========================================= */
 .btn-primary {
     background: var(--primary);
     color: var(--white);
     border: none;
     padding: 0.65rem 1rem;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     width: 100%;
     font-size: 0.95rem;
     text-align: center;
+    transition: background-color 0.2s;
 }
 
 .btn-primary:hover {
@@ -260,18 +310,24 @@ aside.filters select {
     color: var(--text-main);
     border: none;
     padding: 0.65rem 1rem;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     font-size: 0.95rem;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
 }
 
 .card {
     background: var(--white);
     padding: 1.25rem;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius);
     margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
 }
 
 @media (min-width: 768px) {
@@ -286,15 +342,27 @@ aside.filters select {
     padding: 0.75rem;
     margin-bottom: 1rem;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 0.95rem;
+    outline: none;
+    background: var(--white);
+    color: var(--text-main);
+    transition: border-color 0.2s;
 }
 
-/* Modal Window */
+.card input:focus, .card select:focus, .card textarea:focus,
+#authForm input:focus, #authForm select:focus {
+    border-color: var(--primary);
+}
+
+/* =========================================
+   Modal Window
+   ========================================= */
 .modal {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -304,31 +372,40 @@ aside.filters select {
 
 .modal-content {
     background: var(--white);
-    padding: 1.5rem;
-    border-radius: 8px;
+    padding: 2rem 1.5rem 1.5rem;
+    border-radius: 12px;
     width: 100%;
     max-width: 420px;
     position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
 .close {
     position: absolute;
-    right: 1rem; top: 0.8rem;
+    right: 1.25rem; top: 1rem;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #64748b;
+    color: var(--text-muted);
+    transition: color 0.2s;
 }
 
-/* Responsive Footer */
+.close:hover {
+    color: var(--text-main);
+}
+
+/* =========================================
+   Responsive Footer
+   ========================================= */
 .site-footer {
-    background: #1e293b;
+    background: #0f172a;
     color: #fff;
-    padding: 3rem 1rem 1rem;
+    padding: 3rem 1.5rem 1.5rem;
     margin-top: auto;
+    border-top: 1px solid #1e293b;
 }
 
 .footer-container {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
@@ -337,16 +414,19 @@ aside.filters select {
 }
 
 .footer-col {
+    flex: 1;
+    min-width: 240px;
     max-width: 300px;
 }
 
 .footer-col h3, .footer-col h4 {
     color: var(--white);
     margin-bottom: 1rem;
+    font-size: 1.05rem;
 }
 
 .footer-col p {
-    color: #cbd5e1;
+    color: #94a3b8;
     line-height: 1.5;
     font-size: 0.9rem;
 }
@@ -357,13 +437,14 @@ aside.filters select {
 }
 
 .footer-col ul li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
 }
 
 .footer-col ul li a {
     font-size: 0.9rem;
     color: #94a3b8;
     text-decoration: none;
+    transition: color 0.2s;
 }
 
 .footer-col ul li a:hover {
@@ -372,14 +453,16 @@ aside.filters select {
 
 .footer-bottom {
     text-align: center;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #334155;
-    color: #94a3b8;
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #1e293b;
+    color: #64748b;
     font-size: 0.85rem;
 }
 
-/* Cart & Checkout Grid Layouts */
+/* =========================================
+   Cart & Checkout Grid Layouts
+   ========================================= */
 .cart-container-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -397,10 +480,19 @@ aside.filters select {
     justify-content: space-between;
     margin-bottom: 0.75rem;
     font-size: 0.95rem;
+    color: var(--text-muted);
 }
 
 .total-row {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.total-row span:last-child {
     color: var(--primary);
 }
 
@@ -408,7 +500,7 @@ aside.filters select {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0;
+    padding: 1rem 0;
     border-bottom: 1px solid var(--border-color);
 }
 
