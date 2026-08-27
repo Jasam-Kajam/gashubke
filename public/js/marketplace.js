@@ -141,13 +141,16 @@ async function loadListings() {
             card.style.flexDirection = "column";
             card.style.justifyContent = "space-between";
 
+            // Professional SVG Map Marker Icon
+            const mapPinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
+
             card.innerHTML = `
                 <div>
                     ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 160px; object-fit: cover;">` : ''}
                     <div style="padding: 1rem;">
                         <h4 style="margin-bottom: 0.25rem;">${item.title}</h4>
                         <p class="price" style="font-weight: bold; color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem;">KES ${item.price} <span style="font-size:0.8rem; font-weight:normal; color:#64748b;">(${item.size})</span></p>
-                        <p class="location" style="font-size: 0.85rem; color: #475569; margin-bottom: 0.5rem;">📍 ${item.location || 'Local Delivery'}</p>
+                        <p class="location" style="font-size: 0.85rem; color: #475569; margin-bottom: 0.5rem; display: flex; align-items: center;">${mapPinSvg} ${item.location || 'Local Delivery'}</p>
                         <p style="font-size:0.85rem; color:#64748b; margin-bottom:1rem; line-height:1.4;">${item.description || ''}</p>
                     </div>
                 </div>
