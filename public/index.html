@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>GasMarket Pro - Buy & Sell Cooking Gas Refills, Cylinders & Accessories Online</title>
-    <meta name="description" content="Find the best cooking gas prices, refills, cylinders, and burners from verified local suppliers and retailers. Fast delivery and secure ordering on GasMarket Pro.">
-    <meta name="keywords" content="cooking gas delivery, gas refill near me, 6kg gas cylinder, 13kg gas price, cooking gas marketplace, LPG suppliers Kenya">
-    <meta name="author" content="GasMarket Pro">
-    <link rel="canonical" href="https://gasmarketpro.com/">
+    <title>GasHubKE - Kenya's Online Cooking Gas Hub</title>
+    <meta name="description" content="Fast, reliable cooking gas delivery. Find the best cooking gas prices, refills, cylinders, and accessories from verified local suppliers on GasHubKE.">
+    <meta name="keywords" content="GasHubKE, cooking gas delivery Kenya, gas refill near me, 6kg gas cylinder, 13kg gas price, cooking gas platform, LPG suppliers Kenya">
+    <meta name="author" content="GasHubKE">
+    <link rel="canonical" href="https://gashubke.com/">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gasmarketpro.com/">
-    <meta property="og:title" content="GasMarket Pro - Cooking Gas Marketplace">
+    <meta property="og:url" content="https://gashubke.com/">
+    <meta property="og:title" content="GasHubKE - Kenya's Online Cooking Gas Hub">
     <meta property="og:description" content="Connect with trusted cooking gas suppliers and retailers for fast delivery on refills and cylinders.">
-    <meta property="og:image" content="https://gasmarketpro.com/assets/og-banner.jpg">
+    <meta property="og:image" content="https://gashubke.com/assets/og-banner.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="GasMarket Pro - Cooking Gas Marketplace">
+    <meta name="twitter:title" content="GasHubKE - Cooking Gas Platform">
     <meta name="twitter:description" content="Compare prices and order cooking gas cylinders and refills directly from verified local suppliers.">
-    <meta name="twitter:image" content="https://gasmarketpro.com/assets/twitter-banner.jpg">
+    <meta name="twitter:image" content="https://gashubke.com/assets/twitter-banner.jpg">
 
     <link rel="stylesheet" href="./css/styles.css">
 
@@ -27,19 +27,23 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "GasMarket Pro",
-      "url": "https://gasmarketpro.com/",
+      "name": "GasHubKE",
+      "url": "https://gashubke.com/",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://gasmarketpro.com/?s={search_term_string}",
+        "target": "https://gashubke.com/?s={search_term_string}",
         "query-input": "required name=search_term_string"
       }
     }
     </script>
 </head>
 <body>
-    <header class="navbar">
-        <div class="logo">GasMarket Pro</div>
+    <header class="navbar" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: #fff; border-bottom: 1px solid #e2e8f0; gap: 1rem;">
+        
+        <!-- Updated GasHubKE Logo -->
+        <div class="logo-container" style="flex-shrink: 0;">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" style="height: 45px; object-fit: contain;">
+        </div>
         
         <!-- Hamburger Toggle Button for Mobile -->
         <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu">
@@ -47,44 +51,75 @@
             <span></span>
             <span></span>
         </button>
-
-        <div class="search-bar">
-            <input type="search" id="searchInput" placeholder="Search 6kg, 13kg gas cylinders, burners..." aria-label="Search listings">
-            <button id="searchBtn">Search</button>
-        </div>
         
-        <nav class="nav-links" id="navLinks" aria-label="Main Navigation">
-            <a href="#" id="homeLink">Home</a>
-            <a href="#" id="vendorDashboardLink" style="display:none;">Vendor Console</a>
-            <a href="#" id="supplierDashboardNavLink" style="display:none;">Supplier Dashboard</a>
-            <a href="#" id="cartLink">Cart (<span id="cartCount">0</span>)</a>
-            <a href="#" id="authLink">Sign In</a>
+        <!-- Navigation Links -->
+        <nav class="nav-links" id="navLinks" aria-label="Main Navigation" style="display: flex; align-items: center; gap: 1.5rem; margin-left: auto;">
+            <a href="#" id="homeLink" style="font-weight: 500; color: #1e293b; text-decoration: none;">Shop</a>
+            <a href="#" id="supplierDashboardNavLink" style="font-weight: 500; color: #1e293b; text-decoration: none; display:none;">Supplier Dashboard</a>
+            
+            <!-- Cart Link -->
+            <a href="#" id="cartLink" style="color: #1e293b; text-decoration: none; display: flex; align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span id="cartCount" style="margin-left: 4px; font-weight: bold; color: #f97316;">0</span>
+            </a>
+
+            <a href="#" id="authLink" style="font-weight: 500; color: #1e293b; text-decoration: none;">Sign In</a>
         </nav>
+
+        <!-- Search Bar -->
+        <div class="search-bar" style="display: flex; align-items: center; background: #f1f5f9; border-radius: 6px; padding: 0.2rem 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 8px;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="search" id="searchInput" placeholder="Search" aria-label="Search listings" style="border: none; background: transparent; outline: none; padding: 0.5rem; width: 180px;">
+            <button id="searchBtn" style="display: none;">Search</button>
+        </div>
     </header>
 
-    <main class="container">
-        <!-- Marketplace View -->
+    <main class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem 1rem;">
+        
+        <!-- Shop View -->
         <section id="marketplaceView" class="view">
-            <aside class="filters" aria-label="Filter Options">
-                <h2>Filter Gas Products</h2>
-                <label for="filterSize">Cylinder Size</label>
-                <select id="filterSize">
-                    <option value="">All Sizes</option>
-                    <option value="3kg">3 Kg</option>
-                    <option value="6kg">6 Kg</option>
-                    <option value="13kg">13 Kg</option>
-                    <option value="50kg">50 Kg</option>
-                </select>
-                <label for="filterCategory">Category</label>
-                <select id="filterCategory">
-                    <option value="">All Categories</option>
-                    <option value="refill">Gas Refill</option>
-                    <option value="cylinder_complete">Complete Cylinder + Gas</option>
-                    <option value="accessories">Accessories & Burners</option>
-                </select>
-            </aside>
-            <div class="product-grid" id="productGrid" aria-live="polite">
-                <!-- Dynamic listings load here -->
+            
+            <!-- Hero Banner -->
+            <div class="hero-banner" style="width: 100%; min-height: 250px; border-radius: 16px; overflow: hidden; background: linear-gradient(rgba(248, 250, 252, 0.7), rgba(248, 250, 252, 0.9)), url('assets/kitchen-bg.jpg') center/cover no-repeat; display: flex; align-items: center; padding: 3rem; color: #1e293b; margin-bottom: 2.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div>
+                    <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.25rem;">Fast, Reliable Gas Delivery.</h1>
+                    <h2 style="font-size: 2rem; font-weight: 400; color: #475569;">Powered by <strong>GasHubKE.</strong></h2>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 2rem;">
+                <!-- Sidebar Filters -->
+                <aside class="filters" aria-label="Filter Options" style="min-width: 200px;">
+                    <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Browse Gas</h2>
+                    <label for="filterSize" style="display:block; margin-bottom:0.25rem; font-size:0.9rem;">Cylinder Size</label>
+                    <select id="filterSize" style="width:100%; padding:0.5rem; margin-bottom:1rem; border-radius:4px; border:1px solid #cbd5e1;">
+                        <option value="">All Sizes</option>
+                        <option value="3kg">3 Kg</option>
+                        <option value="6kg">6 Kg</option>
+                        <option value="13kg">13 Kg</option>
+                        <option value="50kg">50 Kg</option>
+                    </select>
+                    
+                    <label for="filterCategory" style="display:block; margin-bottom:0.25rem; font-size:0.9rem;">Category</label>
+                    <select id="filterCategory" style="width:100%; padding:0.5rem; margin-bottom:1rem; border-radius:4px; border:1px solid #cbd5e1;">
+                        <option value="">All Categories</option>
+                        <option value="refill">Gas Refill</option>
+                        <option value="cylinder_complete">Complete Cylinder + Gas</option>
+                        <option value="accessories">Accessories & Burners</option>
+                    </select>
+                </aside>
+
+                <!-- Product Grid Container -->
+                <div class="product-grid" id="productGrid" aria-live="polite" style="flex-grow: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <!-- Dynamic listings load here -->
+                </div>
             </div>
         </section>
 
@@ -107,9 +142,8 @@
                 </select>
                 <input type="number" id="itemPrice" placeholder="Price (KES)" required>
                 
-                <!-- Product Image Upload Input -->
                 <label for="itemImage" style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem; display:block;">Product Image</label>
-                <input type="file" id="itemImage" accept="image/*" required>
+                <input type="file" id="itemImage" accept="image/*" multiple required>
 
                 <textarea id="itemDescription" placeholder="Description & delivery terms" required></textarea>
                 <button type="submit" class="btn-primary">Publish Listing</button>
@@ -120,11 +154,10 @@
             </div>
         </section>
 
-        <!-- Supplier Dashboard View (Metrics, Inventory & Customer Orders) -->
+        <!-- Supplier Dashboard View -->
         <section id="supplierDashboardView" class="view" style="display:none;">
             <h2>Supplier Dashboard & Analytics</h2>
             
-            <!-- Metrics Summary Cards -->
             <div class="supplier-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                 <div class="card" style="padding: 1.25rem;">
                     <h4 style="font-size: 0.9rem; color: #64748b;">Total Orders Received</h4>
@@ -140,13 +173,11 @@
                 </div>
             </div>
 
-            <!-- Tabs to Toggle Between Listings Management and Orders -->
             <div class="supplier-tabs" style="margin-bottom: 1rem; display: flex; gap: 1rem;">
                 <button type="button" class="btn-primary" id="tabListingsBtn" onclick="window.switchSupplierTab('listings')">Manage Inventory</button>
                 <button type="button" class="btn-secondary" id="tabOrdersBtn" onclick="window.switchSupplierTab('orders')" style="background:#e2e8f0; color:#1e293b;">Customer Orders</button>
             </div>
 
-            <!-- Tab Content: Inventory Management -->
             <div id="supplierListingsTabContent">
                 <form id="supplierListingForm" class="card" style="margin-bottom: 1.5rem;">
                     <h3>Post New Listing</h3>
@@ -164,9 +195,8 @@
                     </select>
                     <input type="number" id="supplierItemPrice" placeholder="Price (KES)" required>
                     
-                    <!-- Supplier Dashboard Product Image Upload Input -->
-                    <label for="supplierItemImage" style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem; display:block;">Product Image</label>
-                    <input type="file" id="supplierItemImage" accept="image/*" required>
+                    <label for="supplierItemImage" style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem; display:block;">Product Images (Max 5)</label>
+                    <input type="file" id="supplierItemImage" accept="image/*" multiple required>
 
                     <textarea id="supplierItemDescription" placeholder="Description & delivery terms" required></textarea>
                     <button type="submit" class="btn-primary">Publish Listing</button>
@@ -177,7 +207,6 @@
                 </div>
             </div>
 
-            <!-- Tab Content: Customer Orders -->
             <div id="supplierOrdersTabContent" style="display: none;">
                 <div class="card">
                     <h3>Incoming Customer Orders</h3>
@@ -191,36 +220,36 @@
         <!-- Cart & Checkout View -->
         <section id="cartView" class="view" style="display:none;">
             <h2>Your Shopping Cart & Checkout</h2>
-            <div class="cart-container-grid">
-                <div class="cart-items-card card">
+            <div class="cart-container-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+                <div class="cart-items-card card" style="padding: 1.5rem;">
                     <h3>Review Items</h3>
                     <div id="cartItemsList" style="margin-top: 1rem;">
                         <p>Your cart is currently empty.</p>
                     </div>
                 </div>
 
-                <div class="cart-summary-card card">
+                <div class="cart-summary-card card" style="padding: 1.5rem;">
                     <h3>Order Summary</h3>
-                    <div class="summary-row" style="margin-top: 1rem;">
+                    <div class="summary-row" style="margin-top: 1rem; display: flex; justify-content: space-between;">
                         <span>Subtotal</span>
                         <span id="cartSubtotal">KES 0</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
                         <span>Estimated Delivery</span>
                         <span>KES 200</span>
                     </div>
-                    <hr style="margin: 1rem 0; border:0; border-top:1px solid var(--border-color);">
-                    <div class="summary-row total-row">
+                    <hr style="margin: 1rem 0; border:0; border-top:1px solid #e2e8f0;">
+                    <div class="summary-row total-row" style="display: flex; justify-content: space-between; font-size: 1.2rem;">
                         <strong>Total</strong>
                         <strong id="cartTotal">KES 200</strong>
                     </div>
 
                     <form id="checkoutForm" style="margin-top: 1.5rem;">
                         <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">Delivery Details</h4>
-                        <input type="text" id="deliveryName" placeholder="Full Name" required>
-                        <input type="tel" id="deliveryPhone" placeholder="Phone Number (e.g. 0712345678)" required>
-                        <input type="text" id="deliveryAddress" placeholder="Delivery Location / Estate / House No." required>
-                        <button type="submit" class="btn-primary" style="margin-top: 0.5rem;">Place Order & Pay via M-Pesa</button>
+                        <input type="text" id="deliveryName" placeholder="Full Name" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border-radius: 4px; border: 1px solid #cbd5e1;" required>
+                        <input type="tel" id="deliveryPhone" placeholder="Phone Number (e.g. 0712345678)" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border-radius: 4px; border: 1px solid #cbd5e1;" required>
+                        <input type="text" id="deliveryAddress" placeholder="Delivery Location / Estate / House No." style="width: 100%; padding: 0.5rem; margin-bottom: 1rem; border-radius: 4px; border: 1px solid #cbd5e1;" required>
+                        <button type="submit" class="btn-primary" style="width: 100%; padding: 0.75rem;">Place Order & Pay via M-Pesa</button>
                     </form>
                 </div>
             </div>
@@ -235,7 +264,6 @@
                     <input type="email" id="authEmail" placeholder="Email Address" required>
                     <input type="password" id="authPassword" placeholder="Password" required>
                     
-                    <!-- Updated Vendor/Supplier Registration Fields with County & Area Selectors -->
                     <div id="vendorFields" style="display:none;">
                         <input type="text" id="businessName" placeholder="Business / Supplier Name">
                         
@@ -254,63 +282,61 @@
                     </div>
 
                     <button type="submit" id="authSubmitBtn" class="btn-primary">Sign In</button>
-                    <p id="toggleAuthMode" style="cursor:pointer; margin-top:1rem; font-size:0.9rem;">Need an account? Register</p>
+                    <p id="toggleAuthMode" style="cursor:pointer; margin-top:1rem; font-size:0.9rem; text-align: center;">Need an account? Register</p>
                 </form>
             </div>
         </div>
     </main>
 
-    <footer class="site-footer">
-        <div class="footer-container">
-            <div class="footer-col">
-              <h3>GasMarket Pro</h3>
-              <p>Connecting verified cooking gas suppliers, retailers, and households with fast and reliable service.</p>
+    <footer class="site-footer" style="background: #1e293b; color: #fff; padding: 3rem 1rem 1rem;">
+        <div class="footer-container" style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between;">
+            <div class="footer-col" style="max-width: 300px;">
+              <h3 style="margin-bottom: 1rem;">GasHubKE</h3>
+              <p style="color: #cbd5e1; line-height: 1.5; font-size: 0.9rem;">Connecting verified cooking gas suppliers, retailers, and households with fast and reliable service across Kenya.</p>
             </div>
             <div class="footer-col">
-              <h4>Quick Links</h4>
-              <ul>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Supplier Guidelines</a></li>
-                <li><a href="#">Safety & Compliance</a></li>
-                <li><a href="#">Contact Support</a></li>
+              <h4 style="margin-bottom: 1rem;">Quick Links</h4>
+              <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #94a3b8; text-decoration: none;">About Us</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #94a3b8; text-decoration: none;">Supplier Guidelines</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #94a3b8; text-decoration: none;">Safety & Compliance</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #94a3b8; text-decoration: none;">Contact Support</a></li>
               </ul>
             </div>
             <div class="footer-col">
-              <h4>Legal</h4>
-              <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms of Service</a></li>
+              <h4 style="margin-bottom: 1rem;">Legal</h4>
+              <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #94a3b8; text-decoration: none;">Privacy Policy</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #94a3b8; text-decoration: none;">Terms of Service</a></li>
               </ul>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; <span id="currentYear"></span> GasMarket Pro. All rights reserved.</p>
+        <div class="footer-bottom" style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #334155; color: #94a3b8; font-size: 0.85rem;">
+            <p>&copy; <span id="currentYear"></span> GasHubKE. All rights reserved.</p>
         </div>
     </footer>
 
     <!-- UI Scripts Control -->
     <script>
-        // Set dynamic copyright year
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        // Hamburger Menu Toggle Logic
         const hamburgerBtn = document.getElementById('hamburgerBtn');
         const navLinks = document.getElementById('navLinks');
 
-        hamburgerBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            hamburgerBtn.classList.toggle('open');
-        });
-
-        // Close menu automatically on mobile link click
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                hamburgerBtn.classList.remove('open');
+        if(hamburgerBtn && navLinks) {
+            hamburgerBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                hamburgerBtn.classList.toggle('open');
             });
-        });
 
-        // View Switching Control for Navigation Links
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    hamburgerBtn.classList.remove('open');
+                });
+            });
+        }
+
         const homeLink = document.getElementById('homeLink');
         const cartLink = document.getElementById('cartLink');
         const vendorDashboardLink = document.getElementById('vendorDashboardLink');
