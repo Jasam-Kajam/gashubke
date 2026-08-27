@@ -16,7 +16,7 @@ if (vendorDashboardLink) {
     });
 }
 
-// Helper function to convert uploaded image file to Base64 string
+// Helper function to convert an uploaded image file to a Base64 string
 const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -42,7 +42,7 @@ if (listingForm) {
         const imageInput = document.getElementById("itemImage");
 
         try {
-            // Fetch registered vendor profile data to get county, area, and business name automatically
+            // Fetch registered vendor profile data to get county and area automatically
             const userDocRef = doc(db, "users", auth.currentUser.uid);
             const userDoc = await getDoc(userDocRef);
 
@@ -57,13 +57,17 @@ if (listingForm) {
                 businessName = userData.businessName || "Registered Vendor";
             }
 
-            // Process image file if attached
-            let imageUrl = "";
-            if (imageInput && imageInput.files[0]) {
-                imageUrl = await convertFileToBase64(imageInput.files[0]);
+            // Process up to 5 image files if attached
+            let imageUrls = [];
+            if (imageInput && imageInput.files.length > 0) {
+                const filesToProcess = Array.from(imageInput.files).slice(0, 5); // Max 5 images limit
+                for (const file of filesToProcess) {
+                    const base64Str = await convertFileToBase64(file);
+                    imageUrls.push(base64Str);
+                }
             }
 
-            // Save listing with registered location data
+            // Save listing with image array and registered location data
             await addDoc(collection(db, "listings"), {
                 vendorId: auth.currentUser.uid,
                 businessName,
@@ -74,12 +78,13 @@ if (listingForm) {
                 county: supplierCounty,
                 area: supplierArea,
                 location: `${supplierArea}, ${supplierCounty}`,
-                imageUrl,
+                imageUrls, // Array containing up to 5 images
+                imageUrl: imageUrls.length > 0 ? imageUrls[0] : "", // Backward compatibility fallback for single image views
                 description,
                 createdAt: new Date().toISOString()
             });
 
-            alert("Listing published successfully with your registered location!");
+            alert("Listing published successfully with up to 5 images!");
             listingForm.reset();
             loadVendorListings();
         } catch (err) {
@@ -107,12 +112,26 @@ async function loadVendorListings() {
             div.className = "product-card card";
             div.style.marginBottom = "1rem";
             div.style.overflow = "hidden";
+
+            // Build preview gallery supporting multiple images (up to 5)
+            let imagesHtml = "";
+            const displayImages = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls : (item.imageUrl ? [item.imageUrl] : []);
+            
+            if (displayImages.length > 0) {
+                imagesHtml = `<div style="display: flex; gap: 4px; overflow-x: auto; background-color: #f8fafc; padding: 4px; border-bottom: 1px solid #e2e8f0;">`;
+                displayImages.forEach((imgSrc, idx) => {
+                    imagesHtml += `<img src="${imgSrc}" alt="${item.title} ${idx + 1}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; flex-shrink: 0;">`;
+                });
+                imagesHtml += `</div>`;
+            }
+
             div.innerHTML = `
-                ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 140px; object-fit: cover; border-radius: 6px 6px 0 0;">` : ''}
+                ${imagesHtml}
                 <div style="padding: 0.75rem;">
                     <h4>${item.title}</h4>
                     <p class="price" style="font-weight: bold; color: var(--primary);">KES ${item.price} (${item.size})</p>
                     <p class="location" style="font-size: 0.85rem; color: #64748b;">Zone: ${item.location || 'N/A'}</p>
+                    <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Images attached: ${displayImages.length} / 5</p>
                 </div>
             `;
             vendorListingsGrid.appendChild(div);
