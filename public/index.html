@@ -40,7 +40,7 @@
 <body>
     <header class="navbar" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: #fff; border-bottom: 1px solid #e2e8f0; gap: 1rem;">
         
-        <!-- Updated GasHubKE Logo -->
+        <!-- GasHubKE Logo -->
         <div class="logo-container" style="flex-shrink: 0;">
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" style="height: 45px; object-fit: contain;">
         </div>
@@ -56,6 +56,7 @@
         <nav class="nav-links" id="navLinks" aria-label="Main Navigation" style="display: flex; align-items: center; gap: 1.5rem; margin-left: auto;">
             <a href="#" id="homeLink" style="font-weight: 500; color: #1e293b; text-decoration: none;">Marketplace</a>
             <a href="#" id="supplierDashboardNavLink" style="font-weight: 500; color: #1e293b; text-decoration: none; display:none;">Supplier Dashboard</a>
+            <a href="#" id="customerOrdersNavLink" style="font-weight: 500; color: #1e293b; text-decoration: none; display:none;">My Orders</a>
             
             <!-- Cart Link -->
             <a href="#" id="cartLink" style="color: #1e293b; text-decoration: none; display: flex; align-items: center;">
@@ -91,9 +92,9 @@
                 <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDpk_ohiIb9N3HD_2Am6tT0BIMLLyP3JAobCB-bxRhaki6KvVhOG1MDJM72EM-PCoSL93AfOe6STGvoZb4g9Nvqmpr6e01hWst-yd_ShLW7rlnPYYMPDJ7jr_bE5oV_CQXmaCqMyL7oEfH19wS9eGRmkS-w_Zprs4wPOibtEHu2DAki9fzR2CuXEusVJG8/s903/Gemini_Generated_Image_i5vbmti5vbmti5vb_1.jpeg" alt="GasHubKE Promotional Banner">
             </div>
 
-            <div style="display: flex; gap: 2rem;">
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
                 <!-- Sidebar Filters -->
-                <aside class="filters" aria-label="Filter Options" style="min-width: 200px;">
+                <aside class="filters" aria-label="Filter Options" style="min-width: 200px; flex: 1;">
                     <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Browse Gas</h2>
                     <label for="filterSize" style="display:block; margin-bottom:0.25rem; font-size:0.9rem;">Cylinder Size</label>
                     <select id="filterSize" style="width:100%; padding:0.5rem; margin-bottom:1rem; border-radius:4px; border:1px solid #cbd5e1;">
@@ -114,40 +115,9 @@
                 </aside>
 
                 <!-- Product Grid Container -->
-                <div class="product-grid" id="productGrid" aria-live="polite" style="flex-grow: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div class="product-grid" id="productGrid" aria-live="polite" style="flex: 3; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem;">
                     <!-- Dynamic listings load here -->
                 </div>
-            </div>
-        </section>
-
-        <!-- Legacy Vendor Management Console View -->
-        <section id="vendorView" class="view" style="display:none;">
-            <h2>Vendor Management Console</h2>
-            <form id="listingForm" class="card">
-                <h3>Post New Listing</h3>
-                <input type="text" id="itemTitle" placeholder="Product Title (e.g. 13kg Total Gas Refill)" required>
-                <select id="itemSize" required>
-                    <option value="3kg">3 Kg</option>
-                    <option value="6kg">6 Kg</option>
-                    <option value="13kg">13 Kg</option>
-                    <option value="50kg">50 Kg</option>
-                </select>
-                <select id="itemCategory" required>
-                    <option value="refill">Gas Refill</option>
-                    <option value="cylinder_complete">Complete Cylinder</option>
-                    <option value="accessories">Accessories</option>
-                </select>
-                <input type="number" id="itemPrice" placeholder="Price (KES)" required>
-                
-                <label for="itemImage" style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem; display:block;">Product Image</label>
-                <input type="file" id="itemImage" accept="image/*" multiple required>
-
-                <textarea id="itemDescription" placeholder="Description & delivery terms" required></textarea>
-                <button type="submit" class="btn-primary">Publish Listing</button>
-            </form>
-            <div class="my-listings">
-                <h3>Your Active Listings</h3>
-                <div id="vendorListingsGrid"></div>
             </div>
         </section>
 
@@ -328,27 +298,42 @@
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const navLinks = document.getElementById('navLinks');
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburgerBtn = document.getElementById('hamburgerBtn') || document.querySelector('.hamburger');
+            const navLinks = document.getElementById('navLinks') || document.querySelector('.nav-links');
 
-        if(hamburgerBtn && navLinks) {
-            hamburgerBtn.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
-                hamburgerBtn.classList.toggle('open');
-            });
-
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinks.classList.remove('active');
-                    hamburgerBtn.classList.remove('open');
+            if (hamburgerBtn && navLinks) {
+                hamburgerBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navLinks.classList.toggle('active');
+                    hamburgerBtn.classList.toggle('open');
                 });
-            });
-        }
+
+                // Close menu when clicking any navigation link
+                document.querySelectorAll('.nav-links a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        navLinks.classList.remove('active');
+                        hamburgerBtn.classList.remove('open');
+                    });
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!hamburgerBtn.contains(e.target) && !navLinks.contains(e.target)) {
+                        navLinks.classList.remove('active');
+                        hamburgerBtn.classList.remove('open');
+                    }
+                });
+            }
+        });
 
         const homeLink = document.getElementById('homeLink');
         const cartLink = document.getElementById('cartLink');
-        const vendorDashboardLink = document.getElementById('vendorDashboardLink');
         const supplierDashboardNavLink = document.getElementById('supplierDashboardNavLink');
+        const customerOrdersNavLink = document.getElementById('customerOrdersNavLink');
+        const authLink = document.getElementById('authLink');
+        const authModal = document.getElementById('authModal');
+        const closeModal = document.getElementById('closeModal');
 
         function hideAllViews() {
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
@@ -370,14 +355,6 @@
             });
         }
 
-        if (vendorDashboardLink) {
-            vendorDashboardLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                hideAllViews();
-                document.getElementById('vendorView').style.display = 'block';
-            });
-        }
-
         if (supplierDashboardNavLink) {
             supplierDashboardNavLink.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -385,6 +362,34 @@
                 document.getElementById('supplierDashboardView').style.display = 'block';
             });
         }
+
+        if (customerOrdersNavLink) {
+            customerOrdersNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('customerOrdersView').style.display = 'block';
+            });
+        }
+
+        // Auth Modal Popup Triggers
+        if (authLink && authModal) {
+            authLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                authModal.style.display = 'block';
+            });
+        }
+
+        if (closeModal && authModal) {
+            closeModal.addEventListener('click', () => {
+                authModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.style.display = 'none';
+            }
+        });
     </script>
 
     <!-- Firebase & Feature Script Modules -->
@@ -392,7 +397,6 @@
     <script type="module" src="./js/auth.js"></script>
     <script type="module" src="./js/counties.js"></script>
     <script type="module" src="./js/marketplace.js"></script>
-    <script type="module" src="./js/vendor.js"></script>
     <script type="module" src="./js/supplier-dashboard.js"></script>
 </body>
 </html>
