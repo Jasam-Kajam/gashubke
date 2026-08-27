@@ -57,8 +57,22 @@ window.removeFromCart = function(id) {
 function updateCartUI() {
     let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
     const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const cartCountEl = document.getElementById("cartCount");
-    if (cartCountEl) cartCountEl.textContent = totalCount;
+    const cartLink = document.getElementById("cartLink");
+    
+    if (cartLink) {
+        // Professional e-commerce Shopping Cart SVG icon (Jumia/Kilimall style) with dynamic badge indicator
+        const cartSvgIcon = `
+            <span style="position: relative; display: inline-flex; align-items: center; cursor: pointer;" title="Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                ${totalCount > 0 ? `<span id="cartCount" style="position: absolute; top: -8px; right: -10px; background-color: #f97316; color: #fff; font-size: 0.7rem; font-weight: bold; padding: 1px 5px; border-radius: 50%; min-width: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">${totalCount}</span>` : ''}
+            </span>
+        `;
+        cartLink.innerHTML = cartSvgIcon;
+    }
 }
 
 function renderCartView() {
@@ -144,9 +158,13 @@ async function loadListings() {
             // Professional SVG Map Marker Icon
             const mapPinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
 
+            // Support multi-image array or single fallback image
+            const displayImages = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls : (item.imageUrl ? [item.imageUrl] : []);
+            const primaryImage = displayImages.length > 0 ? displayImages[0] : '';
+
             card.innerHTML = `
                 <div>
-                    ${item.imageUrl ? `<div style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: center; align-items: center;"><img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 240px; object-fit: contain;"></div>` : ''}
+                    ${primaryImage ? `<div style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: center; align-items: center;"><img src="${primaryImage}" alt="${item.title}" style="width: 100%; height: 240px; object-fit: contain;"></div>` : ''}
                     <div style="padding: 1rem;">
                         <h4 style="margin-bottom: 0.25rem;">${item.title}</h4>
                         <p class="price" style="font-weight: bold; color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem;">KES ${item.price} <span style="font-size:0.8rem; font-weight:normal; color:#64748b;">(${item.size})</span></p>
