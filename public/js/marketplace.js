@@ -146,7 +146,7 @@ async function loadListings() {
 
             card.innerHTML = `
                 <div>
-                    ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 160px; object-fit: cover;">` : ''}
+                    ${item.imageUrl ? `<div style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: center; align-items: center;"><img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 240px; object-fit: contain;"></div>` : ''}
                     <div style="padding: 1rem;">
                         <h4 style="margin-bottom: 0.25rem;">${item.title}</h4>
                         <p class="price" style="font-weight: bold; color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem;">KES ${item.price} <span style="font-size:0.8rem; font-weight:normal; color:#64748b;">(${item.size})</span></p>
@@ -155,7 +155,7 @@ async function loadListings() {
                     </div>
                 </div>
                 <div style="padding: 0 1rem 1rem 1rem;">
-                    <button class="btn-primary" style="width:100%;" onclick="window.addToListingCart('${itemId}', '${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.location || ''}')">Add to Cart</button>
+                    <button class="btn-primary" style="width:100%;" onclick="window.addToListingCart('${itemId}', '${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.location || ''}')">Order Now</button>
                 </div>
             `;
             productGrid.appendChild(card);
