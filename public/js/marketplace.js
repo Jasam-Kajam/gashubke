@@ -1,4 +1,4 @@
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const productGrid = document.getElementById("productGrid");
@@ -14,8 +14,22 @@ window.switchView = function(viewId) {
     if (target) target.style.display = 'block';
 };
 
-// Cart Item Management Functions
+// Cart Item Management Functions with Authentication Check
 window.addToListingCart = function(id, title, price, location) {
+    // Check if a user is currently authenticated via Firebase Auth
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+        // User is not logged in: Block action and trigger auth modal popup
+        alert("Please sign in or create an account to add items to your cart.");
+        const authModal = document.getElementById('authModal');
+        if (authModal) {
+            authModal.style.display = 'block';
+        }
+        return;
+    }
+
+    // User is logged in, proceed to add item to local cart storage
     let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
     const existingIndex = cart.findIndex(item => item.id === id);
     
@@ -151,7 +165,7 @@ async function loadListings() {
                 if (!matchTitle && !matchDesc && !matchLocation) return;
             }
 
-            matchCount++;
+matchCount++;
             const card = document.createElement("div");
             card.className = "product-card";
 
