@@ -711,3 +711,51 @@ aside.filters select:focus {
         grid-template-columns: 1fr !important; /* Single column fallback for very small phones */
     }
 }
+
+/* =========================================
+   Floating Mobile Filter Bar at the Bottom
+   ========================================= */
+@media (max-width: 768px) {
+    /* Hide the default desktop sidebar positioning */
+    aside.filters {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: var(--white);
+        z-index: 998;
+        padding: 0.6rem 1rem;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        border-top: 1px solid var(--border-color);
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0;
+    }
+
+    /* Hide the large title to save space */
+    aside.filters h2 {
+        display: none;
+    }
+
+    /* Turn filter controls into a side-by-side flex row */
+    aside.filters label {
+        display: none; /* Hide labels to keep it clean, or keep them minimal */
+    }
+
+    aside.filters select {
+        flex: 1;
+        margin-bottom: 0;
+        padding: 0.45rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+
+    /* Add padding to the bottom of the page container so products aren't hidden behind the floating bar */
+    .container {
+        padding-bottom: 5rem !important;
+    }
+}
