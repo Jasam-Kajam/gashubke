@@ -1,5 +1,5 @@
 import { db } from "./firebase-config.js";
-import { collection, addostics, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Tab switcher logic
 window.switchSupplierTab = function(tabName) {
@@ -30,7 +30,7 @@ window.switchSupplierTab = function(tabName) {
 
 // Load supplier listings and update dashboard metrics
 export async function loadSupplierDashboard(vendorId) {
-    const grid = document.getElementById("vendorListingsGrid");
+    const grid = document.getElementById("supplierListingsGrid");
     const statActiveListings = document.getElementById("statActiveListings");
     const statTotalOrders = document.getElementById("statTotalOrders");
     const statRevenue = document.getElementById("statRevenue");
@@ -55,7 +55,7 @@ export async function loadSupplierDashboard(vendorId) {
             const item = docSnap.data();
             const card = document.createElement("div");
             card.className = "product-card";
-            card.style.marginBotom = "1rem";
+            card.style.marginBottom = "1rem";
             card.innerHTML = `
                 <div>
                     <h4>${item.title}</h4>
