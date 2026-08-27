@@ -627,3 +627,87 @@ aside.filters select:focus {
         margin-bottom: 0.5rem;
     }
 }
+
+/* =========================================
+   Advanced Mobile UI Refinements (< 768px)
+   ========================================= */
+@media (max-width: 768px) {
+    /* Tighten main container padding */
+    .container {
+        padding: 0.75rem !important;
+    }
+
+    /* Stack marketplace views and filters cleanly */
+    #marketplaceView {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    aside.filters {
+        width: 100%;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Optimize promotional hero banner height on mobile */
+    .marketplace-hero {
+        max-height: 180px !important;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    /* Perfect 2-column product grid for mobile screens */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem !important;
+        width: 100%;
+    }
+
+    /* Compact product cards to fit mobile screens smoothly */
+    .product-card {
+        border-radius: 8px;
+        font-size: 0.85rem;
+    }
+
+    .product-card img, 
+    .product-card .card-img-container {
+        height: 120px !important;
+        padding: 0.5rem !important;
+    }
+
+    .product-card .card-body,
+    .product-card > div:not(.card-img-container) {
+        padding: 0.75rem !important;
+    }
+
+    .product-card h4 {
+        font-size: 0.85rem !important;
+        line-height: 1.2;
+        margin-bottom: 0.2rem;
+    }
+
+    .product-card .price {
+        font-size: 0.95rem !important;
+    }
+
+    .product-card .location {
+        font-size: 0.75rem !important;
+        margin-bottom: 0.6rem;
+    }
+
+    /* Scale down Buy Now buttons for clean mobile tapping */
+    .product-card .btn-primary {
+        padding: 0.45rem 0.5rem !important;
+        font-size: 0.8rem !important;
+        border-radius: 6px;
+    }
+}
+
+/* Extra small devices optimization (< 380px) */
+@media (max-width: 380px) {
+    .product-grid {
+        grid-template-columns: 1fr !important; /* Single column fallback for very small phones */
+    }
+}
