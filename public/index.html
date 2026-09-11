@@ -457,6 +457,32 @@
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         }
 
+        // Global function for auth.js to call upon successful login to display correct dashboard
+        window.handlePostLoginUI = function(role) {
+            hideAllViews();
+            if (authModal) authModal.style.display = 'none';
+
+            if (role === 'vendor' || role === 'supplier') {
+                if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'inline-block';
+                if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+                document.getElementById('supplierDashboardView').style.display = 'block';
+            } else {
+                if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'inline-block';
+                if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
+                document.getElementById('customerOrdersView').style.display = 'block';
+            }
+            if (authLink) authLink.textContent = 'Sign Out';
+        };
+
+        // Global function for logout reset
+        window.handlePostLogoutUI = function() {
+            hideAllViews();
+            document.getElementById('marketplaceView').style.display = 'block';
+            if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
+            if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+            if (authLink) authLink.textContent = 'Sign In';
+        };
+
         if (homeLink) {
             homeLink.addEventListener('click', (e) => {
                 e.preventDefault();
