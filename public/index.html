@@ -198,33 +198,35 @@
                 <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDpk_ohiIb9N3HD_2Am6tT0BIMLLyP3JAobCB-bxRhaki6KvVhOG1MDJM72EM-PCoSL93AfOe6STGvoZb4g9Nvqmpr6e01hWst-yd_ShLW7rlnPYYMPDJ7jr_bE5oV_CQXmaCqMyL7oEfH19wS9eGRmkS-w_Zprs4wPOibtEHu2DAki9fzR2CuXEusVJG8/s903/Gemini_Generated_Image_i5vbmti5vbmti5vb_1.jpeg" alt="GasHubKE Promotional Banner">
             </div>
 
-            <div style="display: flex; gap: 2rem; flex-wrap: wrap; position: relative; align-items: flex-start; margin-top: 1.5rem;">
-                <!-- Floating & Compact Filter Sidebar -->
-                <aside class="filters" aria-label="Filter Options" style="position: sticky; top: 1.5rem; width: 220px; flex-shrink: 0; background: #fff; padding: 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
-                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #1e293b; font-weight: 600;">Filter Gas</h3>
-                    
-                    <label for="filterSize" style="display:block; margin-bottom:0.2rem; font-size:0.85rem; color: #64748b;">Cylinder Size</label>
-                    <select id="filterSize" style="width:100%; padding:0.4rem; margin-bottom:0.75rem; border-radius:4px; border:1px solid #cbd5e1; font-size:0.9rem;">
+            <!-- Floating & Compact Filter Bar Positioned Above Listings -->
+            <div class="filters-bar" style="display: flex; gap: 1.25rem; align-items: center; background: #fff; padding: 0.85rem 1.25rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; margin: 1.5rem 0; flex-wrap: wrap;">
+                <h3 style="font-size: 0.95rem; margin: 0; color: #1e293b; font-weight: 600;">Filter Gas:</h3>
+                
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label for="filterSize" style="font-size: 0.85rem; color: #64748b; white-space: nowrap;">Size:</label>
+                    <select id="filterSize" style="padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff;">
                         <option value="">All Sizes</option>
                         <option value="3kg">3 Kg</option>
                         <option value="6kg">6 Kg</option>
                         <option value="13kg">13 Kg</option>
                         <option value="50kg">50 Kg</option>
                     </select>
-                    
-                    <label for="filterCategory" style="display:block; margin-bottom:0.2rem; font-size:0.85rem; color: #64748b;">Category</label>
-                    <select id="filterCategory" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid #cbd5e1; font-size:0.9rem;">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label for="filterCategory" style="font-size: 0.85rem; color: #64748b; white-space: nowrap;">Category:</label>
+                    <select id="filterCategory" style="padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff;">
                         <option value="">All Categories</option>
                         <option value="refill">Gas Refill</option>
                         <option value="cylinder_complete">Complete Cylinder + Gas</option>
                         <option value="accessories">Accessories & Burners</option>
                     </select>
-                </aside>
-
-                <!-- Product Grid Container -->
-                <div class="product-grid" id="productGrid" aria-live="polite" style="flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem;">
-                    <!-- Dynamic listings load here -->
                 </div>
+            </div>
+
+            <!-- Product Grid Container -->
+            <div class="product-grid" id="productGrid" aria-live="polite" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem;">
+                <!-- Dynamic listings load here -->
             </div>
         </section>
 
