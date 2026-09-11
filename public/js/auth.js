@@ -15,20 +15,23 @@ const authModalTitle = document.getElementById("authModalTitle");
 const authSubmitBtn = document.getElementById("authSubmitBtn");
 const toggleAuthMode = document.getElementById("toggleAuthMode");
 const vendorFields = document.getElementById("vendorFields");
-const vendorDashboardLink = document.getElementById("vendorDashboardLink");
 
 let isRegistering = false;
 
 authLink.addEventListener("click", (e) => {
     e.preventDefault();
     if (auth.currentUser) {
-        signOut(auth).then(() => window.location.reload());
+        signOut(auth).then(() => {
+            if (window.handlePostLogoutUI) window.handlePostLogoutUI();
+        });
     } else {
         authModal.style.display = "flex";
     }
 });
 
-closeModal.addEventListener("click", () => authModal.style.display = "none");
+if (closeModal) {
+    closeModal.addEventListener("click", () => authModal.style.display = "none");
+}
 
 toggleAuthMode.addEventListener("click", () => {
     isRegistering = !isRegistering;
@@ -51,8 +54,9 @@ authForm.addEventListener("submit", async (e) => {
     const password = document.getElementById("authPassword").value;
 
     try {
+        let role = "customer";
         if (isRegistering) {
-            const role = document.getElementById("userRole").value;
+            role = document.getElementById("userRole").value;
             const businessName = document.getElementById("businessName").value;
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             
@@ -64,11 +68,18 @@ authForm.addEventListener("submit", async (e) => {
             });
             alert("Registration successful!");
         } else {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+            if (userDoc.exists()) {
+                role = userDoc.data().role || "customer";
+            }
             alert("Signed in successfully!");
         }
+        
         authModal.style.display = "none";
-        window.location.reload();
+        if (window.handlePostLoginUI) {
+            window.handlePostLoginUI(role);
+        }
     } catch (error) {
         alert("Authentication Error: " + error.message);
     }
@@ -76,13 +87,21 @@ authForm.addEventListener("submit", async (e) => {
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        authLink.innerText = "Sign Out";
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists() && userDoc.data().role === 'vendor') {
-            vendorDashboardLink.style.display = "inline";
+        try {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            let role = "customer";
+            if (userDoc.exists()) {
+                role = userDoc.data().role || "customer";
+            }
+            if (window.handlePostLoginUI) {
+                window.handlePostLoginUI(role);
+            }
+        } catch (err) {
+            console.error("Error loading user state:", err);
         }
     } else {
-        authLink.innerText = "Sign In";
-        vendorDashboardLink.style.display = "none";
+        if (window.handlePostLogoutUI) {
+            window.handlePostLogoutUI();
+        }
     }
 });
