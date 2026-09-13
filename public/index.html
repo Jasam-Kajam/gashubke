@@ -111,10 +111,17 @@
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
                 border-bottom: 1px solid #e2e8f0;
                 display: none !important;
+                z-index: 1000;
             }
 
             .nav-links.active {
                 display: flex !important;
+            }
+
+            /* Ensure role-specific links display properly inside the active mobile menu */
+            .nav-links.active a[style*="display: inline-block"],
+            .nav-links.active a:not([style*="display: none"]) {
+                display: block !important;
             }
 
             .navbar {
@@ -457,19 +464,20 @@
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         }
 
-        // Global function for auth.js to call upon successful login to display correct dashboard
+        // Global function for auth.js to call upon successful login (keeps marketplace as primary landing while maintaining dashboard nav button)
         window.handlePostLoginUI = function(role) {
             hideAllViews();
             if (authModal) authModal.style.display = 'none';
 
+            // Keep Marketplace as the primary landing page after login
+            document.getElementById('marketplaceView').style.display = 'block';
+
             if (role === 'vendor' || role === 'supplier') {
                 if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'inline-block';
                 if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
-                document.getElementById('supplierDashboardView').style.display = 'block';
             } else {
                 if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'inline-block';
                 if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
-                document.getElementById('customerOrdersView').style.display = 'block';
             }
             if (authLink) authLink.textContent = 'Sign Out';
         };
@@ -519,7 +527,7 @@
         if (authLink && authModal) {
             authLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                authModal.style.display = 'block';
+                authModal.style.display = 'flex';
             });
         }
 
