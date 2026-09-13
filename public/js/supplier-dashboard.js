@@ -106,7 +106,24 @@ window.deleteListing = async function(id) {
 
 async function loadSupplierOrders() {
     const ordersListEl = document.getElementById("supplierOrdersList");
-    const userSession = JSON.parse(localStorage.getItem("gas_user_session"));
+    
+    // Check multiple possible localStorage keys for user session
+    let userSession = null;
+    const possibleKeys = ["gas_user_session", "user", "currentUser", "vendor_session", "logged_in_user"];
+    
+    for (const key of possibleKeys) {
+        const val = localStorage.getItem(key);
+        if (val) {
+            try {
+                const parsed = JSON.parse(val);
+                const uid = parsed.uid || parsed.id || parsed.userId;
+                if (uid) {
+                    userSession = { uid: uid };
+                    break;
+                }
+            } catch (err) {}
+        }
+    }
     
     if (!userSession || !userSession.uid) return;
 
@@ -141,7 +158,7 @@ async function loadSupplierOrders() {
     }
 }
 
-// Handle new listing form submission
+// Handle new listing form submission with robust session checking
 document.addEventListener("DOMContentLoaded", () => {
     const listingForm = document.getElementById("supplierListingForm");
     if (!listingForm) return;
@@ -149,9 +166,32 @@ document.addEventListener("DOMContentLoaded", () => {
     listingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         
-        const userSession = JSON.parse(localStorage.getItem("gas_user_session"));
+        // Check multiple possible localStorage keys used across different pages
+        let userSession = null;
+        const possibleKeys = ["gas_user_session", "user", "currentUser", "vendor_session", "logged_in_user"];
+        
+        for (const key of possibleKeys) {
+            const val = localStorage.getItem(key);
+            if (val) {
+                try {
+                    const parsed = JSON.parse(val);
+                    const uid = parsed.uid || parsed.id || parsed.userId;
+                    if (uid) {
+                        userSession = {
+                            uid: uid,
+                            businessName: parsed.businessName || parsed.name || parsed.email || "Vendor",
+                            supplierArea: parsed.supplierArea || parsed.location || parsed.county || "Ruiru"
+                        };
+                        break;
+                    }
+                } catch (err) {
+                    // Ignore JSON parsing errors for non-JSON strings
+                }
+            }
+        }
+
         if (!userSession || !userSession.uid) {
-            alert("Please sign in as a supplier to post listings.");
+            alert("Please sign in as a supplier to post listings. No active session found.");
             return;
         }
 
@@ -177,8 +217,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             await addDoc(collection(db, "listings"), {
                 vendorId: userSession.uid,
-                vendorName: userSession.businessName || userSession.email,
-                location: userSession.supplierArea || userSession.county || "Ruiru",
+                vendorName: userSession.businessName,
+                location: userSession.supplierArea,
                 title,
                 size,
                 category,
