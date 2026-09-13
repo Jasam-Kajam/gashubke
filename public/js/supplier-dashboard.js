@@ -140,3 +140,74 @@ async function loadSupplierOrders() {
         ordersListEl.innerHTML = "<p>Error loading customer orders.</p>";
     }
 }
+
+// Handle new listing form submission
+document.addEventListener("DOMContentLoaded", () => {
+    const listingForm = document.getElementById("supplierListingForm");
+    if (!listingForm) return;
+
+    listingForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const userSession = JSON.parse(localStorage.getItem("gas_user_session"));
+        if (!userSession || !userSession.uid) {
+            alert("Please sign in as a supplier to post listings.");
+            return;
+        }
+
+        const submitBtn = listingForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Publishing...";
+
+        try {
+            const title = document.getElementById("supplierItemTitle").value.trim();
+            const size = document.getElementById("supplierItemSize").value;
+            const category = document.getElementById("supplierItemCategory").value;
+            const price = parseFloat(document.getElementById("supplierItemPrice").value);
+            const description = document.getElementById("supplierItemDescription").value.trim();
+            const imageInput = document.getElementById("supplierItemImage");
+
+            let imageUrls = [];
+            if (imageInput.files && imageInput.files.length > 0) {
+                for (let file of imageInput.files) {
+                    const base64 = await convertFileToBase64(file);
+                    imageUrls.push(base64);
+                }
+            }
+
+            await addDoc(collection(db, "listings"), {
+                vendorId: userSession.uid,
+                vendorName: userSession.businessName || userSession.email,
+                location: userSession.supplierArea || userSession.county || "Ruiru",
+                title,
+                size,
+                category,
+                price,
+                description,
+                images: imageUrls,
+                createdAt: new Date().toISOString()
+            });
+
+            alert("Listing published successfully!");
+            listingForm.reset();
+            
+            loadSupplierDashboard(userSession.uid);
+        } catch (err) {
+            console.error("Error publishing listing:", err);
+            alert("Failed to publish listing. Please try again.");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Publish Listing";
+        }
+    });
+});
+
+// Helper function to convert image file to Base64
+function convertFileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
