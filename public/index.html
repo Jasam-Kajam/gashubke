@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.1.5 Production
+         Version: 4.1.6 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -257,6 +257,9 @@
                             <li class="nav-item">
                                 <a class="nav-link fw-medium text-dark" href="#" id="customerOrdersNavLink" style="display:none;">My Orders</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-medium text-dark" href="#" id="profileSettingsNavLink" style="display:none;">Settings</a>
+                            </li>
                         </ul>
 
                         <!-- Search & Right Actions -->
@@ -299,6 +302,7 @@
                     <li><a href="#" class="nav-link text-dark fw-medium" onclick="document.getElementById('cartLink').click();">Shopping Cart</a></li>
                     <li id="mobileSupplierLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium" onclick="document.getElementById('supplierDashboardNavLink').click();">Supplier Dashboard</a></li>
                     <li id="mobileCustomerOrdersLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium" onclick="document.getElementById('customerOrdersNavLink').click();">My Orders</a></li>
+                    <li id="mobileSettingsLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium" onclick="document.getElementById('profileSettingsNavLink').click();">Settings</a></li>
                 </ul>
                 <div class="mt-4">
                     <a href="#" id="mobileAuthLink" class="btn btn-primary w-100 py-2" onclick="document.getElementById('authLink').click();">Sign In / Register</a>
@@ -456,6 +460,66 @@
                     <h3 class="fs-5 fw-bold mb-3">Order History</h3>
                     <div id="customerOrdersList">
                         <p class="text-muted">You have not placed any orders yet.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Settings View (Jiji-style Settings) -->
+            <section id="profileSettingsView" class="view" style="display:none;">
+                <div class="d-flex align-items-center mb-4">
+                    <button class="btn btn-link text-dark p-0 me-3 fs-4 text-decoration-none" id="backFromSettingsBtn"><i class="bi bi-chevron-left"></i></button>
+                    <h2 class="fs-4 fw-bold mb-0 text-success">Settings</h2>
+                </div>
+                <div class="card shadow-sm border-0 p-0 overflow-hidden mb-4">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Personal details</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Business details</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Verify your details</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Change phone number</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Confirm email</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Change language</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Disable chats</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Disable Feedback</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Manage notifications</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Change password</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 text-danger">
+                            <span class="fw-medium">Delete my account permanently</span>
+                            <i class="bi bi-chevron-right text-danger"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 text-primary" id="settingsLogoutBtn">
+                            <span class="fw-medium">Log out</span>
+                            <i class="bi bi-chevron-right text-primary"></i>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -622,12 +686,16 @@
         const cartLink = document.getElementById('cartLink');
         const supplierDashboardNavLink = document.getElementById('supplierDashboardNavLink');
         const customerOrdersNavLink = document.getElementById('customerOrdersNavLink');
+        const profileSettingsNavLink = document.getElementById('profileSettingsNavLink');
         const authLink = document.getElementById('authLink');
         const authModal = document.getElementById('authModal');
         const closeModal = document.getElementById('closeModal');
+        const backFromSettingsBtn = document.getElementById('backFromSettingsBtn');
+        const settingsLogoutBtn = document.getElementById('settingsLogoutBtn');
 
         const mobileSupplierLinkLi = document.getElementById('mobileSupplierLinkLi');
         const mobileCustomerOrdersLi = document.getElementById('mobileCustomerOrdersLi');
+        const mobileSettingsLinkLi = document.getElementById('mobileSettingsLinkLi');
         const mobileAuthLink = document.getElementById('mobileAuthLink');
 
         // Bottom Navigation Elements
@@ -636,7 +704,6 @@
         const bottomNavSell = document.getElementById('bottomNavSell');
         const bottomNavOrders = document.getElementById('bottomNavOrders');
         const bottomNavAccount = document.getElementById('bottomNavAccount');
-        const bottomCartCount = document.getElementById('bottomCartCount');
         const bottomAccountText = document.getElementById('bottomAccountText');
 
         function hideAllViews() {
@@ -663,6 +730,9 @@
                 if (mobileSupplierLinkLi) mobileSupplierLinkLi.style.display = 'none';
                 if (bottomAccountText) bottomAccountText.textContent = 'Account';
             }
+            if (profileSettingsNavLink) profileSettingsNavLink.style.display = 'inline-block';
+            if (mobileSettingsLinkLi) mobileSettingsLinkLi.style.display = 'block';
+
             if (authLink) authLink.textContent = 'Sign Out';
             if (mobileAuthLink) mobileAuthLink.textContent = 'Sign Out';
         };
@@ -673,8 +743,10 @@
             document.getElementById('marketplaceView').style.display = 'block';
             if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
             if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+            if (profileSettingsNavLink) profileSettingsNavLink.style.display = 'none';
             if (mobileSupplierLinkLi) mobileSupplierLinkLi.style.display = 'none';
             if (mobileCustomerOrdersLi) mobileCustomerOrdersLi.style.display = 'none';
+            if (mobileSettingsLinkLi) mobileSettingsLinkLi.style.display = 'none';
             if (authLink) authLink.textContent = 'Sign In';
             if (mobileAuthLink) mobileAuthLink.textContent = 'Sign In / Register';
             if (bottomAccountText) bottomAccountText.textContent = 'Sign In';
@@ -737,6 +809,29 @@
             });
         }
 
+        if (profileSettingsNavLink) {
+            profileSettingsNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('profileSettingsView').style.display = 'block';
+            });
+        }
+
+        if (backFromSettingsBtn) {
+            backFromSettingsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+            });
+        }
+
+        if (settingsLogoutBtn) {
+            settingsLogoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.handlePostLogoutUI();
+            });
+        }
+
         if (bottomNavOrders) {
             bottomNavOrders.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -765,10 +860,8 @@
             bottomNavAccount.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (authLink.textContent === 'Sign Out') {
-                    if (customerOrdersNavLink && customerOrdersNavLink.style.display !== 'none') {
-                        customerOrdersNavLink.click();
-                    } else if (supplierDashboardNavLink && supplierDashboardNavLink.style.display !== 'none') {
-                        supplierDashboardNavLink.click();
+                    if (profileSettingsNavLink) {
+                        profileSettingsNavLink.click();
                     }
                 } else {
                     if (authModal) authModal.style.display = 'flex';
