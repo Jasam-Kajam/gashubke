@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.1.4 Production
+         Version: 4.1.5 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -240,7 +240,7 @@
                         </div>
                     </a>
 
-                    <!-- Mobile Hamburger / Offcanvas Toggle (Optional Secondary Menu) -->
+                    <!-- Mobile Hamburger / Offcanvas Toggle -->
                     <button class="navbar-toggler border-0 shadow-none ms-auto me-1 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Toggle navigation">
                         <i class="bi bi-three-dots-vertical fs-5"></i>
                     </button>
@@ -284,7 +284,7 @@
             </nav>
         </header>
 
-        <!-- Offcanvas Mobile Menu (Extra Options) -->
+        <!-- Offcanvas Mobile Menu -->
         <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
             <div class="offcanvas-header border-bottom">
                 <div class="d-flex align-items-center">
@@ -306,7 +306,7 @@
             </div>
         </div>
 
-        <!-- Main Views Container with bottom padding for mobile app bar -->
+        <!-- Main Views Container with extra bottom padding so content isn't hidden behind mobile navigation -->
         <main class="container py-4 pb-5 mb-5">
 
             <!-- Marketplace View -->
@@ -532,38 +532,9 @@
             </div>
         </main>
 
-        <!-- Mobile Bottom Navigation Bar (Jiji-style App Navigation, visible only on mobile screens) -->
-        <nav class="navbar fixed-bottom bg-white border-top d-md-none shadow-sm py-1 px-2" style="z-index: 1040;">
-            <div class="container-fluid d-flex justify-content-around align-items-center text-center">
-                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavHome" style="font-size: 0.75rem;">
-                    <i class="bi bi-house-door fs-5 mb-0 text-primary"></i>
-                    <span class="fw-semibold">Home</span>
-                </a>
-                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1 position-relative" id="bottomNavCart" style="font-size: 0.75rem;">
-                    <i class="bi bi-cart3 fs-5 mb-0"></i>
-                    <span>Cart</span>
-                    <span id="bottomCartCount" class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-danger" style="font-size: 0.55rem; margin-left: 10px;">0</span>
-                </a>
-                <a href="#" class="nav-link d-flex flex-column align-items-center py-1" id="bottomNavSell" style="font-size: 0.75rem;">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; margin-top: -10px; box-shadow: 0 2px 6px rgba(249,115,22,0.4);">
-                        <i class="bi bi-plus-lg fs-5"></i>
-                    </div>
-                    <span class="mt-1 fw-bold text-dark">Sell</span>
-                </a>
-                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavOrders" style="font-size: 0.75rem;">
-                    <i class="bi bi-receipt fs-5 mb-0"></i>
-                    <span>Orders</span>
-                </a>
-                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavAccount" style="font-size: 0.75rem;">
-                    <i class="bi bi-person fs-5 mb-0"></i>
-                    <span id="bottomAccountText">Account</span>
-                </a>
-            </div>
-        </nav>
-
-        <!-- Professional Footer -->
-        <footer class="site-footer bg-dark text-white pt-5 pb-3 mt-5 d-none d-md-block">
-            <div class="container">
+        <!-- Professional Footer (Responsive for all screens, placed above mobile navigation bar) -->
+        <footer class="site-footer bg-dark text-white pt-5 pb-4 mt-5">
+            <div class="container mb-md-0 mb-4">
                 <div class="row g-4 justify-content-between">
                     <div class="col-lg-4">
                         <h3 class="fs-5 fw-bold mb-3 text-warning">GasHubKE</h3>
@@ -597,6 +568,35 @@
                 </div>
             </div>
         </footer>
+
+        <!-- Mobile Bottom Navigation Bar (Jiji-style App Navigation) -->
+        <nav class="navbar fixed-bottom bg-white border-top d-md-none shadow-sm py-1 px-2" style="z-index: 1040;">
+            <div class="container-fluid d-flex justify-content-around align-items-center text-center">
+                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavHome" style="font-size: 0.75rem;">
+                    <i class="bi bi-house-door fs-5 mb-0 text-primary"></i>
+                    <span class="fw-semibold">Home</span>
+                </a>
+                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1 position-relative" id="bottomNavCart" style="font-size: 0.75rem;">
+                    <i class="bi bi-cart3 fs-5 mb-0"></i>
+                    <span>Cart</span>
+                    <span id="bottomCartCount" class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-danger" style="font-size: 0.55rem; margin-left: 10px;">0</span>
+                </a>
+                <a href="#" class="nav-link d-flex flex-column align-items-center py-1" id="bottomNavSell" style="font-size: 0.75rem;">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; margin-top: -10px; box-shadow: 0 2px 6px rgba(249,115,22,0.4);">
+                        <i class="bi bi-plus-lg fs-5"></i>
+                    </div>
+                    <span class="mt-1 fw-bold text-dark">Sell</span>
+                </a>
+                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavOrders" style="font-size: 0.75rem;">
+                    <i class="bi bi-receipt fs-5 mb-0"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavAccount" style="font-size: 0.75rem;">
+                    <i class="bi bi-person fs-5 mb-0"></i>
+                    <span id="bottomAccountText">Account</span>
+                </a>
+            </div>
+        </nav>
 
     </div> <!-- End #app -->
 
@@ -765,7 +765,6 @@
             bottomNavAccount.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (authLink.textContent === 'Sign Out') {
-                    // Already signed in, toggle or show orders/profile
                     if (customerOrdersNavLink && customerOrdersNavLink.style.display !== 'none') {
                         customerOrdersNavLink.click();
                     } else if (supplierDashboardNavLink && supplierDashboardNavLink.style.display !== 'none') {
