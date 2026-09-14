@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.1.8 Production
+         Version: 4.1.9 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -110,25 +110,24 @@
             margin: 0 auto;
         }
 
-        /* Navbar & Brand */
+        /* Navbar & Enlarged Brand Logo */
         .brand-logo {
-            height: 34px;
-            width: 34px;
+            height: 46px;
+            width: 46px;
             object-fit: contain;
-            border-radius: 8px;
+            border-radius: 10px;
             flex-shrink: 0;
         }
 
         .main-header .navbar {
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
         }
 
-        /* Reduced vertical padding for mobile header view */
         @media (max-width: 767.98px) {
             .main-header .navbar {
-                padding-top: 0.2rem !important;
-                padding-bottom: 0.2rem !important;
+                padding-top: 0.25rem !important;
+                padding-bottom: 0.25rem !important;
             }
         }
 
@@ -239,18 +238,18 @@
         <header class="main-header sticky-top bg-white border-bottom shadow-sm">
             <nav class="navbar navbar-expand-md py-1 py-md-2">
                 <div class="container d-flex justify-content-between align-items-center flex-nowrap">
-                    <!-- Brand Logo -->
+                    <!-- Brand Logo (Enlarged) -->
                     <a class="navbar-brand d-flex align-items-center flex-nowrap me-2" href="#" id="brandLogoLink">
-                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" class="brand-logo">
+                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" class="brand-logo" width="46" height="46">
                         <div class="ms-2 lh-sm text-truncate">
-                            <strong style="color: #1e293b; font-size: 0.95rem; display: block;">GasHubKE</strong>
+                            <strong style="color: #1e293b; font-size: 1.05rem; display: block;">GasHubKE</strong>
                             <small class="text-muted d-none d-sm-block" style="font-size: 0.65rem;">Kenya Gas Marketplace</small>
                         </div>
                     </a>
 
-                    <!-- Mobile Hamburger Toggle Button (Standard 3 lines icon) -->
+                    <!-- Mobile Hamburger Toggle Button -->
                     <button class="navbar-toggler border-0 shadow-none ms-auto me-1 d-md-none p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Toggle navigation">
-                        <i class="bi bi-list fs-3 text-dark"></i>
+                        <i class="bi bi-list fs-2 text-dark"></i>
                     </button>
 
                     <!-- Desktop Navigation Links -->
@@ -299,7 +298,7 @@
         <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
             <div class="offcanvas-header border-bottom py-3">
                 <div class="d-flex align-items-center">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="34" height="34">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="46" height="46">
                     <strong class="ms-2">GasHubKE</strong>
                 </div>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -318,13 +317,13 @@
             </div>
         </div>
 
-        <!-- Main Views Container with minimized top padding on mobile to eliminate whitespace -->
-        <main class="container pt-2 pt-md-4 pb-5 mb-5">
+        <!-- Main Views Container with zero top padding on mobile to eliminate whitespace -->
+        <main class="container pt-0 pt-md-4 pb-5 mb-5">
 
             <!-- Marketplace View -->
             <section id="marketplaceView" class="view">
-                <!-- Promotional Banner Hero Section -->
-                <div class="marketplace-hero mb-3 mb-md-4">
+                <!-- Promotional Banner Hero Section with tight spacing -->
+                <div class="marketplace-hero mt-1 mt-md-3 mb-3 mb-md-4">
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDpk_ohiIb9N3HD_2Am6tT0BIMLLyP3JAobCB-bxRhaki6KvVhOG1MDJM72EM-PCoSL93AfOe6STGvoZb4g9Nvqmpr6e01hWst-yd_ShLW7rlnPYYMPDJ7jr_bE5oV_CQXmaCqMyL7oEfH19wS9eGRmkS-w_Zprs4wPOibtEHu2DAki9fzR2CuXEusVJG8/s903/Gemini_Generated_Image_i5vbmti5vbmti5vb_1.jpeg" alt="GasHubKE Promotional Banner">
                 </div>
 
@@ -472,7 +471,7 @@
                 </div>
             </section>
 
-            <!-- Profile Settings View (Jiji-style Settings) -->
+            <!-- Profile Settings View -->
             <section id="profileSettingsView" class="view" style="display:none;">
                 <div class="d-flex align-items-center mb-4">
                     <button class="btn btn-link text-dark p-0 me-3 fs-4 text-decoration-none" id="backFromSettingsBtn"><i class="bi bi-chevron-left"></i></button>
