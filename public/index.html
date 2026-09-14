@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.1.0 Production
+         Version: 4.1.1 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -112,10 +112,16 @@
 
         /* Navbar & Brand */
         .brand-logo {
-            height: 45px;
-            width: 45px;
+            height: 40px;
+            width: 40px;
             object-fit: contain;
             border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .main-header .navbar {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
 
         /* Marketplace Hero Banner */
@@ -221,21 +227,21 @@
             </div>
         </div>
 
-        <!-- Main Header & Navbar -->
+        <!-- Main Header & Navbar (navbar-expand-md ensures desktop expansion at 768px+) -->
         <header class="main-header sticky-top bg-white border-bottom shadow-sm">
-            <nav class="navbar navbar-expand-lg py-2">
-                <div class="container">
+            <nav class="navbar navbar-expand-md py-2">
+                <div class="container d-flex justify-content-between align-items-center flex-nowrap">
                     <!-- Brand Logo -->
-                    <a class="navbar-brand d-flex align-items-center" href="#" id="brandLogoLink">
+                    <a class="navbar-brand d-flex align-items-center flex-nowrap me-2" href="#" id="brandLogoLink">
                         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" class="brand-logo">
-                        <div class="ms-2 lh-sm">
-                            <strong style="color: #1e293b; font-size: 1.05rem;">GasHubKE</strong><br>
-                            <small class="text-muted" style="font-size: 0.75rem;">Kenya Gas Marketplace</small>
+                        <div class="ms-2 lh-sm text-truncate">
+                            <strong style="color: #1e293b; font-size: 1rem; display: block;">GasHubKE</strong>
+                            <small class="text-muted d-none d-sm-block" style="font-size: 0.7rem;">Kenya Gas Marketplace</small>
                         </div>
                     </a>
 
                     <!-- Mobile Hamburger / Offcanvas Toggle -->
-                    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Toggle navigation">
+                    <button class="navbar-toggler border-0 shadow-none ms-auto me-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
@@ -257,7 +263,7 @@
                         <div class="d-flex align-items-center gap-3">
                             <div class="search-bar d-flex align-items-center bg-light rounded px-2 py-1 border">
                                 <i class="bi bi-search text-muted ms-1"></i>
-                                <input type="search" id="searchInput" placeholder="Search gas, refills..." aria-label="Search listings" class="border-0 bg-transparent outline-none px-2 py-1" style="width: 160px; font-size: 0.9rem;">
+                                <input type="search" id="searchInput" placeholder="Search gas, refills..." aria-label="Search listings" class="border-0 bg-transparent outline-none px-2 py-1" style="width: 150px; font-size: 0.9rem;">
                                 <button id="searchBtn" style="display: none;">Search</button>
                             </div>
 
@@ -288,9 +294,9 @@
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body d-flex flex-column justify-content-between">
-                <ul class="nav flex-column gap-3 fs-5">
-                    <li><a href="#" class="nav-link text-dark fw-medium mobile-nav-item" onclick="document.getElementById('homeLink').click();">Marketplace</a></li>
-                    <li><a href="#" class="nav-link text-dark fw-medium mobile-nav-item" onclick="document.getElementById('cartLink').click();">Shopping Cart</a></li>
+                <ul class="nav flex-column gap-3 fs-5" id="mobileNavLinksList">
+                    <li><a href="#" class="nav-link text-dark fw-medium" onclick="document.getElementById('homeLink').click();">Marketplace</a></li>
+                    <li><a href="#" class="nav-link text-dark fw-medium" onclick="document.getElementById('cartLink').click();">Shopping Cart</a></li>
                     <li id="mobileSupplierLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium" onclick="document.getElementById('supplierDashboardNavLink').click();">Supplier Dashboard</a></li>
                     <li id="mobileCustomerOrdersLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium" onclick="document.getElementById('customerOrdersNavLink').click();">My Orders</a></li>
                 </ul>
@@ -303,7 +309,7 @@
         <!-- Main Views Container -->
         <main class="container py-4">
 
-            <!-- Marketplace View (Combines promotional sections, categories, and dynamic product catalog) -->
+            <!-- Marketplace View -->
             <section id="marketplaceView" class="view">
                 <!-- Promotional Banner Hero Section -->
                 <div class="marketplace-hero mb-4">
@@ -342,7 +348,7 @@
                     </div>
                 </div>
 
-                <!-- Floating & Compact Filter Bar Positioned Above Listings -->
+                <!-- Filter Bar -->
                 <div class="filters-bar d-flex gap-3 align-items-center bg-white p-3 rounded shadow-sm border mb-4 flex-wrap">
                     <h3 class="fs-6 mb-0 text-dark fw-bold">Filter Gas Listings:</h3>
                     
@@ -589,6 +595,17 @@
         const authLink = document.getElementById('authLink');
         const authModal = document.getElementById('authModal');
         const closeModal = document.getElementById('closeModal');
+
+        // Automatically close offcanvas mobile menu when any link inside it is clicked
+        document.querySelectorAll('#mobileMenu a, #mobileMenu .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const mobileMenuEl = document.getElementById('mobileMenu');
+                const bsOffcanvas = bootstrap.Offcanvas.getInstance(mobileMenuEl);
+                if (bsOffcanvas) {
+                    bsOffcanvas.hide();
+                }
+            });
+        });
 
         function hideAllViews() {
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
