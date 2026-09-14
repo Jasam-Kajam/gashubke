@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.1.2 Production
+         Version: 4.1.3 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -596,6 +596,10 @@
         const authModal = document.getElementById('authModal');
         const closeModal = document.getElementById('closeModal');
 
+        const mobileSupplierLinkLi = document.getElementById('mobileSupplierLinkLi');
+        const mobileCustomerOrdersLi = document.getElementById('mobileCustomerOrdersLi');
+        const mobileAuthLink = document.getElementById('mobileAuthLink');
+
         // Automatically close offcanvas mobile menu when any link inside it is clicked
         document.querySelectorAll('#mobileMenu a, #mobileMenu .nav-link').forEach(link => {
             link.addEventListener('click', () => {
@@ -621,11 +625,16 @@
             if (role === 'vendor' || role === 'supplier') {
                 if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'inline-block';
                 if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+                if (mobileSupplierLinkLi) mobileSupplierLinkLi.style.display = 'block';
+                if (mobileCustomerOrdersLi) mobileCustomerOrdersLi.style.display = 'none';
             } else {
                 if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'inline-block';
                 if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
+                if (mobileCustomerOrdersLi) mobileCustomerOrdersLi.style.display = 'block';
+                if (mobileSupplierLinkLi) mobileSupplierLinkLi.style.display = 'none';
             }
             if (authLink) authLink.textContent = 'Sign Out';
+            if (mobileAuthLink) mobileAuthLink.textContent = 'Sign Out';
         };
 
         // Global function for logout reset
@@ -634,7 +643,10 @@
             document.getElementById('marketplaceView').style.display = 'block';
             if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
             if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+            if (mobileSupplierLinkLi) mobileSupplierLinkLi.style.display = 'none';
+            if (mobileCustomerOrdersLi) mobileCustomerOrdersLi.style.display = 'none';
             if (authLink) authLink.textContent = 'Sign In';
+            if (mobileAuthLink) mobileAuthLink.textContent = 'Sign In / Register';
         };
 
         if (homeLink) {
