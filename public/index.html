@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.1.7 Production
+         Version: 4.1.8 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,7 +100,7 @@
             background: #1e293b;
             color: #cbd5e1;
             font-size: 0.85rem;
-            padding: 0.4rem 1rem;
+            padding: 0.5rem 1rem;
         }
         .announcement-content {
             display: flex;
@@ -110,20 +110,21 @@
             margin: 0 auto;
         }
 
-        /* Navbar & Brand - Reduced vertical padding */
+        /* Navbar & Brand */
         .brand-logo {
-            height: 36px;
-            width: 36px;
+            height: 34px;
+            width: 34px;
             object-fit: contain;
             border-radius: 8px;
             flex-shrink: 0;
         }
 
         .main-header .navbar {
-            padding-top: 0.25rem !important;
-            padding-bottom: 0.25rem !important;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
 
+        /* Reduced vertical padding for mobile header view */
         @media (max-width: 767.98px) {
             .main-header .navbar {
                 padding-top: 0.2rem !important;
@@ -236,7 +237,7 @@
 
         <!-- Main Header & Navbar -->
         <header class="main-header sticky-top bg-white border-bottom shadow-sm">
-            <nav class="navbar navbar-expand-md py-1">
+            <nav class="navbar navbar-expand-md py-1 py-md-2">
                 <div class="container d-flex justify-content-between align-items-center flex-nowrap">
                     <!-- Brand Logo -->
                     <a class="navbar-brand d-flex align-items-center flex-nowrap me-2" href="#" id="brandLogoLink">
@@ -247,9 +248,9 @@
                         </div>
                     </a>
 
-                    <!-- Mobile Hamburger / Offcanvas Toggle -->
+                    <!-- Mobile Hamburger Toggle Button (Standard 3 lines icon) -->
                     <button class="navbar-toggler border-0 shadow-none ms-auto me-1 d-md-none p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Toggle navigation">
-                        <i class="bi bi-three-dots-vertical fs-5 text-dark"></i>
+                        <i class="bi bi-list fs-3 text-dark"></i>
                     </button>
 
                     <!-- Desktop Navigation Links -->
@@ -294,73 +295,73 @@
             </nav>
         </header>
 
-        <!-- Offcanvas Mobile Menu (with data-bs-dismiss for automatic closing) -->
+        <!-- Offcanvas Mobile Menu -->
         <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
-            <div class="offcanvas-header border-bottom py-2">
+            <div class="offcanvas-header border-bottom py-3">
                 <div class="d-flex align-items-center">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="36" height="36">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="34" height="34">
                     <strong class="ms-2">GasHubKE</strong>
                 </div>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body d-flex flex-column justify-content-between py-3">
-                <ul class="nav flex-column gap-2 fs-5" id="mobileNavLinksList">
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" data-bs-dismiss="offcanvas" onclick="document.getElementById('homeLink').click();">Marketplace</a></li>
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" data-bs-dismiss="offcanvas" onclick="document.getElementById('cartLink').click();">Shopping Cart</a></li>
-                    <li id="mobileSupplierLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" data-bs-dismiss="offcanvas" onclick="document.getElementById('supplierDashboardNavLink').click();">Supplier Dashboard</a></li>
-                    <li id="mobileCustomerOrdersLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" data-bs-dismiss="offcanvas" onclick="document.getElementById('customerOrdersNavLink').click();">My Orders</a></li>
-                    <li id="mobileSettingsLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" data-bs-dismiss="offcanvas" onclick="document.getElementById('profileSettingsNavLink').click();">Settings</a></li>
+                <ul class="nav flex-column gap-2 fs-6" id="mobileNavLinksList">
+                    <li><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('homeLink').click();"><i class="bi bi-house-door me-2 text-primary"></i> Marketplace</a></li>
+                    <li><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('cartLink').click();"><i class="bi bi-cart3 me-2 text-primary"></i> Shopping Cart</a></li>
+                    <li id="mobileSupplierLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('supplierDashboardNavLink').click();"><i class="bi bi-speedometer2 me-2 text-primary"></i> Supplier Dashboard</a></li>
+                    <li id="mobileCustomerOrdersLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('customerOrdersNavLink').click();"><i class="bi bi-receipt me-2 text-primary"></i> My Orders</a></li>
+                    <li id="mobileSettingsLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('profileSettingsNavLink').click();"><i class="bi bi-gear me-2 text-success"></i> Settings</a></li>
                 </ul>
-                <div class="mt-4">
-                    <a href="#" id="mobileAuthLink" class="btn btn-primary w-100 py-2" data-bs-dismiss="offcanvas" onclick="document.getElementById('authLink').click();">Sign In / Register</a>
+                <div class="mt-4 border-top pt-3">
+                    <a href="#" id="mobileAuthLink" class="btn btn-primary w-100 py-2" onclick="closeMobileMenu(); document.getElementById('authLink').click();">Sign In / Register</a>
                 </div>
             </div>
         </div>
 
-        <!-- Main Views Container with extra bottom padding -->
-        <main class="container py-3 pb-5 mb-5">
+        <!-- Main Views Container with minimized top padding on mobile to eliminate whitespace -->
+        <main class="container pt-2 pt-md-4 pb-5 mb-5">
 
             <!-- Marketplace View -->
             <section id="marketplaceView" class="view">
                 <!-- Promotional Banner Hero Section -->
-                <div class="marketplace-hero mb-3">
+                <div class="marketplace-hero mb-3 mb-md-4">
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDpk_ohiIb9N3HD_2Am6tT0BIMLLyP3JAobCB-bxRhaki6KvVhOG1MDJM72EM-PCoSL93AfOe6STGvoZb4g9Nvqmpr6e01hWst-yd_ShLW7rlnPYYMPDJ7jr_bE5oV_CQXmaCqMyL7oEfH19wS9eGRmkS-w_Zprs4wPOibtEHu2DAki9fzR2CuXEusVJG8/s903/Gemini_Generated_Image_i5vbmti5vbmti5vb_1.jpeg" alt="GasHubKE Promotional Banner">
                 </div>
 
                 <!-- Categories Quick Grid with Professional Vector SVGs -->
-                <div class="row g-2 mb-3">
+                <div class="row g-3 mb-4">
                     <div class="col-6 col-md-3">
                         <div class="card p-3 text-center h-100 bg-white shadow-sm border-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
-                            <h6 class="fw-bold mb-1 fs-6">Gas Refills</h6>
-                            <small class="text-muted" style="font-size: 0.75rem;">Fast cylinder exchanges</small>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+                            <h6 class="fw-bold mb-1">Gas Refills</h6>
+                            <small class="text-muted">Fast cylinder exchanges</small>
                         </div>
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="card p-3 text-center h-100 bg-white shadow-sm border-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><rect x="6" y="4" width="12" height="16" rx="3"></rect><path d="M10 2h4"></path><path d="M6 10h12"></path></svg>
-                            <h6 class="fw-bold mb-1 fs-6">Complete Cylinders</h6>
-                            <small class="text-muted" style="font-size: 0.75rem;">New tanks + gas</small>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><rect x="6" y="4" width="12" height="16" rx="3"></rect><path d="M10 2h4"></path><path d="M6 10h12"></path></svg>
+                            <h6 class="fw-bold mb-1">Complete Cylinders</h6>
+                            <small class="text-muted">New tanks + gas</small>
                         </div>
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="card p-3 text-center h-100 bg-white shadow-sm border-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                            <h6 class="fw-bold mb-1 fs-6">Accessories</h6>
-                            <small class="text-muted" style="font-size: 0.75rem;">Regulators & burners</small>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                            <h6 class="fw-bold mb-1">Accessories</h6>
+                            <small class="text-muted">Regulators & burners</small>
                         </div>
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="card p-3 text-center h-100 bg-white shadow-sm border-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
-                            <h6 class="fw-bold mb-1 fs-6">Verified Suppliers</h6>
-                            <small class="text-muted" style="font-size: 0.75rem;">Trusted local retailers</small>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                            <h6 class="fw-bold mb-1">Verified Suppliers</h6>
+                            <small class="text-muted">Trusted local retailers</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Filter Bar -->
-                <div class="filters-bar d-flex gap-3 align-items-center bg-white p-3 rounded shadow-sm border mb-3 flex-wrap">
+                <div class="filters-bar d-flex gap-3 align-items-center bg-white p-3 rounded shadow-sm border mb-4 flex-wrap">
                     <h3 class="fs-6 mb-0 text-dark fw-bold">Filter Gas Listings:</h3>
                     
                     <div class="d-flex align-items-center gap-2">
@@ -393,7 +394,7 @@
 
             <!-- Supplier Dashboard View -->
             <section id="supplierDashboardView" class="view" style="display:none;">
-                <h2 class="mb-4 fs-4 fw-bold">Supplier Dashboard & Analytics</h2>
+                <h2 class="mb-4">Supplier Dashboard & Analytics</h2>
                 
                 <div class="supplier-stats-grid row g-3 mb-4">
                     <div class="col-md-4">
@@ -462,7 +463,7 @@
 
             <!-- Customer Orders View -->
             <section id="customerOrdersView" class="view" style="display:none;">
-                <h2 class="mb-4 fs-4 fw-bold">My Orders & Account Portal</h2>
+                <h2 class="mb-4">My Orders & Account Portal</h2>
                 <div class="card p-4">
                     <h3 class="fs-5 fw-bold mb-3">Order History</h3>
                     <div id="customerOrdersList">
@@ -473,53 +474,53 @@
 
             <!-- Profile Settings View (Jiji-style Settings) -->
             <section id="profileSettingsView" class="view" style="display:none;">
-                <div class="d-flex align-items-center mb-3">
+                <div class="d-flex align-items-center mb-4">
                     <button class="btn btn-link text-dark p-0 me-3 fs-4 text-decoration-none" id="backFromSettingsBtn"><i class="bi bi-chevron-left"></i></button>
                     <h2 class="fs-4 fw-bold mb-0 text-success">Settings</h2>
                 </div>
                 <div class="card shadow-sm border-0 p-0 overflow-hidden mb-4">
                     <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Personal details management'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Personal details</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Business details management'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Business details</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Verification portal'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Verify your details</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Change phone number modal'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Change phone number</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Email confirmation sent'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Confirm email</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Language selection'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Change language</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Chats disabled preference updated'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Disable chats</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Feedback disabled preference updated'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Disable Feedback</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Notification settings'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Manage notifications</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" onclick="alert('Password reset link initiated'); return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                             <span class="fw-medium">Change password</span>
                             <i class="bi bi-chevron-right text-muted"></i>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 text-danger" onclick="if(confirm('Are you sure you want to permanently delete your account?')) { window.handlePostLogoutUI(); } return false;">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 text-danger">
                             <span class="fw-medium">Delete my account permanently</span>
                             <i class="bi bi-chevron-right text-danger"></i>
                         </a>
@@ -533,7 +534,7 @@
 
             <!-- Cart & Checkout View -->
             <section id="cartView" class="view" style="display:none;">
-                <h2 class="mb-4 fs-4 fw-bold">Your Shopping Cart & Checkout</h2>
+                <h2 class="mb-4">Your Shopping Cart & Checkout</h2>
                 <div class="row g-4">
                     <div class="col-lg-7">
                         <div class="card p-4 h-100">
@@ -604,7 +605,7 @@
         </main>
 
         <!-- Professional Footer -->
-        <footer class="site-footer bg-dark text-white pt-4 pb-4 mt-5">
+        <footer class="site-footer bg-dark text-white pt-5 pb-4 mt-5">
             <div class="container mb-md-0 mb-4">
                 <div class="row g-4 justify-content-between">
                     <div class="col-lg-4">
@@ -634,7 +635,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="footer-bottom text-center mt-3 pt-3 border-top border-secondary text-secondary small">
+                <div class="footer-bottom text-center mt-4 pt-3 border-top border-secondary text-secondary small">
                     <p class="mb-0">&copy; <span id="currentYear"></span> GasHubKE Marketplace. All rights reserved.</p>
                 </div>
             </div>
@@ -653,7 +654,7 @@
                     <span id="bottomCartCount" class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-danger" style="font-size: 0.55rem; margin-left: 10px;">0</span>
                 </a>
                 <a href="#" class="nav-link d-flex flex-column align-items-center py-1" id="bottomNavSell" style="font-size: 0.75rem;">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; margin-top: -8px; box-shadow: 0 2px 6px rgba(249,115,22,0.4);">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; margin-top: -10px; box-shadow: 0 2px 6px rgba(249,115,22,0.4);">
                         <i class="bi bi-plus-lg fs-5"></i>
                     </div>
                     <span class="mt-1 fw-bold text-dark">Sell</span>
@@ -676,6 +677,7 @@
 
     <!-- UI Scripts Control -->
     <script>
+        // Hide loader once the page is fully loaded
         window.addEventListener('load', () => {
             const loader = document.getElementById('pageLoader');
             if (loader) {
@@ -704,6 +706,7 @@
         const mobileSettingsLinkLi = document.getElementById('mobileSettingsLinkLi');
         const mobileAuthLink = document.getElementById('mobileAuthLink');
 
+        // Bottom Navigation Elements
         const bottomNavHome = document.getElementById('bottomNavHome');
         const bottomNavCart = document.getElementById('bottomNavCart');
         const bottomNavSell = document.getElementById('bottomNavSell');
@@ -711,10 +714,20 @@
         const bottomNavAccount = document.getElementById('bottomNavAccount');
         const bottomAccountText = document.getElementById('bottomAccountText');
 
+        // Helper function to automatically close the mobile hamburger offcanvas menu reliably
+        function closeMobileMenu() {
+            const mobileMenuEl = document.getElementById('mobileMenu');
+            if (mobileMenuEl) {
+                const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(mobileMenuEl);
+                bsOffcanvas.hide();
+            }
+        }
+
         function hideAllViews() {
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         }
 
+        // Global function for auth.js to call upon successful login
         window.handlePostLoginUI = function(role) {
             hideAllViews();
             if (authModal) authModal.style.display = 'none';
@@ -741,6 +754,7 @@
             if (mobileAuthLink) mobileAuthLink.textContent = 'Sign Out';
         };
 
+        // Global function for logout reset
         window.handlePostLogoutUI = function() {
             hideAllViews();
             document.getElementById('marketplaceView').style.display = 'block';
@@ -755,16 +769,85 @@
             if (bottomAccountText) bottomAccountText.textContent = 'Sign In';
         };
 
-        if (homeLink) homeLink.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('marketplaceView').style.display = 'block'; });
-        if (bottomNavHome) bottomNavHome.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('marketplaceView').style.display = 'block'; });
-        if (brandLogoLink) brandLogoLink.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('marketplaceView').style.display = 'block'; });
-        if (cartLink) cartLink.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('cartView').style.display = 'block'; });
-        if (bottomNavCart) bottomNavCart.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('cartView').style.display = 'block'; });
-        if (supplierDashboardNavLink) supplierDashboardNavLink.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('supplierDashboardView').style.display = 'block'; });
-        if (customerOrdersNavLink) customerOrdersNavLink.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('customerOrdersView').style.display = 'block'; });
-        if (profileSettingsNavLink) profileSettingsNavLink.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('profileSettingsView').style.display = 'block'; });
-        if (backFromSettingsBtn) backFromSettingsBtn.addEventListener('click', (e) => { e.preventDefault(); hideAllViews(); document.getElementById('marketplaceView').style.display = 'block'; });
-        if (settingsLogoutBtn) settingsLogoutBtn.addEventListener('click', (e) => { e.preventDefault(); window.handlePostLogoutUI(); });
+        // Navigation Actions
+        if (homeLink) {
+            homeLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+            });
+        }
+
+        if (bottomNavHome) {
+            bottomNavHome.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+            });
+        }
+
+        if (brandLogoLink) {
+            brandLogoLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+            });
+        }
+
+        if (cartLink) {
+            cartLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('cartView').style.display = 'block';
+            });
+        }
+
+        if (bottomNavCart) {
+            bottomNavCart.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('cartView').style.display = 'block';
+            });
+        }
+
+        if (supplierDashboardNavLink) {
+            supplierDashboardNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('supplierDashboardView').style.display = 'block';
+            });
+        }
+
+        if (customerOrdersNavLink) {
+            customerOrdersNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('customerOrdersView').style.display = 'block';
+            });
+        }
+
+        if (profileSettingsNavLink) {
+            profileSettingsNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('profileSettingsView').style.display = 'block';
+            });
+        }
+
+        if (backFromSettingsBtn) {
+            backFromSettingsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+            });
+        }
+
+        if (settingsLogoutBtn) {
+            settingsLogoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.handlePostLogoutUI();
+            });
+        }
 
         if (bottomNavOrders) {
             bottomNavOrders.addEventListener('click', (e) => {
@@ -794,13 +877,16 @@
             bottomNavAccount.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (authLink.textContent === 'Sign Out') {
-                    if (profileSettingsNavLink) profileSettingsNavLink.click();
+                    if (profileSettingsNavLink) {
+                        profileSettingsNavLink.click();
+                    }
                 } else {
                     if (authModal) authModal.style.display = 'flex';
                 }
             });
         }
 
+        // Auth Modal Popup Triggers
         if (authLink && authModal) {
             authLink.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -809,11 +895,15 @@
         }
 
         if (closeModal && authModal) {
-            closeModal.addEventListener('click', () => { authModal.style.display = 'none'; });
+            closeModal.addEventListener('click', () => {
+                authModal.style.display = 'none';
+            });
         }
 
         window.addEventListener('click', (e) => {
-            if (e.target === authModal) { authModal.style.display = 'none'; }
+            if (e.target === authModal) {
+                authModal.style.display = 'none';
+            }
         });
     </script>
 
