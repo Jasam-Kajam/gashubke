@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.1.9 Production
+         Version: 4.2.0 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,6 +59,7 @@
             color: #1e293b;
             margin: 0;
             padding: 0;
+            scroll-behavior: smooth;
         }
 
         /* Professional Loading Spinner */
@@ -112,8 +113,8 @@
 
         /* Navbar & Enlarged Brand Logo */
         .brand-logo {
-            height: 46px;
-            width: 46px;
+            height: 48px;
+            width: 48px;
             object-fit: contain;
             border-radius: 10px;
             flex-shrink: 0;
@@ -124,6 +125,7 @@
             padding-bottom: 0.4rem;
         }
 
+        /* Zero out top spacing on mobile view for seamless transition */
         @media (max-width: 767.98px) {
             .main-header .navbar {
                 padding-top: 0.25rem !important;
@@ -131,13 +133,12 @@
             }
         }
 
-        /* Marketplace Hero Banner */
-        .marketplace-hero img {
-            width: 100%;
-            max-height: 380px;
-            object-fit: cover;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        /* Interactive Carousel Hero Styles */
+        .hero-slide-item {
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .hero-slide-item:hover {
+            filter: brightness(1.05);
         }
 
         /* Cards & Utilities */
@@ -238,12 +239,12 @@
         <header class="main-header sticky-top bg-white border-bottom shadow-sm">
             <nav class="navbar navbar-expand-md py-1 py-md-2">
                 <div class="container d-flex justify-content-between align-items-center flex-nowrap">
-                    <!-- Brand Logo (Enlarged) -->
+                    <!-- Enlarged Brand Logo -->
                     <a class="navbar-brand d-flex align-items-center flex-nowrap me-2" href="#" id="brandLogoLink">
-                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" class="brand-logo" width="46" height="46">
+                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" class="brand-logo" width="48" height="48">
                         <div class="ms-2 lh-sm text-truncate">
                             <strong style="color: #1e293b; font-size: 1.05rem; display: block;">GasHubKE</strong>
-                            <small class="text-muted d-none d-sm-block" style="font-size: 0.65rem;">Kenya Gas Marketplace</small>
+                            <small class="text-muted d-none d-sm-block" style="font-size: 0.7rem;">Kenya Gas Marketplace</small>
                         </div>
                     </a>
 
@@ -298,8 +299,8 @@
         <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
             <div class="offcanvas-header border-bottom py-3">
                 <div class="d-flex align-items-center">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="46" height="46">
-                    <strong class="ms-2">GasHubKE</strong>
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="48" height="48">
+                    <strong class="ms-2 fs-5">GasHubKE</strong>
                 </div>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
@@ -317,14 +318,85 @@
             </div>
         </div>
 
-        <!-- Main Views Container with zero top padding on mobile to eliminate whitespace -->
+        <!-- Main Views Container -->
         <main class="container pt-0 pt-md-4 pb-5 mb-5">
 
             <!-- Marketplace View -->
             <section id="marketplaceView" class="view">
-                <!-- Promotional Banner Hero Section with tight spacing -->
-                <div class="marketplace-hero mt-1 mt-md-3 mb-3 mb-md-4">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDpk_ohiIb9N3HD_2Am6tT0BIMLLyP3JAobCB-bxRhaki6KvVhOG1MDJM72EM-PCoSL93AfOe6STGvoZb4g9Nvqmpr6e01hWst-yd_ShLW7rlnPYYMPDJ7jr_bE5oV_CQXmaCqMyL7oEfH19wS9eGRmkS-w_Zprs4wPOibtEHu2DAki9fzR2CuXEusVJG8/s903/Gemini_Generated_Image_i5vbmti5vbmti5vb_1.jpeg" alt="GasHubKE Promotional Banner">
+                <!-- Interactive Scrolling Carousel Hero Banner -->
+                <div id="heroCarousel" class="carousel slide mb-4 rounded-4 overflow-hidden shadow-sm" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        <!-- Slide 1: 6kg Refills -->
+                        <div class="carousel-item active hero-slide-item" data-category="refill" data-size="6kg" style="cursor: pointer; background: linear-gradient(135deg, #f97316, #ea580c); color: white; padding: 2.2rem 2rem; min-height: 200px; display: flex; align-items: center;">
+                            <div class="row align-items-center w-100 m-0">
+                                <div class="col-md-8">
+                                    <span class="badge bg-white text-dark mb-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">POPULAR REFILL</span>
+                                    <h2 class="fw-bold fs-3 mb-1">6Kg Cooking Gas Refill</h2>
+                                    <p class="mb-3 text-white-50 small">Fast delivery across Kenya. Order your preferred brand today!</p>
+                                    <span class="btn btn-light btn-sm fw-bold text-dark px-3 py-1.5">Shop 6Kg Refills <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                                <div class="col-md-4 text-center d-none d-md-block">
+                                    <i class="bi bi-fire text-white-50" style="font-size: 3.5rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 2: 13kg Complete Cylinders -->
+                        <div class="carousel-item hero-slide-item" data-category="cylinder_complete" data-size="13kg" style="cursor: pointer; background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 2.2rem 2rem; min-height: 200px; display: flex; align-items: center;">
+                            <div class="row align-items-center w-100 m-0">
+                                <div class="col-md-8">
+                                    <span class="badge bg-warning text-dark mb-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">BEST VALUE</span>
+                                    <h2 class="fw-bold fs-3 mb-1">13Kg Complete Cylinders</h2>
+                                    <p class="mb-3 text-secondary small">Get a brand new cylinder complete with gas and burner setup.</p>
+                                    <span class="btn btn-warning btn-sm fw-bold text-dark px-3 py-1.5">Explore 13Kg Sets <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                                <div class="col-md-4 text-center d-none d-md-block">
+                                    <i class="bi bi-fuel-pump text-warning" style="font-size: 3.5rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 3: Gas Accessories -->
+                        <div class="carousel-item hero-slide-item" data-category="accessories" data-size="" style="cursor: pointer; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 2.2rem 2rem; min-height: 200px; display: flex; align-items: center;">
+                            <div class="row align-items-center w-100 m-0">
+                                <div class="col-md-8">
+                                    <span class="badge bg-light text-primary mb-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">SAFETY & HARDWARE</span>
+                                    <h2 class="fw-bold fs-3 mb-1">Regulators & Accessories</h2>
+                                    <p class="mb-3 text-white-50 small">High-quality gas burners, safe pipes, and regulators for your kitchen.</p>
+                                    <span class="btn btn-light btn-sm fw-bold text-primary px-3 py-1.5">View Accessories <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                                <div class="col-md-4 text-center d-none d-md-block">
+                                    <i class="bi bi-shield-check text-white-50" style="font-size: 3.5rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 4: All Refills -->
+                        <div class="carousel-item hero-slide-item" data-category="refill" data-size="" style="cursor: pointer; background: linear-gradient(135deg, #16a34a, #15803d); color: white; padding: 2.2rem 2rem; min-height: 200px; display: flex; align-items: center;">
+                            <div class="row align-items-center w-100 m-0">
+                                <div class="col-md-8">
+                                    <span class="badge bg-white text-success mb-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">EXCHANGE & REFILL</span>
+                                    <h2 class="fw-bold fs-3 mb-1">All Gas Refill Brands</h2>
+                                    <p class="mb-3 text-white-50 small">Total, Afrigas, Pro Gas, K-Gas and more delivered instantly.</p>
+                                    <span class="btn btn-light btn-sm fw-bold text-success px-3 py-1.5">Browse All Refills <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                                <div class="col-md-4 text-center d-none d-md-block">
+                                    <i class="bi bi-lightning-charge text-white-50" style="font-size: 3.5rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
                 </div>
 
                 <!-- Categories Quick Grid with Professional Vector SVGs -->
@@ -726,12 +798,18 @@
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         }
 
+        // Helper to scroll smoothly to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         // Global function for auth.js to call upon successful login
         window.handlePostLoginUI = function(role) {
             hideAllViews();
             if (authModal) authModal.style.display = 'none';
 
             document.getElementById('marketplaceView').style.display = 'block';
+            scrollToTop();
 
             if (role === 'vendor' || role === 'supplier') {
                 if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'inline-block';
@@ -757,6 +835,7 @@
         window.handlePostLogoutUI = function() {
             hideAllViews();
             document.getElementById('marketplaceView').style.display = 'block';
+            scrollToTop();
             if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
             if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
             if (profileSettingsNavLink) profileSettingsNavLink.style.display = 'none';
@@ -768,12 +847,13 @@
             if (bottomAccountText) bottomAccountText.textContent = 'Sign In';
         };
 
-        // Navigation Actions
+        // Navigation Actions with Scroll to Top
         if (homeLink) {
             homeLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -782,6 +862,7 @@
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -790,6 +871,7 @@
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -798,6 +880,7 @@
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('cartView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -806,6 +889,7 @@
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('cartView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -814,6 +898,7 @@
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('supplierDashboardView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -822,6 +907,7 @@
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('customerOrdersView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -830,6 +916,7 @@
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('profileSettingsView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -838,6 +925,7 @@
                 e.preventDefault();
                 hideAllViews();
                 document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
             });
         }
 
@@ -851,6 +939,7 @@
         if (bottomNavOrders) {
             bottomNavOrders.addEventListener('click', (e) => {
                 e.preventDefault();
+                scrollToTop();
                 if (customerOrdersNavLink && customerOrdersNavLink.style.display !== 'none') {
                     customerOrdersNavLink.click();
                 } else if (supplierDashboardNavLink && supplierDashboardNavLink.style.display !== 'none') {
@@ -864,6 +953,7 @@
         if (bottomNavSell) {
             bottomNavSell.addEventListener('click', (e) => {
                 e.preventDefault();
+                scrollToTop();
                 if (supplierDashboardNavLink && supplierDashboardNavLink.style.display !== 'none') {
                     supplierDashboardNavLink.click();
                 } else {
@@ -875,6 +965,7 @@
         if (bottomNavAccount) {
             bottomNavAccount.addEventListener('click', (e) => {
                 e.preventDefault();
+                scrollToTop();
                 if (authLink.textContent === 'Sign Out') {
                     if (profileSettingsNavLink) {
                         profileSettingsNavLink.click();
@@ -903,6 +994,38 @@
             if (e.target === authModal) {
                 authModal.style.display = 'none';
             }
+        });
+
+        // Interactive Scrolling Carousel Banner Click Handlers
+        document.querySelectorAll('.hero-slide-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const category = item.getAttribute('data-category');
+                const size = item.getAttribute('data-size');
+                
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
+
+                const filterCategory = document.getElementById('filterCategory');
+                const filterSize = document.getElementById('filterSize');
+                
+                if (filterCategory) {
+                    filterCategory.value = category || '';
+                    filterCategory.dispatchEvent(new Event('change'));
+                }
+                if (filterSize) {
+                    filterSize.value = size || '';
+                    filterSize.dispatchEvent(new Event('change'));
+                }
+
+                // Smooth scroll down to product grid section
+                const productGrid = document.getElementById('productGrid');
+                if (productGrid) {
+                    setTimeout(() => {
+                        productGrid.scrollIntoView({ behavior: 'smooth' });
+                    }, 200);
+                }
+            });
         });
     </script>
 
