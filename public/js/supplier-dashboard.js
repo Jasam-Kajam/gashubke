@@ -1,12 +1,13 @@
 import { db } from "./firebase-config.js";
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const auth = getAuth();
+let editingListingId = null;
+window._supplierListingsCache = {};
 
-// Robust helper function to retrieve active supplier session from Firebase Auth or any localStorage format
+// Robust helper function to retrieve active supplier session from Firebase Auth or localStorage
 async function getCurrentUserSession() {
-    // 1. Check Firebase Auth currentUser first
     if (auth.currentUser) {
         const uid = auth.currentUser.uid;
         let businessName = auth.currentUser.displayName || "Vendor";
@@ -27,7 +28,6 @@ async function getCurrentUserSession() {
         return { uid, businessName, supplierArea };
     }
 
-    // 2. Check all possible localStorage session keys and handle nested object structures
     const possibleKeys = ["gas_user_session", "user", "currentUser", "vendor_session", "logged_in_user", "firebase:authUser"];
     
     for (const key of possibleKeys) {
@@ -46,9 +46,7 @@ async function getCurrentUserSession() {
                                          (parsed.user && (parsed.user.supplierArea || parsed.user.location || parsed.user.county)) || "Ruiru";
                     return { uid, businessName, supplierArea };
                 }
-            } catch (err) {
-                // Ignore JSON parse errors for non-JSON strings
-            }
+            } catch (err) {}
         }
     }
 
@@ -108,6 +106,7 @@ export async function loadSupplierDashboard(vendorId) {
         const querySnapshot = await getDocs(q);
 
         grid.innerHTML = "";
+        window._supplierListingsCache = {};
         let activeCount = 0;
 
         if (querySnapshot.empty) {
@@ -117,17 +116,23 @@ export async function loadSupplierDashboard(vendorId) {
         querySnapshot.forEach((docSnap) => {
             activeCount++;
             const item = docSnap.data();
+            window._supplierListingsCache[docSnap.id] = item;
+
             const card = document.createElement("div");
-            card.className = "product-card";
-            card.style.marginBottom = "1rem";
+            card.className = "product-card card p-3 mb-3";
             card.innerHTML = `
-                <div>
-                    <h4>${item.title}</h4>
-                    <p class="price">KES ${item.price}</p>
-                    <p class="location">Zone: ${item.location}</p>
-                    <p style="font-size:0.85rem; color:#64748b;">Size: ${item.size} | Category: ${item.category}</p>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h4 class="fs-6 fw-bold mb-1">${item.title}</h4>
+                        <p class="text-primary fw-semibold mb-1">KES ${item.price}</p>
+                        <p class="text-muted small mb-1">Zone: ${item.location}</p>
+                        <p style="font-size:0.85rem; color:#64748b;" class="mb-2">Size: ${item.size} | Category: ${item.category}</p>
+                    </div>
                 </div>
-                <button type="button" class="btn-danger" onclick="window.deleteListing('${docSnap.id}')" style="background:#ef4444; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; margin-top:0.5rem;">Delete Listing</button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-warning btn-sm text-white px-3" onclick="window.editListing('${docSnap.id}')">Edit</button>
+                    <button type="button" class="btn btn-danger btn-sm px-3" onclick="window.deleteListing('${docSnap.id}')">Delete</button>
+                </div>
             `;
             grid.appendChild(card);
         });
@@ -153,7 +158,29 @@ export async function loadSupplierDashboard(vendorId) {
         console.error("Error loading supplier dashboard data:", err);
         grid.innerHTML = "<p>Failed to load dashboard inventory.</p>";
     }
-}
+};
+
+// Edit item action handler
+window.editListing = function(id) {
+    const item = window._supplierListingsCache[id];
+    if (!item) return;
+
+    document.getElementById("supplierItemTitle").value = item.title || "";
+    document.getElementById("supplierItemSize").value = item.size || "6kg";
+    document.getElementById("supplierItemCategory").value = item.category || "refill";
+    document.getElementById("supplierItemPrice").value = item.price || "";
+    document.getElementById("supplierItemDescription").value = item.description || "";
+    
+    editingListingId = id;
+    
+    const submitBtn = document.querySelector("#supplierListingForm button[type='submit']");
+    if (submitBtn) submitBtn.textContent = "Update Listing";
+
+    const formTitle = document.querySelector("#supplierListingForm h3");
+    if (formTitle) formTitle.textContent = "Edit Gas Listing";
+
+    document.getElementById("supplierListingForm").scrollIntoView({ behavior: 'smooth' });
+};
 
 // Delete item action handler
 window.deleteListing = async function(id) {
@@ -161,7 +188,8 @@ window.deleteListing = async function(id) {
     try {
         await deleteDoc(doc(db, "listings", id));
         alert("Listing removed successfully.");
-        location.reload();
+        const session = await getCurrentUserSession();
+        if (session) loadSupplierDashboard(session.uid);
     } catch (err) {
         console.error("Error deleting listing:", err);
         alert("Failed to delete listing.");
@@ -193,7 +221,7 @@ async function loadSupplierOrders() {
         querySnapshot.forEach((docSnap) => {
             const order = docSnap.data();
             html += `
-                <div style="border-bottom: 1px solid var(--border-color, #e2e8f0); padding: 0.75rem 0;">
+                <div style="border-bottom: 1px solid #e2e8f0; padding: 0.75rem 0;">
                     <p><strong>Order ID:</strong> ${docSnap.id}</p>
                     <p><strong>Customer:</strong> ${order.customerName} (${order.customerPhone})</p>
                     <p><strong>Delivery Location:</strong> ${order.deliveryAddress}</p>
@@ -209,12 +237,11 @@ async function loadSupplierOrders() {
     }
 }
 
-// Handle new listing form submission with robust session checking
+// Handle new listing form submission (Create or Update)
 document.addEventListener("DOMContentLoaded", () => {
     const listingForm = document.getElementById("supplierListingForm");
     if (!listingForm) return;
 
-    // Automatically trigger dashboard load if session exists on page open
     getCurrentUserSession().then(session => {
         if (session && session.uid) {
             loadSupplierDashboard(session.uid);
@@ -225,7 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         
         const userSession = await getCurrentUserSession();
-
         if (!userSession || !userSession.uid) {
             alert("Please sign in as a supplier to post listings. No active session found.");
             return;
@@ -233,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const submitBtn = listingForm.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
-        submitBtn.textContent = "Publishing...";
+        submitBtn.textContent = editingListingId ? "Updating..." : "Publishing...";
 
         try {
             const title = document.getElementById("supplierItemTitle").value.trim();
@@ -246,44 +272,87 @@ document.addEventListener("DOMContentLoaded", () => {
             let imageUrls = [];
             if (imageInput.files && imageInput.files.length > 0) {
                 for (let file of imageInput.files) {
-                    const base64 = await convertFileToBase64(file);
-                    imageUrls.push(base64);
+                    const compressedBase64 = await compressImage(file, 800, 0.7);
+                    imageUrls.push(compressedBase64);
                 }
+            } else if (editingListingId && window._supplierListingsCache[editingListingId]) {
+                // Keep existing images if none selected during edit
+                imageUrls = window._supplierListingsCache[editingListingId].images || [];
             }
 
-            await addDoc(collection(db, "listings"), {
-                vendorId: userSession.uid,
-                vendorName: userSession.businessName,
-                location: userSession.supplierArea,
-                title,
-                size,
-                category,
-                price,
-                description,
-                images: imageUrls,
-                createdAt: new Date().toISOString()
-            });
+            if (editingListingId) {
+                // Update existing listing document
+                await updateDoc(doc(db, "listings", editingListingId), {
+                    title,
+                    size,
+                    category,
+                    price,
+                    description,
+                    images: imageUrls,
+                    updatedAt: new Date().toISOString()
+                });
+                alert("Listing updated successfully!");
+            } else {
+                // Create new listing document
+                await addDoc(collection(db, "listings"), {
+                    vendorId: userSession.uid,
+                    vendorName: userSession.businessName,
+                    location: userSession.supplierArea,
+                    title,
+                    size,
+                    category,
+                    price,
+                    description,
+                    images: imageUrls,
+                    createdAt: new Date().toISOString()
+                });
+                alert("Listing published successfully!");
+            }
 
-            alert("Listing published successfully!");
+            // Reset form and state
             listingForm.reset();
+            editingListingId = null;
+            const formTitle = document.querySelector("#supplierListingForm h3");
+            if (formTitle) formTitle.textContent = "Post New Gas Listing";
             
             loadSupplierDashboard(userSession.uid);
         } catch (err) {
-            console.error("Error publishing listing:", err);
-            alert("Failed to publish listing. Please try again.");
+            console.error("Error saving listing:", err);
+            alert("Failed to save listing. Please try again.");
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = "Publish Listing";
+            submitBtn.textContent = editingListingId ? "Update Listing" : "Publish Listing";
         }
     });
 });
 
-// Helper function to convert image file to Base64
-function convertFileToBase64(file) {
+// Helper function to compress images and avoid Firestore 1MB document size limits
+function compressImage(file, maxWidth = 800, quality = 0.7) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = (error) => reject(error);
+        };
+        reader.onerror = (error) => reject(error);
     });
 }
