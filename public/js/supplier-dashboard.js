@@ -1,5 +1,59 @@
 import { db } from "./firebase-config.js";
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const auth = getAuth();
+
+// Robust helper function to retrieve active supplier session from Firebase Auth or any localStorage format
+async function getCurrentUserSession() {
+    // 1. Check Firebase Auth currentUser first
+    if (auth.currentUser) {
+        const uid = auth.currentUser.uid;
+        let businessName = auth.currentUser.displayName || "Vendor";
+        let supplierArea = "Ruiru";
+        
+        try {
+            const userDocRef = doc(db, "users", uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const data = userDocSnap.data();
+                businessName = data.businessName || data.name || businessName;
+                supplierArea = data.supplierArea || data.location || data.county || supplierArea;
+            }
+        } catch (e) {
+            console.error("Error fetching user profile from Firestore:", e);
+        }
+        
+        return { uid, businessName, supplierArea };
+    }
+
+    // 2. Check all possible localStorage session keys and handle nested object structures
+    const possibleKeys = ["gas_user_session", "user", "currentUser", "vendor_session", "logged_in_user", "firebase:authUser"];
+    
+    for (const key of possibleKeys) {
+        const val = localStorage.getItem(key);
+        if (val) {
+            try {
+                const parsed = JSON.parse(val);
+                const uid = parsed.uid || parsed.id || parsed.userId || 
+                            (parsed.user && (parsed.user.uid || parsed.user.id || parsed.user.userId)) ||
+                            (parsed.firebaseUser && parsed.firebaseUser.uid);
+                
+                if (uid) {
+                    const businessName = parsed.businessName || parsed.name || parsed.email || 
+                                         (parsed.user && (parsed.user.businessName || parsed.user.name || parsed.user.email)) || "Vendor";
+                    const supplierArea = parsed.supplierArea || parsed.location || parsed.county || 
+                                         (parsed.user && (parsed.user.supplierArea || parsed.user.location || parsed.user.county)) || "Ruiru";
+                    return { uid, businessName, supplierArea };
+                }
+            } catch (err) {
+                // Ignore JSON parse errors for non-JSON strings
+            }
+        }
+    }
+
+    return null;
+}
 
 // Tab switcher logic
 window.switchSupplierTab = function(tabName) {
@@ -36,6 +90,16 @@ export async function loadSupplierDashboard(vendorId) {
     const statRevenue = document.getElementById("statRevenue");
 
     if (!grid) return;
+
+    if (!vendorId) {
+        const session = await getCurrentUserSession();
+        if (session) {
+            vendorId = session.uid;
+        } else {
+            grid.innerHTML = "<p>Please sign in as a supplier to view your inventory.</p>";
+            return;
+        }
+    }
 
     grid.innerHTML = "<p>Loading your inventory...</p>";
 
@@ -106,26 +170,13 @@ window.deleteListing = async function(id) {
 
 async function loadSupplierOrders() {
     const ordersListEl = document.getElementById("supplierOrdersList");
+    if (!ordersListEl) return;
     
-    // Check multiple possible localStorage keys for user session
-    let userSession = null;
-    const possibleKeys = ["gas_user_session", "user", "currentUser", "vendor_session", "logged_in_user"];
-    
-    for (const key of possibleKeys) {
-        const val = localStorage.getItem(key);
-        if (val) {
-            try {
-                const parsed = JSON.parse(val);
-                const uid = parsed.uid || parsed.id || parsed.userId;
-                if (uid) {
-                    userSession = { uid: uid };
-                    break;
-                }
-            } catch (err) {}
-        }
+    const userSession = await getCurrentUserSession();
+    if (!userSession || !userSession.uid) {
+        ordersListEl.innerHTML = "<p>Please sign in as a supplier to view orders.</p>";
+        return;
     }
-    
-    if (!userSession || !userSession.uid) return;
 
     ordersListEl.innerHTML = "<p>Loading customer orders...</p>";
 
@@ -142,7 +193,7 @@ async function loadSupplierOrders() {
         querySnapshot.forEach((docSnap) => {
             const order = docSnap.data();
             html += `
-                <div style="border-bottom: 1px solid var(--border-color); padding: 0.75rem 0;">
+                <div style="border-bottom: 1px solid var(--border-color, #e2e8f0); padding: 0.75rem 0;">
                     <p><strong>Order ID:</strong> ${docSnap.id}</p>
                     <p><strong>Customer:</strong> ${order.customerName} (${order.customerPhone})</p>
                     <p><strong>Delivery Location:</strong> ${order.deliveryAddress}</p>
@@ -163,32 +214,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const listingForm = document.getElementById("supplierListingForm");
     if (!listingForm) return;
 
+    // Automatically trigger dashboard load if session exists on page open
+    getCurrentUserSession().then(session => {
+        if (session && session.uid) {
+            loadSupplierDashboard(session.uid);
+        }
+    });
+
     listingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         
-        // Check multiple possible localStorage keys used across different pages
-        let userSession = null;
-        const possibleKeys = ["gas_user_session", "user", "currentUser", "vendor_session", "logged_in_user"];
-        
-        for (const key of possibleKeys) {
-            const val = localStorage.getItem(key);
-            if (val) {
-                try {
-                    const parsed = JSON.parse(val);
-                    const uid = parsed.uid || parsed.id || parsed.userId;
-                    if (uid) {
-                        userSession = {
-                            uid: uid,
-                            businessName: parsed.businessName || parsed.name || parsed.email || "Vendor",
-                            supplierArea: parsed.supplierArea || parsed.location || parsed.county || "Ruiru"
-                        };
-                        break;
-                    }
-                } catch (err) {
-                    // Ignore JSON parsing errors for non-JSON strings
-                }
-            }
-        }
+        const userSession = await getCurrentUserSession();
 
         if (!userSession || !userSession.uid) {
             alert("Please sign in as a supplier to post listings. No active session found.");
