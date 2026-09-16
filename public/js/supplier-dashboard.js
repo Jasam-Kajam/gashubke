@@ -6,20 +6,25 @@ const auth = getAuth();
 let editingListingId = null;
 window._supplierListingsCache = {};
 
-// Robust helper function to retrieve active supplier session from Firebase Auth or localStorage
+// Robust helper function to retrieve active supplier session and their registered default location
 async function getCurrentUserSession() {
+    let uid = null;
+    let businessName = "Vendor";
+    let supplierArea = "Ruiru"; // Default fallback
+
+    // 1. Check Firebase Auth currentUser & fetch profile from Firestore
     if (auth.currentUser) {
-        const uid = auth.currentUser.uid;
-        let businessName = auth.currentUser.displayName || "Vendor";
-        let supplierArea = "Ruiru";
+        uid = auth.currentUser.uid;
+        businessName = auth.currentUser.displayName || "Vendor";
         
         try {
             const userDocRef = doc(db, "users", uid);
             const userDocSnap = await getDoc(userDocRef);
             if (userDocSnap.exists()) {
                 const data = userDocSnap.data();
-                businessName = data.businessName || data.name || businessName;
-                supplierArea = data.supplierArea || data.location || data.county || supplierArea;
+                businessName = data.businessName || data.name || data.fullName || businessName;
+                // Capture whichever location field was used during registration
+                supplierArea = data.supplierArea || data.location || data.county || data.zone || data.businessLocation || data.area || supplierArea;
             }
         } catch (e) {
             console.error("Error fetching user profile from Firestore:", e);
@@ -28,6 +33,7 @@ async function getCurrentUserSession() {
         return { uid, businessName, supplierArea };
     }
 
+    // 2. Check all possible localStorage session keys
     const possibleKeys = ["gas_user_session", "user", "currentUser", "vendor_session", "logged_in_user", "firebase:authUser"];
     
     for (const key of possibleKeys) {
@@ -35,15 +41,17 @@ async function getCurrentUserSession() {
         if (val) {
             try {
                 const parsed = JSON.parse(val);
-                const uid = parsed.uid || parsed.id || parsed.userId || 
-                            (parsed.user && (parsed.user.uid || parsed.user.id || parsed.user.userId)) ||
-                            (parsed.firebaseUser && parsed.firebaseUser.uid);
+                uid = parsed.uid || parsed.id || parsed.userId || 
+                      (parsed.user && (parsed.user.uid || parsed.user.id || parsed.user.userId)) ||
+                      (parsed.firebaseUser && parsed.firebaseUser.uid);
                 
                 if (uid) {
-                    const businessName = parsed.businessName || parsed.name || parsed.email || 
-                                         (parsed.user && (parsed.user.businessName || parsed.user.name || parsed.user.email)) || "Vendor";
-                    const supplierArea = parsed.supplierArea || parsed.location || parsed.county || 
-                                         (parsed.user && (parsed.user.supplierArea || parsed.user.location || parsed.user.county)) || "Ruiru";
+                    businessName = parsed.businessName || parsed.name || parsed.email || 
+                                   (parsed.user && (parsed.user.businessName || parsed.user.name || parsed.user.email)) || businessName;
+                    
+                    supplierArea = parsed.supplierArea || parsed.location || parsed.county || parsed.zone || parsed.businessLocation || parsed.area ||
+                                   (parsed.user && (parsed.user.supplierArea || parsed.user.location || parsed.user.county || parsed.user.zone)) || supplierArea;
+                    
                     return { uid, businessName, supplierArea };
                 }
             } catch (err) {}
@@ -89,14 +97,24 @@ export async function loadSupplierDashboard(vendorId) {
 
     if (!grid) return;
 
+    let userSession = null;
     if (!vendorId) {
-        const session = await getCurrentUserSession();
-        if (session) {
-            vendorId = session.uid;
+        userSession = await getCurrentUserSession();
+        if (userSession) {
+            vendorId = userSession.uid;
         } else {
             grid.innerHTML = "<p>Please sign in as a supplier to view your inventory.</p>";
             return;
         }
+    } else {
+        userSession = await getCurrentUserSession();
+    }
+
+    // Auto-populate location field in form if present
+    const locationInput = document.getElementById("supplierItemLocation");
+    if (locationInput && userSession) {
+        locationInput.value = userSession.supplierArea;
+        locationInput.readOnly = true; // Lock it to their registered default location
     }
 
     grid.innerHTML = "<p>Loading your inventory...</p>";
@@ -170,6 +188,11 @@ window.editListing = function(id) {
     document.getElementById("supplierItemCategory").value = item.category || "refill";
     document.getElementById("supplierItemPrice").value = item.price || "";
     document.getElementById("supplierItemDescription").value = item.description || "";
+    
+    const locationInput = document.getElementById("supplierItemLocation");
+    if (locationInput) {
+        locationInput.value = item.location || "";
+    }
     
     editingListingId = id;
     
@@ -267,16 +290,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const category = document.getElementById("supplierItemCategory").value;
             const price = parseFloat(document.getElementById("supplierItemPrice").value);
             const description = document.getElementById("supplierItemDescription").value.trim();
+            
+            // Always use the supplier's registered default location/zone
+            const location = userSession.supplierArea;
+            
             const imageInput = document.getElementById("supplierItemImage");
 
             let imageUrls = [];
-            if (imageInput.files && imageInput.files.length > 0) {
+            if (imageInput && imageInput.files && imageInput.files.length > 0) {
                 for (let file of imageInput.files) {
                     const compressedBase64 = await compressImage(file, 800, 0.7);
                     imageUrls.push(compressedBase64);
                 }
             } else if (editingListingId && window._supplierListingsCache[editingListingId]) {
-                // Keep existing images if none selected during edit
                 imageUrls = window._supplierListingsCache[editingListingId].images || [];
             }
 
@@ -288,16 +314,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     category,
                     price,
                     description,
+                    location,
                     images: imageUrls,
                     updatedAt: new Date().toISOString()
                 });
                 alert("Listing updated successfully!");
             } else {
-                // Create new listing document
+                // Create new listing document using the registered location
                 await addDoc(collection(db, "listings"), {
                     vendorId: userSession.uid,
                     vendorName: userSession.businessName,
-                    location: userSession.supplierArea,
+                    location: location,
                     title,
                     size,
                     category,
@@ -315,6 +342,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const formTitle = document.querySelector("#supplierListingForm h3");
             if (formTitle) formTitle.textContent = "Post New Gas Listing";
             
+            // Re-lock location field back to registered default after reset
+            const locationInput = document.getElementById("supplierItemLocation");
+            if (locationInput) locationInput.value = userSession.supplierArea;
+
             loadSupplierDashboard(userSession.uid);
         } catch (err) {
             console.error("Error saving listing:", err);
