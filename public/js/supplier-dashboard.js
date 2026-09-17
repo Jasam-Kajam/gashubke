@@ -23,7 +23,6 @@ async function getCurrentUserSession() {
             if (userDocSnap.exists()) {
                 const data = userDocSnap.data();
                 businessName = data.businessName || data.name || data.fullName || businessName;
-                // Capture whichever location field was used during registration
                 supplierArea = data.supplierArea || data.location || data.county || data.zone || data.businessLocation || data.area || supplierArea;
             }
         } catch (e) {
@@ -114,7 +113,7 @@ export async function loadSupplierDashboard(vendorId) {
     const locationInput = document.getElementById("supplierItemLocation");
     if (locationInput && userSession) {
         locationInput.value = userSession.supplierArea;
-        locationInput.readOnly = true; // Lock it to their registered default location
+        locationInput.readOnly = true;
     }
 
     grid.innerHTML = "<p>Loading your inventory...</p>";
@@ -138,16 +137,26 @@ export async function loadSupplierDashboard(vendorId) {
 
             const card = document.createElement("div");
             card.className = "product-card card p-3 mb-3";
+            
+            // Render thumbnail preview if images exist
+            let imgThumbnail = "";
+            if (item.images && item.images.length > 0) {
+                imgThumbnail = `<img src="${item.images[0]}" alt="Gas" style="width:60px; height:60px; object-fit:cover; border-radius:4px; margin-right:1rem;" />`;
+            }
+
             card.innerHTML = `
                 <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h4 class="fs-6 fw-bold mb-1">${item.title}</h4>
-                        <p class="text-primary fw-semibold mb-1">KES ${item.price}</p>
-                        <p class="text-muted small mb-1">Zone: ${item.location}</p>
-                        <p style="font-size:0.85rem; color:#64748b;" class="mb-2">Size: ${item.size} | Category: ${item.category}</p>
+                    <div class="d-flex align-items-center">
+                        ${imgThumbnail}
+                        <div>
+                            <h4 class="fs-6 fw-bold mb-1">${item.title}</h4>
+                            <p class="text-primary fw-semibold mb-1">KES ${item.price}</p>
+                            <p class="text-muted small mb-1">Zone: ${item.location}</p>
+                            <p style="font-size:0.85rem; color:#64748b;" class="mb-2">Size: ${item.size} | Category: ${item.category}</p>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 mt-2">
                     <button type="button" class="btn btn-warning btn-sm text-white px-3" onclick="window.editListing('${docSnap.id}')">Edit</button>
                     <button type="button" class="btn btn-danger btn-sm px-3" onclick="window.deleteListing('${docSnap.id}')">Delete</button>
                 </div>
@@ -290,24 +299,29 @@ document.addEventListener("DOMContentLoaded", () => {
             const category = document.getElementById("supplierItemCategory").value;
             const price = parseFloat(document.getElementById("supplierItemPrice").value);
             const description = document.getElementById("supplierItemDescription").value.trim();
-            
-            // Always use the supplier's registered default location/zone
             const location = userSession.supplierArea;
             
-            const imageInput = document.getElementById("supplierItemImage");
+            // Flexible file input selector (checks supplierItemImage, supplierItemImages, or any file input in form)
+            const imageInput = document.getElementById("supplierItemImage") || 
+                               document.getElementById("supplierItemImages") || 
+                               listingForm.querySelector('input[type="file"]');
 
             let imageUrls = [];
             if (imageInput && imageInput.files && imageInput.files.length > 0) {
                 for (let file of imageInput.files) {
                     const compressedBase64 = await compressImage(file, 800, 0.7);
-                    imageUrls.push(compressedBase64);
+                    if (compressedBase64) {
+                        imageUrls.push(compressedBase64);
+                    }
                 }
-            } else if (editingListingId && window._supplierListingsCache[editingListingId]) {
+            } 
+            
+            // If no new images were selected during an edit, retain the existing images
+            if (imageUrls.length === 0 && editingListingId && window._supplierListingsCache[editingListingId]) {
                 imageUrls = window._supplierListingsCache[editingListingId].images || [];
             }
 
             if (editingListingId) {
-                // Update existing listing document
                 await updateDoc(doc(db, "listings", editingListingId), {
                     title,
                     size,
@@ -320,7 +334,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 alert("Listing updated successfully!");
             } else {
-                // Create new listing document using the registered location
                 await addDoc(collection(db, "listings"), {
                     vendorId: userSession.uid,
                     vendorName: userSession.businessName,
@@ -342,7 +355,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const formTitle = document.querySelector("#supplierListingForm h3");
             if (formTitle) formTitle.textContent = "Post New Gas Listing";
             
-            // Re-lock location field back to registered default after reset
             const locationInput = document.getElementById("supplierItemLocation");
             if (locationInput) locationInput.value = userSession.supplierArea;
 
@@ -357,33 +369,44 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// Helper function to compress images and avoid Firestore 1MB document size limits
+// Helper function to compress images reliably with fallback safeguards
 function compressImage(file, maxWidth = 800, quality = 0.7) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
             const img = new Image();
-            img.src = event.target.result;
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
+                try {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                } catch (e) {
+                    console.error("Canvas compression error, using raw base64:", e);
+                    resolve(event.target.result); // Fallback to raw base64 if canvas fails
                 }
-                
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                resolve(canvas.toDataURL('image/jpeg', quality));
             };
-            img.onerror = (error) => reject(error);
+            img.onerror = (error) => {
+                console.error("Image load error, using raw base64:", error);
+                resolve(event.target.result); // Fallback to raw base64
+            };
+            img.src = event.target.result;
         };
-        reader.onerror = (error) => reject(error);
+        reader.onerror = (error) => {
+            console.error("FileReader error:", error);
+            resolve(null);
+        };
     });
 }
