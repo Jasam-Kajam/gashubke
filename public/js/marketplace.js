@@ -167,7 +167,6 @@ async function loadListings() {
 
             const mapPinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
 
-            // SUPPORT ALL IMAGE PROPERTY FORMATS SAVED ACROSS VERSIONS (images array, imageUrls array, or single imageUrl)
             const displayImages = (item.images && item.images.length > 0) ? item.images : 
                                   ((item.imageUrls && item.imageUrls.length > 0) ? item.imageUrls : 
                                   (item.imageUrl ? [item.imageUrl] : []));
@@ -175,7 +174,7 @@ async function loadListings() {
 
             card.innerHTML = `
                 <div>
-                    ${primaryImage ? `<div class="card-img-container"><img src="${primaryImage}" alt="${item.title}" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:10px;"></div>` : ''}
+                    ${primaryImage ? `<div class="card-img-container" style="background:#f8fafc; border-radius:6px; margin-bottom:10px; overflow:hidden; display:flex; align-items:center; justify-content:center; height:180px;"><img src="${primaryImage}" alt="${item.title}" style="width:100%; height:100%; object-fit:contain;"></div>` : ''}
                     <div class="card-body">
                         <h4>${item.title}</h4>
                         <p class="price">KES ${item.price} <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted);">(${item.size})</span></p>
