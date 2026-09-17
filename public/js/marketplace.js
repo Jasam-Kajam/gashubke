@@ -16,11 +16,9 @@ window.switchView = function(viewId) {
 
 // Cart Item Management Functions with Authentication Check
 window.addToListingCart = function(id, title, price, location) {
-    // Check if a user is currently authenticated via Firebase Auth
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
-        // User is not logged in: Block action and trigger auth modal popup
         alert("Please sign in or create an account to add items to your cart.");
         const authModal = document.getElementById('authModal');
         if (authModal) {
@@ -29,7 +27,6 @@ window.addToListingCart = function(id, title, price, location) {
         return;
     }
 
-    // User is logged in, proceed to add item to local cart storage
     let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
     const existingIndex = cart.findIndex(item => item.id === id);
     
@@ -74,7 +71,6 @@ function updateCartUI() {
     const cartLink = document.getElementById("cartLink");
     
     if (cartLink) {
-        // Professional e-commerce Shopping Cart SVG icon with dynamic badge indicator
         const cartSvgIcon = `
             <span style="position: relative; display: inline-flex; align-items: center; cursor: pointer;" title="Cart">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
@@ -101,7 +97,7 @@ function renderCartView() {
     if (cart.length === 0) {
         cartItemsList.innerHTML = "<p>Your cart is currently empty.</p>";
         if (cartSubtotal) cartSubtotal.textContent = "KES 0";
-        if (cartTotal) cartTotal.textContent = "KES 200"; // Base delivery fee
+        if (cartTotal) cartTotal.textContent = "KES 200";
         return;
     }
 
@@ -165,20 +161,21 @@ async function loadListings() {
                 if (!matchTitle && !matchDesc && !matchLocation) return;
             }
 
-matchCount++;
+            matchCount++;
             const card = document.createElement("div");
             card.className = "product-card";
 
-            // Professional SVG Map Marker Icon
             const mapPinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: var(--primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
 
-            // Support multi-image array or single fallback image
-            const displayImages = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls : (item.imageUrl ? [item.imageUrl] : []);
+            // SUPPORT ALL IMAGE PROPERTY FORMATS SAVED ACROSS VERSIONS (images array, imageUrls array, or single imageUrl)
+            const displayImages = (item.images && item.images.length > 0) ? item.images : 
+                                  ((item.imageUrls && item.imageUrls.length > 0) ? item.imageUrls : 
+                                  (item.imageUrl ? [item.imageUrl] : []));
             const primaryImage = displayImages.length > 0 ? displayImages[0] : '';
 
             card.innerHTML = `
                 <div>
-                    ${primaryImage ? `<div class="card-img-container"><img src="${primaryImage}" alt="${item.title}"></div>` : ''}
+                    ${primaryImage ? `<div class="card-img-container"><img src="${primaryImage}" alt="${item.title}" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:10px;"></div>` : ''}
                     <div class="card-body">
                         <h4>${item.title}</h4>
                         <p class="price">KES ${item.price} <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted);">(${item.size})</span></p>
@@ -229,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Responsive Mobile Hamburger Menu Toggle
     if (hamburger && navLinks) {
         hamburger.addEventListener("click", () => {
             navLinks.classList.toggle("active");
@@ -237,7 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Filter & Search Event Listeners with Null Safeguards
 if (filterSize) filterSize.addEventListener("change", loadListings);
 if (filterCategory) filterCategory.addEventListener("change", loadListings);
 if (searchBtn) searchBtn.addEventListener("click", loadListings);
@@ -249,5 +244,4 @@ if (searchInput) {
     });
 }
 
-// Initial Data Load
 loadListings();
