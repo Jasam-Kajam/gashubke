@@ -1,6 +1,6 @@
 import { db } from "./firebase-config.js";
 import { collection, addDoc, getDocs, query, where, deleteDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const auth = getAuth();
 let editingListingId = null;
@@ -12,7 +12,7 @@ async function getCurrentUserSession() {
     let businessName = "Vendor";
     let supplierArea = "Ruiru"; // Default fallback
 
-    // 1. Check Firebase Auth currentUser & fetch profile from Firestore
+    // 1. Check Firebase Auth currentUser first
     if (auth.currentUser) {
         uid = auth.currentUser.uid;
         businessName = auth.currentUser.displayName || "Vendor";
@@ -32,7 +32,7 @@ async function getCurrentUserSession() {
         return { uid, businessName, supplierArea };
     }
 
-    // 2. Check all possible localStorage session keys
+    // 2. Fallback to localStorage session keys if auth object is still initializing
     const possibleKeys = ["gas_user_session", "user", "currentUser", "vendor_session", "logged_in_user", "firebase:authUser"];
     
     for (const key of possibleKeys) {
@@ -61,33 +61,33 @@ async function getCurrentUserSession() {
 }
 
 // Tab switcher logic
-window.switchSupplierTab = function(tabName) {
+window.switchSupplierTab = async function(tabName) {
     const listingsContent = document.getElementById("supplierListingsTabContent");
     const ordersContent = document.getElementById("supplierOrdersTabContent");
     const tabListingsBtn = document.getElementById("tabListingsBtn");
     const tabOrdersBtn = document.getElementById("tabOrdersBtn");
 
     if (tabName === 'listings') {
-        listingsContent.style.display = 'block';
-        ordersContent.style.display = 'none';
-        tabListingsBtn.className = 'btn-primary';
-        tabListingsBtn.style.background = '';
-        tabOrdersBtn.className = 'btn-secondary';
-        tabOrdersBtn.style.background = '#e2e8f0';
-        tabOrdersBtn.style.color = '#1e293b';
+        if (listingsContent) listingsContent.style.display = 'block';
+        if (ordersContent) ordersContent.style.display = 'none';
+        if (tabListingsBtn) { tabListingsBtn.className = 'btn-primary'; tabListingsBtn.style.background = ''; }
+        if (tabOrdersBtn) { tabOrdersBtn.className = 'btn-secondary'; tabOrdersBtn.style.background = '#e2e8f0'; tabOrdersBtn.style.color = '#1e293b'; }
+        
+        // Refresh listings for current user
+        const session = await getCurrentUserSession();
+        if (session && session.uid) {
+            loadSupplierDashboard(session.uid);
+        }
     } else {
-        listingsContent.style.display = 'none';
-        ordersContent.style.display = 'block';
-        tabOrdersBtn.className = 'btn-primary';
-        tabOrdersBtn.style.background = '';
-        tabListingsBtn.className = 'btn-secondary';
-        tabListingsBtn.style.background = '#e2e8f0';
-        tabListingsBtn.style.color = '#1e293b';
+        if (listingsContent) listingsContent.style.display = 'none';
+        if (ordersContent) ordersContent.style.display = 'block';
+        if (tabOrdersBtn) { tabOrdersBtn.className = 'btn-primary'; tabOrdersBtn.style.background = ''; }
+        if (tabListingsBtn) { tabListingsBtn.className = 'btn-secondary'; tabListingsBtn.style.background = '#e2e8f0'; tabListingsBtn.style.color = '#1e293b'; }
         loadSupplierOrders();
     }
 };
 
-// Load supplier listings and update dashboard metrics
+// Load supplier listings strictly filtered by logged-in vendorId
 export async function loadSupplierDashboard(vendorId) {
     const grid = document.getElementById("supplierListingsGrid");
     const statActiveListings = document.getElementById("statActiveListings");
@@ -99,7 +99,7 @@ export async function loadSupplierDashboard(vendorId) {
     let userSession = null;
     if (!vendorId) {
         userSession = await getCurrentUserSession();
-        if (userSession) {
+        if (userSession && userSession.uid) {
             vendorId = userSession.uid;
         } else {
             grid.innerHTML = "<p>Please sign in as a supplier to view your inventory.</p>";
@@ -119,6 +119,7 @@ export async function loadSupplierDashboard(vendorId) {
     grid.innerHTML = "<p>Loading your inventory...</p>";
 
     try {
+        // STRICT QUERY: Only fetch documents where vendorId matches the logged-in supplier
         const q = query(collection(db, "listings"), where("vendorId", "==", vendorId));
         const querySnapshot = await getDocs(q);
 
@@ -138,10 +139,14 @@ export async function loadSupplierDashboard(vendorId) {
             const card = document.createElement("div");
             card.className = "product-card card p-3 mb-3";
             
-            // Render thumbnail preview if images exist
+            // Render thumbnail preview with full visibility (contain)
             let imgThumbnail = "";
-            if (item.images && item.images.length > 0) {
-                imgThumbnail = `<img src="${item.images[0]}" alt="Gas" style="width:60px; height:60px; object-fit:cover; border-radius:4px; margin-right:1rem;" />`;
+            const displayImages = (item.images && item.images.length > 0) ? item.images : 
+                                  ((item.imageUrls && item.imageUrls.length > 0) ? item.imageUrls : 
+                                  (item.imageUrl ? [item.imageUrl] : []));
+            
+            if (displayImages.length > 0) {
+                imgThumbnail = `<div style="width:60px; height:60px; background:#f8fafc; border-radius:4px; margin-right:1rem; overflow:hidden; display:flex; align-items:center; justify-content:center;"><img src="${displayImages[0]}" alt="Gas" style="width:100%; height:100%; object-fit:contain;" /></div>`;
             }
 
             card.innerHTML = `
@@ -166,7 +171,7 @@ export async function loadSupplierDashboard(vendorId) {
 
         if (statActiveListings) statActiveListings.textContent = activeCount;
 
-        // Fetch supplier orders stats
+        // Fetch supplier orders stats strictly for this vendorId
         const ordersQuery = query(collection(db, "orders"), where("vendorId", "==", vendorId));
         const ordersSnapshot = await getDocs(ordersQuery);
         let orderCount = 0;
@@ -272,13 +277,20 @@ async function loadSupplierOrders() {
 // Handle new listing form submission (Create or Update)
 document.addEventListener("DOMContentLoaded", () => {
     const listingForm = document.getElementById("supplierListingForm");
-    if (!listingForm) return;
 
-    getCurrentUserSession().then(session => {
-        if (session && session.uid) {
-            loadSupplierDashboard(session.uid);
+    // Listen for Firebase Auth state changes to load listings instantly upon login/refresh
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            loadSupplierDashboard(user.uid);
+        } else {
+            const session = await getCurrentUserSession();
+            if (session && session.uid) {
+                loadSupplierDashboard(session.uid);
+            }
         }
     });
+
+    if (!listingForm) return;
 
     listingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -301,7 +313,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const description = document.getElementById("supplierItemDescription").value.trim();
             const location = userSession.supplierArea;
             
-            // Flexible file input selector (checks supplierItemImage, supplierItemImages, or any file input in form)
             const imageInput = document.getElementById("supplierItemImage") || 
                                document.getElementById("supplierItemImages") || 
                                listingForm.querySelector('input[type="file"]');
@@ -316,9 +327,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             } 
             
-            // If no new images were selected during an edit, retain the existing images
             if (imageUrls.length === 0 && editingListingId && window._supplierListingsCache[editingListingId]) {
-                imageUrls = window._supplierListingsCache[editingListingId].images || [];
+                imageUrls = window._supplierListingsCache[editingListingId].images || window._supplierListingsCache[editingListingId].imageUrls || [];
             }
 
             if (editingListingId) {
@@ -349,7 +359,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Listing published successfully!");
             }
 
-            // Reset form and state
             listingForm.reset();
             editingListingId = null;
             const formTitle = document.querySelector("#supplierListingForm h3");
@@ -395,12 +404,12 @@ function compressImage(file, maxWidth = 800, quality = 0.7) {
                     resolve(canvas.toDataURL('image/jpeg', quality));
                 } catch (e) {
                     console.error("Canvas compression error, using raw base64:", e);
-                    resolve(event.target.result); // Fallback to raw base64 if canvas fails
+                    resolve(event.target.result);
                 }
             };
             img.onerror = (error) => {
                 console.error("Image load error, using raw base64:", error);
-                resolve(event.target.result); // Fallback to raw base64
+                resolve(event.target.result);
             };
             img.src = event.target.result;
         };
