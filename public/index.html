@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.3.0 Production
+         Version: 4.2.0 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -125,6 +125,7 @@
             padding-bottom: 0.4rem;
         }
 
+        /* Zero out top spacing on mobile view for seamless transition */
         @media (max-width: 767.98px) {
             .main-header .navbar {
                 padding-top: 0.25rem !important;
@@ -132,78 +133,12 @@
             }
         }
 
-        /* Hero Scrolling Branded Cylinders Banner Styles */
-        .hero-cylinder-banner {
-            overflow: hidden;
-            width: 100%;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            padding: 16px 0;
-            white-space: nowrap;
-            position: relative;
-            margin-bottom: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        /* Interactive Carousel Hero Styles */
+        .hero-slide-item {
+            transition: transform 0.3s ease, filter 0.3s ease;
         }
-
-        .hero-cylinder-banner .scrolling-track {
-            display: flex;
-            gap: 1.5rem;
-            width: max-content;
-            animation: scrollMarquee 28s linear infinite;
-        }
-
-        .hero-cylinder-banner .scrolling-track:hover {
-            animation-play-state: paused;
-        }
-
-        @keyframes scrollMarquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        .cylinder-promo-card {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-            min-width: 250px;
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-
-        .cylinder-promo-card:hover {
-            border-color: #f97316;
-            transform: translateY(-2px);
-        }
-
-        .cylinder-promo-card img {
-            width: 42px;
-            height: 42px;
-            object-fit: contain;
-            border-radius: 50%;
-            background: #ffffff;
-            padding: 3px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .cylinder-promo-card div {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cylinder-promo-card .brand-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #0f172a;
-        }
-
-        .cylinder-promo-card .promo-text {
-            font-size: 0.75rem;
-            color: #64748b;
+        .hero-slide-item:hover {
+            filter: brightness(1.05);
         }
 
         /* Cards & Utilities */
@@ -384,107 +319,721 @@
         </div>
 
         <!-- Main Views Container -->
-        <main class="container pt-3 pt-md-4 pb-5 mb-5">
+        <main class="container pt-0 pt-md-4 pb-5 mb-5">
 
             <!-- Marketplace View -->
             <section id="marketplaceView" class="view">
-                
-                <!-- Hero Scrolling Branded Gas Cylinders Banner -->
-                <div class="hero-cylinder-banner">
-                    <div class="scrolling-track">
-                        <!-- Set 1 -->
-                        <div class="cylinder-promo-card">
-                            <img src="assets/progas.png" alt="ProGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">ProGas</span>
-                                <span class="promo-text">6kg & 13kg Refills Available</span>
+                <!-- Interactive Scrolling Carousel Hero Banner -->
+                <div id="heroCarousel" class="carousel slide mb-4 rounded-4 overflow-hidden shadow-sm" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        <!-- Slide 1: 6kg Refills -->
+                        <div class="carousel-item active hero-slide-item" data-category="refill" data-size="6kg" style="cursor: pointer; background: linear-gradient(135deg, #f97316, #ea580c); color: white; padding: 2.2rem 2rem; min-height: 200px; display: flex; align-items: center;">
+                            <div class="row align-items-center w-100 m-0">
+                                <div class="col-md-8">
+                                    <span class="badge bg-white text-dark mb-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">POPULAR REFILL</span>
+                                    <h2 class="fw-bold fs-3 mb-1">6Kg Cooking Gas Refill</h2>
+                                    <p class="mb-3 text-white-50 small">Fast delivery across Kenya. Order your preferred brand today!</p>
+                                    <span class="btn btn-light btn-sm fw-bold text-dark px-3 py-1.5">Shop 6Kg Refills <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                                <div class="col-md-4 text-center d-none d-md-block">
+                                    <i class="bi bi-fire text-white-50" style="font-size: 3.5rem;"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/total.png" alt="TotalEnergies" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">TotalEnergies</span>
-                                <span class="promo-text">Safe & Certified Clean Energy</span>
+                        <!-- Slide 2: 13kg Complete Cylinders -->
+                        <div class="carousel-item hero-slide-item" data-category="cylinder_complete" data-size="13kg" style="cursor: pointer; background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 2.2rem 2rem; min-height: 200px; display: flex; align-items: center;">
+                            <div class="row align-items-center w-100 m-0">
+                                <div class="col-md-8">
+                                    <span class="badge bg-warning text-dark mb-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">BEST VALUE</span>
+                                    <h2 class="fw-bold fs-3 mb-1">13Kg Complete Cylinders</h2>
+                                    <p class="mb-3 text-secondary small">Get a brand new cylinder complete with gas and burner setup.</p>
+                                    <span class="btn btn-warning btn-sm fw-bold text-dark px-3 py-1.5">Explore 13Kg Sets <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                                <div class="col-md-4 text-center d-none d-md-block">
+                                    <i class="bi bi-fuel-pump text-warning" style="font-size: 3.5rem;"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/afrigas.png" alt="AfriGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">AfriGas</span>
-                                <span class="promo-text">Instant Delivery in Your Zone</span>
+                        <!-- Slide 3: Gas Accessories -->
+                        <div class="carousel-item hero-slide-item" data-category="accessories" data-size="" style="cursor: pointer; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 2.2rem 2rem; min-height: 200px; display: flex; align-items: center;">
+                            <div class="row align-items-center w-100 m-0">
+                                <div class="col-md-8">
+                                    <span class="badge bg-light text-primary mb-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">SAFETY & HARDWARE</span>
+                                    <h2 class="fw-bold fs-3 mb-1">Regulators & Accessories</h2>
+                                    <p class="mb-3 text-white-50 small">High-quality gas burners, safe pipes, and regulators for your kitchen.</p>
+                                    <span class="btn btn-light btn-sm fw-bold text-primary px-3 py-1.5">View Accessories <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                                <div class="col-md-4 text-center d-none d-md-block">
+                                    <i class="bi bi-shield-check text-white-50" style="font-size: 3.5rem;"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/kgas.png" alt="K-Gas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">K-Gas</span>
-                                <span class="promo-text">Trusted Household Power</span>
+                        <!-- Slide 4: All Refills -->
+                        <div class="carousel-item hero-slide-item" data-category="refill" data-size="" style="cursor: pointer; background: linear-gradient(135deg, #16a34a, #15803d); color: white; padding: 2.2rem 2rem; min-height: 200px; display: flex; align-items: center;">
+                            <div class="row align-items-center w-100 m-0">
+                                <div class="col-md-8">
+                                    <span class="badge bg-white text-success mb-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">EXCHANGE & REFILL</span>
+                                    <h2 class="fw-bold fs-3 mb-1">All Gas Refill Brands</h2>
+                                    <p class="mb-3 text-white-50 small">Total, Afrigas, Pro Gas, K-Gas and more delivered instantly.</p>
+                                    <span class="btn btn-light btn-sm fw-bold text-success px-3 py-1.5">Browse All Refills <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                                <div class="col-md-4 text-center d-none d-md-block">
+                                    <i class="bi bi-lightning-charge text-white-50" style="font-size: 3.5rem;"></i>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
 
-                        <!-- Duplicate Set for Infinite Seamless Scrolling Loop -->
-                        <div class="cylinder-promo-card">
-                            <img src="assets/progas.png" alt="ProGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">ProGas</span>
-                                <span class="promo-text">6kg & 13kg Refills Available</span>
-                            </div>
+                <!-- Categories Quick Grid with Professional Vector SVGs -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="card p-3 text-center h-100 bg-white shadow-sm border-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+                            <h6 class="fw-bold mb-1">Gas Refills</h6>
+                            <small class="text-muted">Fast cylinder exchanges</small>
                         </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/total.png" alt="TotalEnergies" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">TotalEnergies</span>
-                                <span class="promo-text">Safe & Certified Clean Energy</span>
-                            </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card p-3 text-center h-100 bg-white shadow-sm border-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><rect x="6" y="4" width="12" height="16" rx="3"></rect><path d="M10 2h4"></path><path d="M6 10h12"></path></svg>
+                            <h6 class="fw-bold mb-1">Complete Cylinders</h6>
+                            <small class="text-muted">New tanks + gas</small>
                         </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/afrigas.png" alt="AfriGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">AfriGas</span>
-                                <span class="promo-text">Instant Delivery in Your Zone</span>
-                            </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card p-3 text-center h-100 bg-white shadow-sm border-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                            <h6 class="fw-bold mb-1">Accessories</h6>
+                            <small class="text-muted">Regulators & burners</small>
                         </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/kgas.png" alt="K-Gas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">K-Gas</span>
-                                <span class="promo-text">Trusted Household Power</span>
-                            </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card p-3 text-center h-100 bg-white shadow-sm border-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 mx-auto"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                            <h6 class="fw-bold mb-1">Verified Suppliers</h6>
+                            <small class="text-muted">Trusted local retailers</small>
                         </div>
                     </div>
                 </div>
 
-                <!-- Filters & Product Grid Section -->
-                <div class="row mb-4 align-items-center">
-                    <div class="col-md-6 mb-2 mb-md-0">
-                        <h1 class="h4 fw-bold mb-0">Active Cooking Gas Listings</h1>
-                    </div>
-                    <div class="col-md-6 d-flex gap-2 justify-content-md-end">
-                        <select id="filterSize" class="form-select form-select-sm w-auto">
+                <!-- Filter Bar -->
+                <div class="filters-bar d-flex gap-3 align-items-center bg-white p-3 rounded shadow-sm border mb-4 flex-wrap">
+                    <h3 class="fs-6 mb-0 text-dark fw-bold">Filter Gas Listings:</h3>
+                    
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="filterSize" class="text-muted small">Size:</label>
+                        <select id="filterSize" class="form-select form-select-sm" style="width: 120px;">
                             <option value="">All Sizes</option>
-                            <option value="6kg">6kg Cylinder</option>
-                            <option value="13kg">13kg Cylinder</option>
-                            <option value="other">Other Sizes</option>
+                            <option value="3kg">3 Kg</option>
+                            <option value="6kg">6 Kg</option>
+                            <option value="13kg">13 Kg</option>
+                            <option value="50kg">50 Kg</option>
                         </select>
-                        <select id="filterCategory" class="form-select form-select-sm w-auto">
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="filterCategory" class="text-muted small">Category:</label>
+                        <select id="filterCategory" class="form-select form-select-sm" style="width: 160px;">
                             <option value="">All Categories</option>
-                            <option value="refill">Refill</option>
-                            <option value="cylinder_complete">Complete Set</option>
+                            <option value="refill">Gas Refill</option>
+                            <option value="cylinder_complete">Complete Cylinder</option>
                             <option value="accessories">Accessories</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Product Grid -->
-                <div id="productGrid" class="row row-cols-1 row-cols-md-3 g-4">
-                    <p class="text-muted">Loading gas suppliers & inventory...</p>
+                <!-- Dynamic Product Grid Container -->
+                <div class="product-grid" id="productGrid" aria-live="polite" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem;">
+                    <!-- Dynamic Firebase listings load here -->
                 </div>
             </section>
 
+            <!-- Supplier Dashboard View -->
+            <section id="supplierDashboardView" class="view" style="display:none;">
+                <h2 class="mb-4">Supplier Dashboard & Analytics</h2>
+                
+                <div class="supplier-stats-grid row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                            <h4 class="fs-6 text-muted mb-1">Total Orders Received</h4>
+                            <p id="statTotalOrders" class="fs-3 fw-bold text-primary mb-0">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                            <h4 class="fs-6 text-muted mb-1">Active Listings</h4>
+                            <p id="statActiveListings" class="fs-3 fw-bold text-primary mb-0">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                            <h4 class="fs-6 text-muted mb-1">Total Revenue (KES)</h4>
+                            <p id="statRevenue" class="fs-3 fw-bold text-primary mb-0">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="supplier-tabs mb-3 d-flex gap-2">
+                    <button type="button" class="btn btn-primary btn-sm" id="tabListingsBtn" onclick="window.switchSupplierTab('listings')">Manage Inventory</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="tabOrdersBtn" onclick="window.switchSupplierTab('orders')">Customer Orders</button>
+                </div>
+
+                <div id="supplierListingsTabContent">
+                    <form id="supplierListingForm" class="card p-4 mb-4">
+                        <h3 class="fs-5 mb-3 fw-bold">Post New Gas Listing</h3>
+                        <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. 13kg Total Gas Refill)" required>
+                        <select id="supplierItemSize" required>
+                            <option value="3kg">3 Kg</option>
+                            <option value="6kg">6 Kg</option>
+                            <option value="13kg">13 Kg</option>
+                            <option value="50kg">50 Kg</option>
+                        </select>
+                        <select id="supplierItemCategory" required>
+                            <option value="refill">Gas Refill</option>
+                            <option value="cylinder_complete">Complete Cylinder</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                        <input type="number" id="supplierItemPrice" placeholder="Price (KES)" required>
+                        
+                        <label for="supplierItemImage" class="small text-muted mt-1 d-block">Product Images (Max 5)</label>
+                        <input type="file" id="supplierItemImage" accept="image/*" multiple required>
+
+                        <textarea id="supplierItemDescription" placeholder="Description & delivery terms" rows="3" required></textarea>
+                        <button type="submit" class="btn btn-primary mt-2">Publish Listing</button>
+                    </form>
+                    <div class="my-listings">
+                        <h3 class="fs-5 fw-bold mb-3">Your Active Listings</h3>
+                        <div id="supplierListingsGrid"></div>
+                    </div>
+                </div>
+
+                <div id="supplierOrdersTabContent" style="display: none;">
+                    <div class="card p-4">
+                        <h3 class="fs-5 fw-bold mb-3">Incoming Customer Orders</h3>
+                        <div id="supplierOrdersList">
+                            <p class="text-muted">No customer orders received yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Customer Orders View -->
+            <section id="customerOrdersView" class="view" style="display:none;">
+                <h2 class="mb-4">My Orders & Account Portal</h2>
+                <div class="card p-4">
+                    <h3 class="fs-5 fw-bold mb-3">Order History</h3>
+                    <div id="customerOrdersList">
+                        <p class="text-muted">You have not placed any orders yet.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Settings View -->
+            <section id="profileSettingsView" class="view" style="display:none;">
+                <div class="d-flex align-items-center mb-4">
+                    <button class="btn btn-link text-dark p-0 me-3 fs-4 text-decoration-none" id="backFromSettingsBtn"><i class="bi bi-chevron-left"></i></button>
+                    <h2 class="fs-4 fw-bold mb-0 text-success">Settings</h2>
+                </div>
+                <div class="card shadow-sm border-0 p-0 overflow-hidden mb-4">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Personal details</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Business details</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Verify your details</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Change phone number</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Confirm email</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Change language</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Disable chats</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Disable Feedback</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Manage notifications</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-medium">Change password</span>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 text-danger">
+                            <span class="fw-medium">Delete my account permanently</span>
+                            <i class="bi bi-chevron-right text-danger"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 text-primary" id="settingsLogoutBtn">
+                            <span class="fw-medium">Log out</span>
+                            <i class="bi bi-chevron-right text-primary"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cart & Checkout View -->
+            <section id="cartView" class="view" style="display:none;">
+                <h2 class="mb-4">Your Shopping Cart & Checkout</h2>
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <div class="card p-4 h-100">
+                            <h3 class="fs-5 fw-bold mb-3">Review Items</h3>
+                            <div id="cartItemsList">
+                                <p class="text-muted">Your cart is currently empty.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="card p-4">
+                            <h3 class="fs-5 fw-bold mb-3">Order Summary</h3>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal</span>
+                                <span id="cartSubtotal" class="fw-semibold">KES 0</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Estimated Delivery</span>
+                                <span class="fw-semibold">KES 200</span>
+                            </div>
+                            <hr class="text-muted">
+                            <div class="d-flex justify-content-between mb-4 fs-5">
+                                <strong>Total</strong>
+                                <strong id="cartTotal" class="text-primary">KES 200</strong>
+                            </div>
+
+                            <form id="checkoutForm">
+                                <h4 class="fs-6 fw-bold mb-2">Delivery Details</h4>
+                                <input type="text" id="deliveryName" placeholder="Full Name" required>
+                                <input type="tel" id="deliveryPhone" placeholder="Phone Number (e.g. 0712345678)" required>
+                                <input type="text" id="deliveryAddress" placeholder="Delivery Location / Estate / House No." required>
+                                <button type="submit" class="btn btn-primary w-100 py-2 mt-2">Place Order & Pay via M-Pesa</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Auth Modal -->
+            <div id="authModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
+                <div class="modal-content shadow-lg">
+                    <span id="closeModal" class="close" role="button" aria-label="Close modal">&times;</span>
+                    <h2 id="authModalTitle" class="fs-4 fw-bold mb-3">Sign In</h2>
+                    <form id="authForm">
+                        <input type="email" id="authEmail" placeholder="Email Address" required>
+                        <input type="password" id="authPassword" placeholder="Password" required>
+                        
+                        <div id="vendorFields" style="display:none;">
+                            <input type="text" id="businessName" placeholder="Business / Supplier Name">
+                            <select id="supplierCounty">
+                                <option value="">Select County</option>
+                            </select>
+                            <select id="supplierArea">
+                                <option value="">Select Town / Area First</option>
+                            </select>
+                            <select id="userRole">
+                                <option value="customer">Customer</option>
+                                <option value="vendor">Supplier / Retailer</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" id="authSubmitBtn" class="btn btn-primary w-100 py-2 mt-2">Sign In</button>
+                        <p id="toggleAuthMode" class="text-center text-primary mt-3 mb-0" style="cursor:pointer; font-size: 0.9rem;">Need an account? Register</p>
+                    </form>
+                </div>
+            </div>
         </main>
-    </div>
+
+        <!-- Professional Footer -->
+        <footer class="site-footer bg-dark text-white pt-5 pb-4 mt-5">
+            <div class="container mb-md-0 mb-4">
+                <div class="row g-4 justify-content-between">
+                    <div class="col-lg-4">
+                        <h3 class="fs-5 fw-bold mb-3 text-warning">GasHubKE</h3>
+                        <p class="text-secondary small lh-base">Connecting verified cooking gas suppliers, retailers, and households with fast and reliable service across Kenya.</p>
+                        <div class="d-flex gap-3 fs-5 mt-3">
+                            <a href="#" class="text-secondary"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="text-secondary"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="text-secondary"><i class="bi bi-twitter-x"></i></a>
+                            <a href="#" class="text-secondary"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <h4 class="fs-6 fw-bold mb-3">Quick Links</h4>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none">About Us</a></li>
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none">Supplier Guidelines</a></li>
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none">Safety & Compliance</a></li>
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none">Contact Support</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <h4 class="fs-6 fw-bold mb-3">Legal</h4>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none">Privacy Policy</a></li>
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom text-center mt-4 pt-3 border-top border-secondary text-secondary small">
+                    <p class="mb-0">&copy; <span id="currentYear"></span> GasHubKE Marketplace. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Mobile Bottom Navigation Bar -->
+        <nav class="navbar fixed-bottom bg-white border-top d-md-none shadow-sm py-1 px-2" style="z-index: 1040;">
+            <div class="container-fluid d-flex justify-content-around align-items-center text-center">
+                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavHome" style="font-size: 0.75rem;">
+                    <i class="bi bi-house-door fs-5 mb-0 text-primary"></i>
+                    <span class="fw-semibold">Home</span>
+                </a>
+                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1 position-relative" id="bottomNavCart" style="font-size: 0.75rem;">
+                    <i class="bi bi-cart3 fs-5 mb-0"></i>
+                    <span>Cart</span>
+                    <span id="bottomCartCount" class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-danger" style="font-size: 0.55rem; margin-left: 10px;">0</span>
+                </a>
+                <a href="#" class="nav-link d-flex flex-column align-items-center py-1" id="bottomNavSell" style="font-size: 0.75rem;">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; margin-top: -10px; box-shadow: 0 2px 6px rgba(249,115,22,0.4);">
+                        <i class="bi bi-plus-lg fs-5"></i>
+                    </div>
+                    <span class="mt-1 fw-bold text-dark">Sell</span>
+                </a>
+                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavOrders" style="font-size: 0.75rem;">
+                    <i class="bi bi-receipt fs-5 mb-0"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="#" class="nav-link text-dark d-flex flex-column align-items-center py-1" id="bottomNavAccount" style="font-size: 0.75rem;">
+                    <i class="bi bi-person fs-5 mb-0"></i>
+                    <span id="bottomAccountText">Account</span>
+                </a>
+            </div>
+        </nav>
+
+    </div> <!-- End #app -->
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- UI Scripts Control -->
+    <script>
+        // Hide loader once the page is fully loaded
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('pageLoader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 400);
+            }
+        });
+
+        const currentYearEl = document.getElementById('currentYear');
+        if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+
+        const homeLink = document.getElementById('homeLink');
+        const brandLogoLink = document.getElementById('brandLogoLink');
+        const cartLink = document.getElementById('cartLink');
+        const supplierDashboardNavLink = document.getElementById('supplierDashboardNavLink');
+        const customerOrdersNavLink = document.getElementById('customerOrdersNavLink');
+        const profileSettingsNavLink = document.getElementById('profileSettingsNavLink');
+        const authLink = document.getElementById('authLink');
+        const authModal = document.getElementById('authModal');
+        const closeModal = document.getElementById('closeModal');
+        const backFromSettingsBtn = document.getElementById('backFromSettingsBtn');
+        const settingsLogoutBtn = document.getElementById('settingsLogoutBtn');
+
+        const mobileSupplierLinkLi = document.getElementById('mobileSupplierLinkLi');
+        const mobileCustomerOrdersLi = document.getElementById('mobileCustomerOrdersLi');
+        const mobileSettingsLinkLi = document.getElementById('mobileSettingsLinkLi');
+        const mobileAuthLink = document.getElementById('mobileAuthLink');
+
+        // Bottom Navigation Elements
+        const bottomNavHome = document.getElementById('bottomNavHome');
+        const bottomNavCart = document.getElementById('bottomNavCart');
+        const bottomNavSell = document.getElementById('bottomNavSell');
+        const bottomNavOrders = document.getElementById('bottomNavOrders');
+        const bottomNavAccount = document.getElementById('bottomNavAccount');
+        const bottomAccountText = document.getElementById('bottomAccountText');
+
+        // Helper function to automatically close the mobile hamburger offcanvas menu reliably
+        function closeMobileMenu() {
+            const mobileMenuEl = document.getElementById('mobileMenu');
+            if (mobileMenuEl) {
+                const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(mobileMenuEl);
+                bsOffcanvas.hide();
+            }
+        }
+
+        function hideAllViews() {
+            document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+        }
+
+        // Helper to scroll smoothly to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Global function for auth.js to call upon successful login
+        window.handlePostLoginUI = function(role) {
+            hideAllViews();
+            if (authModal) authModal.style.display = 'none';
+
+            document.getElementById('marketplaceView').style.display = 'block';
+            scrollToTop();
+
+            if (role === 'vendor' || role === 'supplier') {
+                if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'inline-block';
+                if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+                if (mobileSupplierLinkLi) mobileSupplierLinkLi.style.display = 'block';
+                if (mobileCustomerOrdersLi) mobileCustomerOrdersLi.style.display = 'none';
+                if (bottomAccountText) bottomAccountText.textContent = 'Dashboard';
+            } else {
+                if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'inline-block';
+                if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
+                if (mobileCustomerOrdersLi) mobileCustomerOrdersLi.style.display = 'block';
+                if (mobileSupplierLinkLi) mobileSupplierLinkLi.style.display = 'none';
+                if (bottomAccountText) bottomAccountText.textContent = 'Account';
+            }
+            if (profileSettingsNavLink) profileSettingsNavLink.style.display = 'inline-block';
+            if (mobileSettingsLinkLi) mobileSettingsLinkLi.style.display = 'block';
+
+            if (authLink) authLink.textContent = 'Sign Out';
+            if (mobileAuthLink) mobileAuthLink.textContent = 'Sign Out';
+        };
+
+        // Global function for logout reset
+        window.handlePostLogoutUI = function() {
+            hideAllViews();
+            document.getElementById('marketplaceView').style.display = 'block';
+            scrollToTop();
+            if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
+            if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+            if (profileSettingsNavLink) profileSettingsNavLink.style.display = 'none';
+            if (mobileSupplierLinkLi) mobileSupplierLinkLi.style.display = 'none';
+            if (mobileCustomerOrdersLi) mobileCustomerOrdersLi.style.display = 'none';
+            if (mobileSettingsLinkLi) mobileSettingsLinkLi.style.display = 'none';
+            if (authLink) authLink.textContent = 'Sign In';
+            if (mobileAuthLink) mobileAuthLink.textContent = 'Sign In / Register';
+            if (bottomAccountText) bottomAccountText.textContent = 'Sign In';
+        };
+
+        // Navigation Actions with Scroll to Top
+        if (homeLink) {
+            homeLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (bottomNavHome) {
+            bottomNavHome.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (brandLogoLink) {
+            brandLogoLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (cartLink) {
+            cartLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('cartView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (bottomNavCart) {
+            bottomNavCart.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('cartView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (supplierDashboardNavLink) {
+            supplierDashboardNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('supplierDashboardView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (customerOrdersNavLink) {
+            customerOrdersNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('customerOrdersView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (profileSettingsNavLink) {
+            profileSettingsNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('profileSettingsView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (backFromSettingsBtn) {
+            backFromSettingsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
+            });
+        }
+
+        if (settingsLogoutBtn) {
+            settingsLogoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.handlePostLogoutUI();
+            });
+        }
+
+        if (bottomNavOrders) {
+            bottomNavOrders.addEventListener('click', (e) => {
+                e.preventDefault();
+                scrollToTop();
+                if (customerOrdersNavLink && customerOrdersNavLink.style.display !== 'none') {
+                    customerOrdersNavLink.click();
+                } else if (supplierDashboardNavLink && supplierDashboardNavLink.style.display !== 'none') {
+                    supplierDashboardNavLink.click();
+                } else {
+                    if (authModal) authModal.style.display = 'flex';
+                }
+            });
+        }
+
+        if (bottomNavSell) {
+            bottomNavSell.addEventListener('click', (e) => {
+                e.preventDefault();
+                scrollToTop();
+                if (supplierDashboardNavLink && supplierDashboardNavLink.style.display !== 'none') {
+                    supplierDashboardNavLink.click();
+                } else {
+                    if (authModal) authModal.style.display = 'flex';
+                }
+            });
+        }
+
+        if (bottomNavAccount) {
+            bottomNavAccount.addEventListener('click', (e) => {
+                e.preventDefault();
+                scrollToTop();
+                if (authLink.textContent === 'Sign Out') {
+                    if (profileSettingsNavLink) {
+                        profileSettingsNavLink.click();
+                    }
+                } else {
+                    if (authModal) authModal.style.display = 'flex';
+                }
+            });
+        }
+
+        // Auth Modal Popup Triggers
+        if (authLink && authModal) {
+            authLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                authModal.style.display = 'flex';
+            });
+        }
+
+        if (closeModal && authModal) {
+            closeModal.addEventListener('click', () => {
+                authModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.style.display = 'none';
+            }
+        });
+
+        // Interactive Scrolling Carousel Banner Click Handlers
+        document.querySelectorAll('.hero-slide-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const category = item.getAttribute('data-category');
+                const size = item.getAttribute('data-size');
+                
+                hideAllViews();
+                document.getElementById('marketplaceView').style.display = 'block';
+                scrollToTop();
+
+                const filterCategory = document.getElementById('filterCategory');
+                const filterSize = document.getElementById('filterSize');
+                
+                if (filterCategory) {
+                    filterCategory.value = category || '';
+                    filterCategory.dispatchEvent(new Event('change'));
+                }
+                if (filterSize) {
+                    filterSize.value = size || '';
+                    filterSize.dispatchEvent(new Event('change'));
+                }
+
+                // Smooth scroll down to product grid section
+                const productGrid = document.getElementById('productGrid');
+                if (productGrid) {
+                    setTimeout(() => {
+                        productGrid.scrollIntoView({ behavior: 'smooth' });
+                    }, 200);
+                }
+            });
+        });
+    </script>
+
+    <!-- Firebase & Feature Script Modules -->
+    <script type="module" src="./js/firebase-config.js"></script>
+    <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="./js/counties.js"></script>
+    <script type="module" src="./js/marketplace.js"></script>
+    <script type="module" src="./js/supplier-dashboard.js"></script>
 </body>
 </html>
