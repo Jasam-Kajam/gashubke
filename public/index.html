@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.8.0 Production
+         Version: 4.9.0 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,7 +62,7 @@
             scroll-behavior: smooth;
         }
 
-        /* Professional Loading Spinner */
+        /* Professional Loading Spinner with transition */
         #pageLoader {
             position: fixed;
             inset: 0;
@@ -72,6 +72,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            opacity: 1;
+            visibility: visible;
             transition: opacity 0.4s ease, visibility 0.4s ease;
         }
 
@@ -232,30 +234,6 @@
             background-color: #ea580c;
             border-color: #ea580c;
         }
-
-        /* Modal Styles */
-        .modal {
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 450px;
-            width: 100%;
-            position: relative;
-        }
-        .close {
-            position: absolute;
-            top: 1rem;
-            right: 1.25rem;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #64748b;
-        }
         
         input, select, textarea {
             width: 100%;
@@ -349,7 +327,6 @@
                             <div class="search-bar d-flex align-items-center bg-light rounded px-2 py-1 border">
                                 <i class="bi bi-search text-muted ms-1"></i>
                                 <input type="search" id="searchInput" placeholder="Search gas, refills..." aria-label="Search listings" class="border-0 bg-transparent outline-none px-2 py-1" style="width: 150px; font-size: 0.9rem;">
-                                <button id="searchBtn" style="display: none;">Search</button>
                             </div>
 
                             <!-- Cart Link with Badge -->
@@ -379,29 +356,23 @@
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body d-flex flex-column justify-content-between py-3">
-                <ul class="nav flex-column gap-2 fs-6" id="mobileNavLinksList">
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('homeLink').click();"><i class="bi bi-house-door me-2 text-primary"></i> Marketplace</a></li>
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('cartLink').click();"><i class="bi bi-cart3 me-2 text-primary"></i> Shopping Cart</a></li>
-                    <li id="mobileSupplierLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('supplierDashboardNavLink').click();"><i class="bi bi-speedometer2 me-2 text-primary"></i> Supplier Dashboard</a></li>
-                    <li id="mobileCustomerOrdersLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('customerOrdersNavLink').click();"><i class="bi bi-receipt me-2 text-primary"></i> My Orders</a></li>
-                    <li id="mobileSettingsLinkLi" style="display:none;"><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); document.getElementById('profileSettingsNavLink').click();"><i class="bi bi-gear me-2 text-success"></i> Settings</a></li>
+                <ul class="nav flex-column gap-2 fs-6">
+                    <li><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu()"><i class="bi bi-house-door me-2 text-primary"></i> Marketplace</a></li>
+                    <li><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu()"><i class="bi bi-cart3 me-2 text-primary"></i> Shopping Cart</a></li>
                 </ul>
                 <div class="mt-4 border-top pt-3">
-                    <a href="#" id="mobileAuthLink" class="btn btn-primary w-100 py-2" onclick="closeMobileMenu(); document.getElementById('authLink').click();">Sign In / Register</a>
+                    <a href="#" class="btn btn-primary w-100 py-2" onclick="closeMobileMenu()">Sign In / Register</a>
                 </div>
             </div>
         </div>
 
         <!-- Main Views Container -->
         <main class="container pt-0 pt-md-4 pb-5 mb-5">
-
-            <!-- Marketplace View -->
             <section id="marketplaceView" class="view">
                 
                 <!-- Hero Scrolling Branded Gas Cylinders Banner -->
                 <div class="hero-cylinder-banner">
                     <div class="scrolling-track">
-                        <!-- Set 1 -->
                         <div class="cylinder-promo-card">
                             <img src="assets/progas.png" alt="ProGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
                             <div>
@@ -430,8 +401,7 @@
                                 <span class="promo-text">Trusted Household Power</span>
                             </div>
                         </div>
-
-                        <!-- Duplicate Set for Infinite Seamless Scrolling Loop -->
+                        <!-- Duplicate set for smooth scrolling -->
                         <div class="cylinder-promo-card">
                             <img src="assets/progas.png" alt="ProGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
                             <div>
@@ -463,7 +433,7 @@
                     </div>
                 </div>
 
-                <!-- Comprehensive Filter Section (Location - 47 Counties, Brands, Sizes, Categories) -->
+                <!-- Comprehensive Filter Section -->
                 <div class="filter-container mb-4">
                     <div class="row align-items-center g-2">
                         <div class="col-lg-2 col-md-12 mb-1 mb-lg-0">
@@ -473,7 +443,7 @@
                         </div>
                         <div class="col-lg-10 col-md-12">
                             <div class="row g-2">
-                                <!-- Location Filter (Dynamic 47 Counties from counties.js) -->
+                                <!-- Location Filter (Dynamic 47 Counties) -->
                                 <div class="col-6 col-md-3">
                                     <select id="filterLocation" class="form-select form-select-sm mb-0">
                                         <option value="">All 47 Counties</option>
@@ -524,10 +494,9 @@
 
                 <!-- Product Grid -->
                 <div id="productGrid" class="row row-cols-1 row-cols-md-3 g-4">
-                    <p class="text-muted">Loading gas suppliers & inventory...</p>
+                    <!-- Populated dynamically -->
                 </div>
             </section>
-
         </main>
     </div>
 
@@ -537,9 +506,10 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Initialization Script to Populate Counties into Dropdown -->
+    <!-- App Initialization & Spinner Dismissal Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. Populate Counties Dropdown
             const locationSelect = document.getElementById('filterLocation');
             if (typeof KENYA_COUNTIES !== 'undefined' && locationSelect) {
                 KENYA_COUNTIES.forEach(county => {
@@ -548,6 +518,15 @@
                     option.textContent = county;
                     locationSelect.appendChild(option);
                 });
+            }
+
+            // 2. Hide Page Loader Spinner once DOM is ready
+            const pageLoader = document.getElementById('pageLoader');
+            if (pageLoader) {
+                pageLoader.style.opacity = '0';
+                setTimeout(() => {
+                    pageLoader.style.display = 'none';
+                }, 400);
             }
         });
 
