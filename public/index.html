@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.3.1 Production
+         Version: 4.3.0 Production
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,8 +72,6 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            opacity: 1;
-            visibility: visible;
             transition: opacity 0.4s ease, visibility 0.4s ease;
         }
 
@@ -127,7 +125,6 @@
             padding-bottom: 0.4rem;
         }
 
-        /* Zero out top spacing on mobile view for seamless transition */
         @media (max-width: 767.98px) {
             .main-header .navbar {
                 padding-top: 0.25rem !important;
@@ -387,7 +384,7 @@
         </div>
 
         <!-- Main Views Container -->
-        <main class="container pt-0 pt-md-4 pb-5 mb-5">
+        <main class="container pt-3 pt-md-4 pb-5 mb-5">
 
             <!-- Marketplace View -->
             <section id="marketplaceView" class="view">
@@ -459,31 +456,15 @@
 
                 <!-- Filters & Product Grid Section -->
                 <div class="row mb-4 align-items-center">
-                    <div class="col-md-4 mb-2 mb-md-0">
+                    <div class="col-md-6 mb-2 mb-md-0">
                         <h1 class="h4 fw-bold mb-0">Active Cooking Gas Listings</h1>
                     </div>
-                    <div class="col-md-8 d-flex flex-wrap gap-2 justify-content-md-end">
-                        <!-- Location Filter (All 47 Counties via counties.js) -->
-                        <select id="filterLocation" class="form-select form-select-sm w-auto">
-                            <option value="">All 47 Counties</option>
-                        </select>
-                        <!-- Brands Filter -->
-                        <select id="filterBrand" class="form-select form-select-sm w-auto">
-                            <option value="">All Brands</option>
-                            <option value="ProGas">ProGas</option>
-                            <option value="TotalEnergies">TotalEnergies</option>
-                            <option value="AfriGas">AfriGas</option>
-                            <option value="K-Gas">K-Gas</option>
-                            <option value="Hashi">Hashi</option>
-                            <option value="Lake Gas">Lake Gas</option>
-                        </select>
+                    <div class="col-md-6 d-flex gap-2 justify-content-md-end">
                         <select id="filterSize" class="form-select form-select-sm w-auto">
                             <option value="">All Sizes</option>
-                            <option value="3kg">3kg Cylinder</option>
                             <option value="6kg">6kg Cylinder</option>
                             <option value="13kg">13kg Cylinder</option>
-                            <option value="22.5kg">22.5kg Cylinder</option>
-                            <option value="50kg">50kg Commercial</option>
+                            <option value="other">Other Sizes</option>
                         </select>
                         <select id="filterCategory" class="form-select form-select-sm w-auto">
                             <option value="">All Categories</option>
@@ -492,11 +473,6 @@
                             <option value="accessories">Accessories</option>
                         </select>
                     </div>
-                </div>
-
-                <!-- Result count badge -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span id="resultCountBadge" class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.8rem;">Showing all listings</span>
                 </div>
 
                 <!-- Product Grid -->
@@ -508,135 +484,7 @@
         </main>
     </div>
 
-    <!-- Include Counties Data JS -->
-    <script src="./counties.js"></script>
-
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Application Initialization & Logic Script -->
-    <script>
-        // Sample mock database listings for initial marketplace rendering
-        let allListings = [
-            { id: 1, title: "ProGas 6kg Complete Set", brand: "ProGas", size: "6kg", category: "cylinder_complete", location: "Kiambu", price: 3800, supplier: "Ruiru Gas Hub" },
-            { id: 2, title: "TotalEnergies 13kg Refill", brand: "TotalEnergies", size: "13kg", category: "refill", location: "Nairobi", price: 2800, supplier: "Westlands Gas Point" },
-            { id: 3, title: "AfriGas 6kg Refill", brand: "AfriGas", size: "6kg", category: "refill", location: "Mombasa", price: 1250, supplier: "Nyali Energy Ltd" },
-            { id: 4, title: "K-Gas 13kg Complete Set", brand: "K-Gas", size: "13kg", category: "cylinder_complete", location: "Nakuru", price: 6500, supplier: "Rift Valley Gas Center" },
-            { id: 5, title: "Gas Burner & Hose Pipe Accessory", brand: "ProGas", size: "3kg", category: "accessories", location: "Kisumu", price: 850, supplier: "Lake Basin Hardware" }
-        ];
-
-        let cart = [];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Populate Counties Dropdown dynamically from counties.js
-            const locationSelect = document.getElementById('filterLocation');
-            if (typeof KENYA_COUNTIES !== 'undefined' && locationSelect) {
-                KENYA_COUNTIES.forEach(county => {
-                    const option = document.createElement('option');
-                    option.value = county;
-                    option.textContent = county;
-                    locationSelect.appendChild(option);
-                });
-            }
-
-            // 2. Initial Render of Products
-            renderProductGrid(allListings);
-
-            // 3. Attach Filter Event Listeners
-            ['filterLocation', 'filterBrand', 'filterSize', 'filterCategory'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.addEventListener('change', filterListings);
-                }
-            });
-
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', filterListings);
-            }
-
-            // 4. Hide Page Loader Spinner smoothly
-            const pageLoader = document.getElementById('pageLoader');
-            if (pageLoader) {
-                pageLoader.style.opacity = '0';
-                setTimeout(() => {
-                    pageLoader.style.display = 'none';
-                }, 400);
-            }
-        });
-
-        function filterListings() {
-            const selectedLocation = document.getElementById('filterLocation').value.toLowerCase();
-            const selectedBrand = document.getElementById('filterBrand').value.toLowerCase();
-            const selectedSize = document.getElementById('filterSize').value.toLowerCase();
-            const selectedCategory = document.getElementById('filterCategory').value.toLowerCase();
-            const searchQuery = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
-
-            const filtered = allListings.filter(item => {
-                const matchesLocation = !selectedLocation || item.location.toLowerCase() === selectedLocation;
-                const matchesBrand = !selectedBrand || item.brand.toLowerCase() === selectedBrand;
-                const matchesSize = !selectedSize || item.size.toLowerCase() === selectedSize;
-                const matchesCategory = !selectedCategory || item.category.toLowerCase() === selectedCategory;
-                const matchesSearch = !searchQuery || item.title.toLowerCase().includes(searchQuery) || item.supplier.toLowerCase().includes(searchQuery);
-
-                return matchesLocation && matchesBrand && matchesSize && matchesCategory && matchesSearch;
-            });
-
-            renderProductGrid(filtered);
-        }
-
-        function renderProductGrid(listings) {
-            const grid = document.getElementById('productGrid');
-            const badge = document.getElementById('resultCountBadge');
-            
-            if (badge) {
-                badge.textContent = `Showing ${listings.length} result${listings.length === 1 ? '' : 's'}`;
-            }
-
-            if (!grid) return;
-
-            if (listings.length === 0) {
-                grid.innerHTML = `<div class="col-12 text-center py-5"><p class="text-muted">No gas listings found matching your filter criteria.</p></div>`;
-                return;
-            }
-
-            grid.innerHTML = listings.map(item => `
-                <div class="col">
-                    <div class="card h-100 product-card p-3 d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-primary text-white">${item.brand}</span>
-                            <span class="text-muted small"><i class="bi bi-geo-alt"></i> ${item.location}</span>
-                        </div>
-                        <h5 class="h6 fw-bold mb-1">${item.title}</h5>
-                        <p class="text-muted small mb-2">Supplier: ${item.supplier}</p>
-                        <div class="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
-                            <span class="fw-bold text-dark">KSh ${item.price.toLocaleString()}</span>
-                            <button class="btn btn-sm btn-outline-primary" onclick="addToCart(${item.id})">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function addToCart(id) {
-            const product = allListings.find(p => p.id === id);
-            if (product) {
-                cart.push(product);
-                const cartCountEl = document.getElementById('cartCount');
-                if (cartCountEl) {
-                    cartCountEl.textContent = cart.length;
-                }
-                alert(`${product.title} added to your cart!`);
-            }
-        }
-
-        function closeMobileMenu() {
-            const mobileMenuEl = document.getElementById('mobileMenu');
-            if (mobileMenuEl) {
-                const bsOffcanvas = bootstrap.Offcanvas.getInstance(mobileMenuEl);
-                if (bsOffcanvas) bsOffcanvas.hide();
-            }
-        }
-    </script>
 </body>
 </html>
