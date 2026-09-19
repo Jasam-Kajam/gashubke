@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 5.5.0 Production-Ready (Firebase Realtime Powered)
+         Version: 6.0.0 Production (Part I & II Unified Realtime)
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -128,7 +128,7 @@
             }
         }
 
-        /* Hero Scrolling Branded Cylinders Banner Styles */
+        /* Hero Scrolling Branded Cylinders Banner (Part I Element) */
         .hero-cylinder-banner {
             overflow: hidden;
             width: 100%;
@@ -202,7 +202,7 @@
             color: #64748b;
         }
 
-        /* Filter Section Card styling */
+        /* Filter Section Card styling (Part I Element) */
         .filter-container {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -211,7 +211,7 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
 
-        /* Multi-Views Management */
+        /* Multi-Views Management (Part II Element) */
         .view {
             display: none;
         }
@@ -251,7 +251,7 @@
             box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
         }
 
-        /* Mobile Bottom Navigation Bar */
+        /* Mobile Bottom Navigation Bar (Part II Element) */
         .mobile-bottom-nav {
             position: fixed;
             bottom: 0;
@@ -287,7 +287,7 @@
     <!-- Professional Page Loader Spinner -->
     <div id="pageLoader">
         <div class="spinner-ring"></div>
-        <div class="spinner-text" id="loaderText">Initializing GasHubKE Firestore...</div>
+        <div class="spinner-text">Connecting to GasHubKE Firebase...</div>
     </div>
 
     <!-- App Wrapper -->
@@ -314,7 +314,7 @@
                         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" class="brand-logo" width="48" height="48">
                         <div class="ms-2 lh-sm text-truncate">
                             <strong style="color: #1e293b; font-size: 1.05rem; display: block;">GasHubKE</strong>
-                            <small class="text-muted d-none d-sm-block" style="font-size: 0.7rem;">Production Realtime</small>
+                            <small class="text-muted d-none d-sm-block" style="font-size: 0.7rem;">Parts I & II Unified</small>
                         </div>
                     </a>
 
@@ -390,7 +390,7 @@
         <!-- Main Views Container -->
         <main class="container pt-3 pt-md-4 pb-5 mb-5">
             
-            <!-- 1. Marketplace View (Part I) -->
+            <!-- 1. Marketplace View (Part I Elements) -->
             <section id="marketplaceView" class="view active">
                 
                 <!-- Hero Scrolling Branded Gas Cylinders Banner -->
@@ -521,7 +521,7 @@
                 </div>
             </section>
 
-            <!-- 2. Supplier Dashboard View (Part II) -->
+            <!-- 2. Supplier Dashboard View (Part II Elements) -->
             <section id="supplierDashboardView" class="view">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
@@ -574,7 +574,7 @@
                 </div>
             </section>
 
-            <!-- 3. Customer Orders View (Part II) -->
+            <!-- 3. Customer Orders View (Part II Elements) -->
             <section id="customerOrdersView" class="view">
                 <div class="mb-4">
                     <h2 class="fw-bold mb-1">My Orders</h2>
@@ -585,7 +585,7 @@
                 </div>
             </section>
 
-            <!-- 4. Profile Settings View (Part II) -->
+            <!-- 4. Profile Settings View (Part II Elements) -->
             <section id="profileSettingsView" class="view">
                 <div class="mb-4">
                     <h2 class="fw-bold mb-1">Account Settings</h2>
@@ -620,7 +620,7 @@
                 </div>
             </section>
 
-            <!-- 5. Cart & Checkout View (Part II) -->
+            <!-- 5. Cart & Checkout View (Part II Elements) -->
             <section id="cartCheckoutView" class="view">
                 <div class="mb-4">
                     <h2 class="fw-bold mb-1">Shopping Cart & Checkout</h2>
@@ -681,7 +681,7 @@
         </main>
     </div>
 
-    <!-- Mobile Bottom Navigation Bar -->
+    <!-- Mobile Bottom Navigation Bar (Part II Element) -->
     <nav class="mobile-bottom-nav d-md-none">
         <a href="#" class="active" onclick="switchView('marketplaceView'); setActiveNav(this)">
             <i class="bi bi-shop"></i>
@@ -843,7 +843,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-    <!-- GasHubKE Production Realtime Logic Script -->
+    <!-- GasHubKE Unified Realtime Logic Script -->
     <script>
         // ==========================================
         // FIREBASE INITIALIZATION & CONFIGURATION
@@ -923,9 +923,9 @@
             renderCart();
         });
 
-        // Realtime Firestore Listeners for Products & Orders (Production Grade)
+        // Realtime Firestore Listeners for Products & Orders
         function initRealtimeListeners() {
-            // Real-time products sync
+            // Real-time products sync (Part I Marketplace data source)
             db.collection('products').onSnapshot(snapshot => {
                 products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
@@ -943,7 +943,7 @@
                 console.error("Products listener error:", err);
             });
 
-            // Real-time orders sync
+            // Real-time orders sync (Part II Orders & Dashboard)
             if (currentUser) {
                 db.collection('orders').onSnapshot(snapshot => {
                     orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
