@@ -4,7 +4,7 @@
     <!-- ======================================================
          GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
          File: index.html
-         Version: 4.9.0 Production
+         Version: 5.0.0 Production (Firebase Powered)
     ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,24 +12,8 @@
 
     <title>GasHubKE | Kenya's Trusted Online Cooking Gas Marketplace</title>
     <meta name="description" content="Fast, reliable cooking gas delivery. Compare prices, order gas refills, cylinders, and accessories from verified local suppliers across Kenya on GasHubKE.">
-    <meta name="keywords" content="GasHubKE, Kenya Gas, cooking gas delivery Kenya, gas refill near me, 6kg gas cylinder, 13kg gas price, cooking gas platform, LPG suppliers Kenya">
-    <meta name="author" content="GasHubKE">
-    <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#f97316">
     <link rel="canonical" href="https://gashubke.com/">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gashubke.com/">
-    <meta property="og:title" content="GasHubKE - Kenya's Online Cooking Gas Hub">
-    <meta property="og:description" content="Connect with trusted cooking gas suppliers and retailers for fast delivery on refills and cylinders across Kenya.">
-    <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="GasHubKE - Cooking Gas Platform">
-    <meta name="twitter:description" content="Compare prices and order cooking gas cylinders and refills directly from verified local suppliers.">
-    <meta name="twitter:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg">
 
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg">
@@ -62,7 +46,7 @@
             scroll-behavior: smooth;
         }
 
-        /* Professional Loading Spinner with transition */
+        /* Professional Loading Spinner */
         #pageLoader {
             position: fixed;
             inset: 0;
@@ -287,27 +271,13 @@
             margin-bottom: 2px;
         }
     </style>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "GasHubKE",
-      "url": "https://gashubke.com/",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://gashubke.com/?s={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
 </head>
 <body>
 
     <!-- Professional Page Loader Spinner -->
     <div id="pageLoader">
         <div class="spinner-ring"></div>
-        <div class="spinner-text">Loading GasHubKE Marketplace...</div>
+        <div class="spinner-text" id="loaderText">Connecting to GasHubKE Firebase...</div>
     </div>
 
     <!-- App Wrapper -->
@@ -334,7 +304,7 @@
                         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" class="brand-logo" width="48" height="48">
                         <div class="ms-2 lh-sm text-truncate">
                             <strong style="color: #1e293b; font-size: 1.05rem; display: block;">GasHubKE</strong>
-                            <small class="text-muted d-none d-sm-block" style="font-size: 0.7rem;">Kenya Gas Marketplace</small>
+                            <small class="text-muted d-none d-sm-block" style="font-size: 0.7rem;">Firebase Powered</small>
                         </div>
                     </a>
 
@@ -347,16 +317,16 @@
                     <div class="collapse navbar-collapse" id="desktopNavigation">
                         <ul class="navbar-nav mx-auto align-items-center gap-3">
                             <li class="nav-item">
-                                <a class="nav-link fw-medium text-dark active" href="#" id="homeLink" onclick="switchView('marketplaceView')">Marketplace</a>
+                                <a class="nav-link fw-medium text-dark active" href="#" onclick="switchView('marketplaceView')">Marketplace</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fw-medium text-dark" href="#" id="supplierDashboardNavLink" onclick="switchView('supplierDashboardView')" style="display:none;">Supplier Dashboard</a>
+                                <a class="nav-link fw-medium text-dark" id="supplierDashboardNavLink" href="#" onclick="switchView('supplierDashboardView')" style="display:none;">Supplier Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fw-medium text-dark" href="#" id="customerOrdersNavLink" onclick="switchView('customerOrdersView')" style="display:none;">My Orders</a>
+                                <a class="nav-link fw-medium text-dark" id="customerOrdersNavLink" href="#" onclick="switchView('customerOrdersView')" style="display:none;">My Orders</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fw-medium text-dark" href="#" id="profileSettingsNavLink" onclick="switchView('profileSettingsView')" style="display:none;">Settings</a>
+                                <a class="nav-link fw-medium text-dark" id="profileSettingsNavLink" href="#" onclick="switchView('profileSettingsView')" style="display:none;">Settings</a>
                             </li>
                         </ul>
 
@@ -531,13 +501,13 @@
 
                 <!-- Product Grid Header & Count -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h5 fw-bold mb-0 text-secondary">Available Offers</h2>
-                    <span id="resultCountBadge" class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.8rem;">Showing all listings</span>
+                    <h2 class="h5 fw-bold mb-0 text-secondary">Firebase Live Offers</h2>
+                    <span id="resultCountBadge" class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.8rem;">Loading...</span>
                 </div>
 
                 <!-- Product Grid -->
                 <div id="productGrid" class="row row-cols-1 row-cols-md-3 g-4">
-                    <!-- Populated dynamically via JS -->
+                    <!-- Populated dynamically via Firebase Firestore -->
                 </div>
             </section>
 
@@ -546,7 +516,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h2 class="fw-bold mb-1">Supplier Dashboard</h2>
-                        <p class="text-muted mb-0">Manage your cooking gas inventory, pricing, and incoming orders.</p>
+                        <p class="text-muted mb-0">Manage your Firestore inventory listings and incoming gas orders.</p>
                     </div>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
                         <i class="bi bi-plus-lg me-1"></i> Add New Listing
@@ -573,7 +543,7 @@
                     </div>
                 </div>
                 <div class="card p-4">
-                    <h4 class="h6 fw-bold mb-3">Your Inventory Listings</h4>
+                    <h4 class="h6 fw-bold mb-3">Your Inventory (Firestore)</h4>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
@@ -598,7 +568,7 @@
             <section id="customerOrdersView" class="view">
                 <div class="mb-4">
                     <h2 class="fw-bold mb-1">My Orders</h2>
-                    <p class="text-muted mb-0">Track your active and past cooking gas deliveries.</p>
+                    <p class="text-muted mb-0">Track your live orders synced from Firestore.</p>
                 </div>
                 <div id="customerOrdersList" class="vstack gap-3">
                     <!-- Dynamically populated -->
@@ -609,7 +579,7 @@
             <section id="profileSettingsView" class="view">
                 <div class="mb-4">
                     <h2 class="fw-bold mb-1">Account Settings</h2>
-                    <p class="text-muted mb-0">Update your delivery address, phone number, and account preferences.</p>
+                    <p class="text-muted mb-0">Update your Firebase user profile details.</p>
                 </div>
                 <div class="card p-4 mx-auto" style="max-width: 600px;">
                     <form id="profileForm" onsubmit="saveProfile(event)">
@@ -635,7 +605,7 @@
                             <label class="form-label fw-medium">Specific Delivery Address / Estate</label>
                             <textarea id="profileAddress" class="form-control" rows="2" placeholder="e.g., Ruiru Town, Kihunguro Stage"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2">Save Changes</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2">Save Profile</button>
                     </form>
                 </div>
             </section>
@@ -644,7 +614,7 @@
             <section id="cartCheckoutView" class="view">
                 <div class="mb-4">
                     <h2 class="fw-bold mb-1">Shopping Cart & Checkout</h2>
-                    <p class="text-muted mb-0">Review your selected gas items and complete instant M-Pesa or Cash delivery.</p>
+                    <p class="text-muted mb-0">Complete instant M-Pesa STK push or cash delivery.</p>
                 </div>
                 <div class="row g-4">
                     <div class="col-lg-8">
@@ -691,7 +661,7 @@
                                 </select>
                             </div>
                             <button class="btn btn-primary w-100 py-2 fw-bold" onclick="completeCheckout()">
-                                Place Order Now
+                                Place Order (Firestore)
                             </button>
                         </div>
                     </div>
@@ -738,19 +708,18 @@
                         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="40" height="40">
                         <span class="ms-2 fw-bold fs-5 text-white">GasHubKE</span>
                     </div>
-                    <p class="text-white-50 small">Kenya's premier online cooking gas marketplace connecting households and businesses with verified local LPG distributors for fast, safe deliveries.</p>
+                    <p class="text-white-50 small">Kenya's premier online cooking gas marketplace powered by Firebase real-time database.</p>
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <h5 class="text-white fs-6 fw-bold mb-3">Quick Links</h5>
                     <ul class="list-unstyled vstack gap-2 small">
                         <li><a href="#" class="text-white-50 text-decoration-none" onclick="switchView('marketplaceView')">Marketplace</a></li>
                         <li><a href="#" class="text-white-50 text-decoration-none" onclick="switchView('cartCheckoutView')">Shopping Cart</a></li>
-                        <li><a href="#" class="text-white-50 text-decoration-none" data-bs-toggle="modal" data-bs-target="#authModal">Supplier Portal</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <h5 class="text-white fs-6 fw-bold mb-3">Top Counties</h5>
-                    <p class="text-white-50 small mb-0">Nairobi, Kiambu (Ruiru, Thika), Mombasa, Kisumu, Nakuru, Eldoret, Machakos, Kajiado and all 47 counties.</p>
+                    <h5 class="text-white fs-6 fw-bold mb-3">Coverage</h5>
+                    <p class="text-white-50 small mb-0">Nairobi, Kiambu, Mombasa, Kisumu, Nakuru, and all 47 Counties.</p>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h5 class="text-white fs-6 fw-bold mb-3">Customer Support</h5>
@@ -760,7 +729,7 @@
             </div>
             <hr class="border-secondary my-4">
             <div class="text-center text-white-50 small">
-                &copy; 2026 GasHubKE. All rights reserved. Built for safe and instant LPG delivery across Kenya.
+                &copy; 2026 GasHubKE. All rights reserved.
             </div>
         </div>
     </footer>
@@ -770,7 +739,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold">Sign In to GasHubKE</h5>
+                    <h5 class="modal-title fw-bold">Sign In / Register (Firebase)</h5>
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -780,7 +749,7 @@
                             <input type="email" id="authEmail" class="form-control" placeholder="user@example.com" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label small fw-medium">Password</label>
+                            <label class="form-label small fw-medium">Password (Min 6 chars)</label>
                             <input type="password" id="authPassword" class="form-control" placeholder="••••••••" required>
                         </div>
                         <div class="mb-3">
@@ -790,7 +759,7 @@
                                 <option value="supplier">Gas Supplier / Distributor</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-medium">Continue</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-medium">Authenticate</button>
                     </form>
                 </div>
             </div>
@@ -802,7 +771,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold">Add New Cooking Gas Listing</h5>
+                    <h5 class="modal-title fw-bold">Add New Firestore Listing</h5>
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -832,8 +801,8 @@
                             <label class="form-label small fw-medium">Category</label>
                             <select id="newProdCategory" class="form-select" required>
                                 <option value="refill">Refill</option>
-                                <option value="cylinder_complete">Complete Set (Cylinder + Gas + Burner)</option>
-                                <option value="accessories">Accessories (Grill, Pipe, Regulator)</option>
+                                <option value="cylinder_complete">Complete Set</option>
+                                <option value="accessories">Accessories</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -846,7 +815,7 @@
                                 <option value="">Select County</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2">Publish Listing</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2">Publish to Firestore</button>
                     </form>
                 </div>
             </div>
@@ -859,22 +828,37 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- GasHubKE Application Logic Script -->
+    <!-- Firebase SDK (Compat v9) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <!-- GasHubKE Firebase & App Logic Script -->
     <script>
-        // Mock State Data
-        let currentUser = JSON.parse(localStorage.getItem('gashub_user')) || null;
+        // ==========================================
+        // FIREBASE INITIALIZATION & CONFIGURATION
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
+            projectId: "YOUR_FIREBASE_PROJECT_ID",
+            storageBucket: "YOUR_FIREBASE_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID",
+            appId: "YOUR_FIREBASE_APP_ID"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // App State
+        let currentUser = null;
+        let products = [];
+        let orders = [];
         let cart = JSON.parse(localStorage.getItem('gashub_cart')) || [];
-        let orders = JSON.parse(localStorage.getItem('gashub_orders')) || [
-            { id: 'GH-9821', items: '6kg ProGas Refill', total: 1150, status: 'Out for Delivery', date: '2026-03-29' }
-        ];
-        let products = JSON.parse(localStorage.getItem('gashub_products')) || [
-            { id: 1, brand: 'ProGas', size: '6kg', category: 'refill', price: 1150, location: 'Kiambu', supplier: 'Ruiru Gas Hub', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' },
-            { id: 2, brand: 'ProGas', size: '13kg', category: 'refill', price: 2600, location: 'Nairobi', supplier: 'Westlands LPG', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' },
-            { id: 3, brand: 'TotalEnergies', size: '6kg', category: 'refill', price: 1200, location: 'Kiambu', supplier: 'Kihunguro Station', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' },
-            { id: 4, brand: 'TotalEnergies', size: '13kg', category: 'cylinder_complete', price: 5800, location: 'Mombasa', supplier: 'Nyali Gas Depot', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' },
-            { id: 5, brand: 'AfriGas', size: '6kg', category: 'refill', price: 1100, location: 'Nakuru', supplier: 'Nakuru Gas Centre', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' },
-            { id: 6, brand: 'K-Gas', size: '13kg', category: 'refill', price: 2550, location: 'Kisumu', supplier: 'Mega City Gas', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' }
-        ];
 
         document.addEventListener('DOMContentLoaded', () => {
             // Populate County Selects
@@ -890,19 +874,42 @@
                 });
             }
 
-            updateAuthUI();
-            renderProducts();
+            // Firebase Auth State Listener
+            auth.onAuthStateChanged(async (user) => {
+                const loader = document.getElementById('pageLoader');
+                if (user) {
+                    currentUser = {
+                        uid: user.uid,
+                        email: user.email,
+                        name: user.displayName || user.email.split('@')[0],
+                        role: user.reloadUserInfo?.customAttributes?.role || 'customer'
+                    };
+                    
+                    // Fetch user profile from Firestore if exists
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const data = userDoc.data();
+                        currentUser.phone = data.phone || '';
+                        currentUser.county = data.county || '';
+                        currentUser.address = data.address || '';
+                        currentUser.role = data.role || currentUser.role;
+                    }
+                } else {
+                    currentUser = null;
+                }
+
+                updateAuthUI();
+                fetchProductsFromFirestore();
+                if (currentUser) fetchOrdersFromFirestore();
+
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => { loader.style.display = 'none'; }, 400);
+                }
+            });
+
             updateCartBadge();
             renderCart();
-            renderSupplierInventory();
-            renderCustomerOrders();
-
-            // Hide Page Loader Spinner
-            const pageLoader = document.getElementById('pageLoader');
-            if (pageLoader) {
-                pageLoader.style.opacity = '0';
-                setTimeout(() => { pageLoader.style.display = 'none'; }, 400);
-            }
         });
 
         function switchView(viewId) {
@@ -925,6 +932,34 @@
             }
         }
 
+        // ==========================================
+        // FIRESTORE PRODUCTS & INVENTORY
+        // ==========================================
+        async function fetchProductsFromFirestore() {
+            try {
+                const snapshot = await db.collection('products').get();
+                products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Fallback seed data if empty
+                if (products.length === 0) {
+                    products = [
+                        { id: '1', brand: 'ProGas', size: '6kg', category: 'refill', price: 1150, location: 'Kiambu', supplier: 'Ruiru Gas Hub', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' },
+                        { id: '2', brand: 'TotalEnergies', size: '13kg', category: 'refill', price: 2600, location: 'Nairobi', supplier: 'Westlands LPG', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' },
+                        { id: '3', brand: 'AfriGas', size: '6kg', category: 'refill', price: 1100, location: 'Nakuru', supplier: 'Nakuru Centre', image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80' }
+                    ];
+                }
+                renderProducts();
+                renderSupplierInventory();
+            } catch (err) {
+                console.error("Error fetching products:", err);
+                renderProducts();
+            }
+        }
+
+        function renderProducts() {
+            renderProductsList(products);
+        }
+
         function filterProducts() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const county = document.getElementById('filterLocation').value;
@@ -933,7 +968,7 @@
             const category = document.getElementById('filterCategory').value;
 
             const filtered = products.filter(p => {
-                const matchQuery = p.brand.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query) || p.size.toLowerCase().includes(query);
+                const matchQuery = p.brand.toLowerCase().includes(query) || (p.supplier && p.supplier.toLowerCase().includes(query)) || p.size.toLowerCase().includes(query);
                 const matchCounty = !county || p.location === county;
                 const matchBrand = !brand || p.brand === brand;
                 const matchSize = !size || p.size === size;
@@ -944,10 +979,6 @@
             renderProductsList(filtered);
         }
 
-        function renderProducts() {
-            renderProductsList(products);
-        }
-
         function renderProductsList(list) {
             const grid = document.getElementById('productGrid');
             const badge = document.getElementById('resultCountBadge');
@@ -956,24 +987,24 @@
             badge.textContent = `Showing ${list.length} listing${list.length === 1 ? '' : 's'}`;
 
             if (list.length === 0) {
-                grid.innerHTML = `<div class="col-12 text-center py-5 text-muted"><p>No cooking gas listings found matching your filters.</p></div>`;
+                grid.innerHTML = `<div class="col-12 text-center py-5 text-muted"><p>No cooking gas listings found.</p></div>`;
                 return;
             }
 
             grid.innerHTML = list.map(p => `
                 <div class="col">
                     <div class="card h-100 shadow-sm">
-                        <img src="${p.image}" class="card-img-top bg-light p-3" alt="${p.brand}" style="height: 180px; object-fit: contain;">
+                        <img src="${p.image || 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80'}" class="card-img-top bg-light p-3" alt="${p.brand}" style="height: 180px; object-fit: contain;">
                         <div class="card-body d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-1">
                                 <span class="badge bg-secondary-subtle text-dark border">${p.size} ${p.category}</span>
                                 <span class="text-muted small"><i class="bi bi-geo-alt"></i> ${p.location}</span>
                             </div>
                             <h5 class="card-title fw-bold text-dark mt-1">${p.brand} (${p.size})</h5>
-                            <p class="text-muted small mb-2">Supplier: ${p.supplier}</p>
+                            <p class="text-muted small mb-2">Supplier: ${p.supplier || 'Verified'}</p>
                             <div class="mt-auto d-flex justify-content-between align-items-center pt-2 border-top">
-                                <span class="fw-bold text-primary fs-5">KES ${p.price.toLocaleString()}</span>
-                                <button class="btn btn-outline-primary btn-sm px-3" onclick="addToCart(${p.id})">
+                                <span class="fw-bold text-primary fs-5">KES ${Number(p.price).toLocaleString()}</span>
+                                <button class="btn btn-outline-primary btn-sm px-3" onclick="addToCart('${p.id}')">
                                     <i class="bi bi-cart-plus me-1"></i> Order
                                 </button>
                             </div>
@@ -983,6 +1014,94 @@
             `).join('');
         }
 
+        // ==========================================
+        // AUTHENTICATION & PROFILE
+        // ==========================================
+        async function handleAuth(event) {
+            event.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const role = document.getElementById('authRole').value;
+
+            try {
+                let res;
+                try {
+                    res = await auth.signInWithEmailAndPassword(email, password);
+                } catch (signinErr) {
+                    // Register if user doesn't exist
+                    res = await auth.createUserWithEmailAndPassword(email, password);
+                    await db.collection('users').doc(res.user.uid).set({
+                        email, role, name: email.split('@')[0], phone: '', county: '', address: ''
+                    });
+                }
+
+                const modalEl = document.getElementById('authModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                alert('Authentication successful!');
+                if (role === 'supplier') switchView('supplierDashboardView');
+            } catch (err) {
+                alert('Auth Error: ' + err.message);
+            }
+        }
+
+        function updateAuthUI() {
+            const authLink = document.getElementById('authLink');
+            const supplierNav = document.getElementById('supplierDashboardNavLink');
+            const ordersNav = document.getElementById('customerOrdersNavLink');
+            const settingsNav = document.getElementById('profileSettingsNavLink');
+            const mobileAuthBtn = document.getElementById('mobileAuthBtn');
+            const bottomAuth = document.getElementById('bottomNavAuth');
+            const bottomOrders = document.getElementById('bottomNavOrders');
+            const bottomDashboard = document.getElementById('bottomNavDashboard');
+            const bottomProfile = document.getElementById('bottomNavProfile');
+
+            if (currentUser) {
+                if (authLink) authLink.textContent = currentUser.name;
+                if (mobileAuthBtn) mobileAuthBtn.textContent = 'Sign Out';
+                if (bottomAuth) bottomAuth.innerHTML = `<i class="bi bi-box-arrow-right"></i><span>Sign Out</span>`;
+                if (bottomAuth) bottomAuth.onclick = () => { auth.signOut().then(() => location.reload()); };
+
+                if (currentUser.role === 'supplier') {
+                    if (supplierNav) supplierNav.style.display = 'block';
+                    if (bottomDashboard) bottomDashboard.style.display = 'block';
+                } else {
+                    if (ordersNav) ordersNav.style.display = 'block';
+                    if (settingsNav) settingsNav.style.display = 'block';
+                    if (bottomOrders) bottomOrders.style.display = 'block';
+                    if (bottomProfile) bottomProfile.style.display = 'block';
+                }
+
+                if (document.getElementById('profileName')) {
+                    document.getElementById('profileName').value = currentUser.name || '';
+                    document.getElementById('profileEmail').value = currentUser.email || '';
+                    document.getElementById('profilePhone').value = currentUser.phone || '';
+                    document.getElementById('profileCounty').value = currentUser.county || '';
+                    document.getElementById('profileAddress').value = currentUser.address || '';
+                }
+            } else {
+                if (supplierNav) supplierNav.style.display = 'none';
+                if (ordersNav) ordersNav.style.display = 'none';
+                if (settingsNav) settingsNav.style.display = 'none';
+            }
+        }
+
+        async function saveProfile(event) {
+            event.preventDefault();
+            if (!currentUser) return;
+            const updated = {
+                name: document.getElementById('profileName').value,
+                phone: document.getElementById('profilePhone').value,
+                county: document.getElementById('profileCounty').value,
+                address: document.getElementById('profileAddress').value
+            };
+            await db.collection('users').doc(currentUser.uid).update(updated);
+            alert('Profile saved to Firestore!');
+        }
+
+        // ==========================================
+        // CART & ORDERS (FIRESTORE)
+        // ==========================================
         function addToCart(productId) {
             const prod = products.find(p => p.id === productId);
             if (!prod) return;
@@ -992,20 +1111,16 @@
             } else {
                 cart.push({ ...prod, qty: 1 });
             }
-            saveCart();
+            localStorage.setItem('gashub_cart', JSON.stringify(cart));
             updateCartBadge();
             renderCart();
-            alert(`${prod.brand} ${prod.size} added to your cart!`);
+            alert(`${prod.brand} ${prod.size} added to cart!`);
         }
 
         function updateCartBadge() {
             const countEl = document.getElementById('cartCount');
             const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
             if (countEl) countEl.textContent = totalQty;
-        }
-
-        function saveCart() {
-            localStorage.setItem('gashub_cart', JSON.stringify(cart));
         }
 
         function renderCart() {
@@ -1015,7 +1130,7 @@
             if (!tbody) return;
 
             if (cart.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">Your shopping cart is empty.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">Your cart is empty.</td></tr>`;
                 if (subtotalEl) subtotalEl.textContent = 'KES 0';
                 if (totalEl) totalEl.textContent = 'KES 0';
                 return;
@@ -1029,9 +1144,9 @@
                     <tr>
                         <td>
                             <div class="fw-bold">${item.brand} (${item.size})</div>
-                            <small class="text-muted">${item.supplier} - ${item.location}</small>
+                            <small class="text-muted">${item.supplier || ''} - ${item.location}</small>
                         </td>
-                        <td>KES ${item.price.toLocaleString()}</td>
+                        <td>KES ${Number(item.price).toLocaleString()}</td>
                         <td>
                             <input type="number" min="1" value="${item.qty}" class="form-control form-control-sm" style="width: 70px;" onchange="updateQty(${index}, this.value)">
                         </td>
@@ -1051,54 +1166,76 @@
 
         function updateQty(index, val) {
             const qty = parseInt(val);
-            if (qty > 0) {
-                cart[index].qty = qty;
-            } else {
-                cart.splice(index, 1);
-            }
-            saveCart();
+            if (qty > 0) cart[index].qty = qty;
+            else cart.splice(index, 1);
+            localStorage.setItem('gashub_cart', JSON.stringify(cart));
             updateCartBadge();
             renderCart();
         }
 
         function removeFromCart(index) {
             cart.splice(index, 1);
-            saveCart();
+            localStorage.setItem('gashub_cart', JSON.stringify(cart));
             updateCartBadge();
             renderCart();
         }
 
-        function completeCheckout() {
+        async function completeCheckout() {
             if (cart.length === 0) {
-                alert('Your cart is empty.');
+                alert('Cart is empty.');
                 return;
             }
+            if (!currentUser) {
+                alert('Please sign in to place an order.');
+                var myModal = new bootstrap.Modal(document.getElementById('authModal'));
+                myModal.show();
+                return;
+            }
+
             const newOrder = {
-                id: 'GH-' + Math.floor(1000 + Math.random() * 9000),
+                userId: currentUser.uid,
+                customerEmail: currentUser.email,
                 items: cart.map(i => `${i.qty}x ${i.brand} ${i.size}`).join(', '),
                 total: cart.reduce((sum, i) => sum + (i.price * i.qty), 0),
                 status: 'Confirmed - Preparing Delivery',
                 date: new Date().toISOString().split('T')[0]
             };
-            orders.unshift(newOrder);
-            localStorage.setItem('gashub_orders', JSON.stringify(orders));
-            cart = [];
-            saveCart();
-            updateCartBadge();
-            renderCart();
-            renderCustomerOrders();
-            alert('Order placed successfully! Delivery agent has been assigned.');
-            switchView('customerOrdersView');
+
+            try {
+                await db.collection('orders').add(newOrder);
+                cart = [];
+                localStorage.setItem('gashub_cart', JSON.stringify(cart));
+                updateCartBadge();
+                renderCart();
+                fetchOrdersFromFirestore();
+                alert('Order placed successfully in Firestore!');
+                switchView('customerOrdersView');
+            } catch (err) {
+                alert('Checkout Error: ' + err.message);
+            }
+        }
+
+        async function fetchOrdersFromFirestore() {
+            try {
+                const snapshot = await db.collection('orders').get();
+                orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderCustomerOrders();
+                renderSupplierDashboardStats();
+            } catch (err) {
+                console.error("Error fetching orders:", err);
+            }
         }
 
         function renderCustomerOrders() {
             const listEl = document.getElementById('customerOrdersList');
             if (!listEl) return;
-            if (orders.length === 0) {
-                listEl.innerHTML = `<div class="card p-4 text-center text-muted">No orders placed yet.</div>`;
+            const userOrders = currentUser && currentUser.role === 'supplier' ? orders : orders.filter(o => currentUser && o.userId === currentUser.uid);
+            
+            if (userOrders.length === 0) {
+                listEl.innerHTML = `<div class="card p-4 text-center text-muted">No orders found.</div>`;
                 return;
             }
-            listEl.innerHTML = orders.map(o => `
+            listEl.innerHTML = userOrders.map(o => `
                 <div class="card p-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <strong class="text-primary">${o.id}</strong>
@@ -1107,89 +1244,13 @@
                     <p class="mb-1 fw-medium">${o.items}</p>
                     <div class="d-flex justify-content-between text-muted small">
                         <span>Date: ${o.date}</span>
-                        <strong class="text-dark">Total: KES ${o.total.toLocaleString()}</strong>
+                        <strong class="text-dark">Total: KES ${Number(o.total).toLocaleString()}</strong>
                     </div>
                 </div>
             `).join('');
         }
 
-        function handleAuth(event) {
-            event.preventDefault();
-            const email = document.getElementById('authEmail').value;
-            const role = document.getElementById('authRole').value;
-            currentUser = { email, role, name: email.split('@')[0], phone: '0712345678', county: 'Kiambu', address: 'Ruiru Town' };
-            localStorage.setItem('gashub_user', JSON.stringify(currentUser));
-            
-            const modalEl = document.getElementById('authModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
-            updateAuthUI();
-            alert(`Welcome back, ${currentUser.name}! Signed in as ${role.toUpperCase()}`);
-            if (role === 'supplier') switchView('supplierDashboardView');
-            else switchView('marketplaceView');
-        }
-
-        function updateAuthUI() {
-            const authLink = document.getElementById('authLink');
-            const supplierNav = document.getElementById('supplierDashboardNavLink');
-            const ordersNav = document.getElementById('customerOrdersNavLink');
-            const settingsNav = document.getElementById('profileSettingsNavLink');
-            const mobileAuthBtn = document.getElementById('mobileAuthBtn');
-            const bottomAuth = document.getElementById('bottomNavAuth');
-            const bottomOrders = document.getElementById('bottomNavOrders');
-            const bottomDashboard = document.getElementById('bottomNavDashboard');
-            const bottomProfile = document.getElementById('bottomNavProfile');
-
-            if (currentUser) {
-                if (authLink) authLink.textContent = currentUser.name;
-                if (mobileAuthBtn) mobileAuthBtn.textContent = 'Sign Out';
-                if (bottomAuth) bottomAuth.innerHTML = `<i class="bi bi-box-arrow-right"></i><span>Sign Out</span>`;
-                if (bottomAuth) bottomAuth.onclick = () => { logoutUser(); };
-
-                if (currentUser.role === 'supplier') {
-                    if (supplierNav) supplierNav.style.display = 'block';
-                    if (bottomDashboard) bottomDashboard.style.display = 'block';
-                } else {
-                    if (ordersNav) ordersNav.style.display = 'block';
-                    if (settingsNav) settingsNav.style.display = 'block';
-                    if (bottomOrders) bottomOrders.style.display = 'block';
-                    if (bottomProfile) bottomProfile.style.display = 'block';
-                }
-
-                // Populate profile form if present
-                if (document.getElementById('profileName')) {
-                    document.getElementById('profileName').value = currentUser.name || '';
-                    document.getElementById('profileEmail').value = currentUser.email || '';
-                    document.getElementById('profilePhone').value = currentUser.phone || '';
-                    document.getElementById('profileCounty').value = currentUser.county || '';
-                    document.getElementById('profileAddress').value = currentUser.address || '';
-                }
-            } else {
-                if (supplierNav) supplierNav.style.display = 'none';
-                if (ordersNav) ordersNav.style.display = 'none';
-                if (settingsNav) settingsNav.style.display = 'none';
-            }
-        }
-
-        function logoutUser() {
-            localStorage.removeItem('gashub_user');
-            currentUser = null;
-            location.reload();
-        }
-
-        function saveProfile(event) {
-            event.preventDefault();
-            if (!currentUser) return;
-            currentUser.name = document.getElementById('profileName').value;
-            currentUser.phone = document.getElementById('profilePhone').value;
-            currentUser.county = document.getElementById('profileCounty').value;
-            currentUser.address = document.getElementById('profileAddress').value;
-            localStorage.setItem('gashub_user', JSON.stringify(currentUser));
-            alert('Profile updated successfully!');
-        }
-
-        function saveNewProduct(event) {
+        async function saveNewProduct(event) {
             event.preventDefault();
             const brand = document.getElementById('newProdBrand').value;
             const size = document.getElementById('newProdSize').value;
@@ -1198,39 +1259,37 @@
             const location = document.getElementById('newProdCounty').value;
 
             const newP = {
-                id: products.length + 1,
                 brand, size, category, price, location,
-                supplier: currentUser ? currentUser.name + ' Gas' : 'Verified Supplier',
+                supplier: currentUser ? currentUser.name + ' Gas' : 'Supplier',
                 image: 'https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=300&auto=format&fit=crop&q=80'
             };
 
-            products.unshift(newP);
-            localStorage.setItem('gashub_products', JSON.stringify(products));
-
-            const modalEl = document.getElementById('addProductModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
-            renderProducts();
-            renderSupplierInventory();
-            alert('New gas listing published successfully!');
+            try {
+                await db.collection('products').add(newP);
+                const modalEl = document.getElementById('addProductModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                fetchProductsFromFirestore();
+                alert('Product published to Firestore!');
+            } catch (err) {
+                alert('Error adding product: ' + err.message);
+            }
         }
 
         function renderSupplierInventory() {
             const tbody = document.getElementById('supplierInventoryTable');
             const countEl = document.getElementById('supplierListingCount');
-            const revenueEl = document.getElementById('supplierRevenue');
             if (!tbody) return;
 
-            tbody.innerHTML = products.map((p, idx) => `
+            tbody.innerHTML = products.map((p) => `
                 <tr>
                     <td><strong>${p.brand}</strong></td>
                     <td>${p.size}</td>
                     <td>${p.category}</td>
-                    <td>KES ${p.price.toLocaleString()}</td>
+                    <td>KES ${Number(p.price).toLocaleString()}</td>
                     <td>${p.location}</td>
                     <td>
-                        <button class="btn btn-outline-danger btn-sm border-0" onclick="deleteProduct(${p.id})">
+                        <button class="btn btn-outline-danger btn-sm border-0" onclick="deleteProduct('${p.id}')">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
@@ -1238,14 +1297,25 @@
             `).join('');
 
             if (countEl) countEl.textContent = products.length;
-            if (revenueEl) revenueEl.textContent = 'KES 48,250';
         }
 
-        function deleteProduct(id) {
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem('gashub_products', JSON.stringify(products));
-            renderProducts();
-            renderSupplierInventory();
+        async function deleteProduct(id) {
+            try {
+                await db.collection('products').doc(id).delete();
+                fetchProductsFromFirestore();
+            } catch (err) {
+                alert('Delete error: ' + err.message);
+            }
+        }
+
+        function renderSupplierDashboardStats() {
+            const pendingEl = document.getElementById('supplierPendingOrders');
+            const revEl = document.getElementById('supplierRevenue');
+            if (pendingEl) pendingEl.textContent = orders.length;
+            if (revEl) {
+                const totalRev = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+                revEl.textContent = `KES ${totalRev.toLocaleString()}`;
+            }
         }
     </script>
 </body>
