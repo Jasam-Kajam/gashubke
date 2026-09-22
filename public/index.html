@@ -1,882 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- ======================================================
-         GasHubKE - Kenya's Trusted Online Cooking Gas Marketplace
-         File: index.html (Modularized Version 6.1.0)
-    ====================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <title>GasHubKE | Kenya's Trusted Online Cooking Gas Marketplace</title>
-    <meta name="description" content="Fast, reliable cooking gas delivery. Compare prices, order gas refills, cylinders, and accessories from verified local suppliers across Kenya on GasHubKE.">
-    <meta name="keywords" content="GasHubKE, Kenya Gas, cooking gas delivery Kenya, gas refill near me, 6kg gas cylinder, 13kg gas price, cooking gas platform, LPG suppliers Kenya">
-    <meta name="author" content="GasHubKE">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#f97316">
-    <link rel="canonical" href="https://gashubke.com/">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gashubke.com/">
-    <meta property="og:title" content="GasHubKE - Kenya's Online Cooking Gas Hub">
-    <meta property="og:description" content="Connect with trusted cooking gas suppliers and retailers for fast delivery on refills and cylinders across Kenya.">
-    <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap 5 & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Custom Stylesheet -->
-    <link rel="stylesheet" href="./css/styles.css">
-
-    <style>
-        :root {
-            --primary: #f97316;
-            --primary-dark: #ea580c;
-            --secondary: #1e293b;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-        }
-
-        /* Professional Loading Spinner */
-        #pageLoader {
-            position: fixed;
-            inset: 0;
-            background: #ffffff;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-
-        .spinner-ring {
-            width: 55px;
-            height: 55px;
-            border: 4px solid #f1f5f9;
-            border-top-color: #f97316;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .spinner-text {
-            margin-top: 1rem;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #64748b;
-            letter-spacing: 0.5px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Announcement Bar */
-        .announcement-bar {
-            background: #1e293b;
-            color: #cbd5e1;
-            font-size: 0.85rem;
-            padding: 0.5rem 1rem;
-        }
-        .announcement-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Navbar & Brand Logo */
-        .brand-logo {
-            height: 48px;
-            width: 48px;
-            object-fit: contain;
-            border-radius: 10px;
-            flex-shrink: 0;
-        }
-
-        .main-header .navbar {
-            padding-top: 0.4rem;
-            padding-bottom: 0.4rem;
-        }
-
-        @media (max-width: 767.98px) {
-            .main-header .navbar {
-                padding-top: 0.25rem !important;
-                padding-bottom: 0.25rem !important;
-            }
-        }
-
-        /* Hero Scrolling Branded Cylinders Banner */
-        .hero-cylinder-banner {
-            overflow: hidden;
-            width: 100%;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            padding: 16px 0;
-            white-space: nowrap;
-            position: relative;
-            margin-bottom: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-        }
-
-        .hero-cylinder-banner .scrolling-track {
-            display: flex;
-            gap: 1.5rem;
-            width: max-content;
-            animation: scrollMarquee 28s linear infinite;
-        }
-
-        .hero-cylinder-banner .scrolling-track:hover {
-            animation-play-state: paused;
-        }
-
-        @keyframes scrollMarquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        .cylinder-promo-card {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-            min-width: 250px;
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-
-        .cylinder-promo-card:hover {
-            border-color: #f97316;
-            transform: translateY(-2px);
-        }
-
-        .cylinder-promo-card img {
-            width: 42px;
-            height: 42px;
-            object-fit: contain;
-            border-radius: 50%;
-            background: #ffffff;
-            padding: 3px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .cylinder-promo-card div {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cylinder-promo-card .brand-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #0f172a;
-        }
-
-        .cylinder-promo-card .promo-text {
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-
-        /* Filter Section Card */
-        .filter-container {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-
-        /* Multi-Views Management */
-        .view {
-            display: none;
-        }
-        .view.active {
-            display: block;
-        }
-
-        /* Cards & Utilities */
-        .card {
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            background: #fff;
-        }
-
-        .btn-primary {
-            background-color: #f97316;
-            border-color: #f97316;
-            font-weight: 500;
-        }
-        .btn-primary:hover {
-            background-color: #ea580c;
-            border-color: #ea580c;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 0.65rem 0.85rem;
-            margin-bottom: 0.75rem;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            font-size: 0.95rem;
-            outline: none;
-        }
-        input:focus, select:focus, textarea:focus {
-            border-color: #f97316;
-            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
-        }
-
-        /* Mobile Bottom Navigation Bar */
-        .mobile-bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-around;
-            padding: 0.5rem 0;
-            z-index: 1040;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
-        .mobile-bottom-nav a {
-            text-align: center;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 0.75rem;
-            flex: 1;
-        }
-        .mobile-bottom-nav a.active, .mobile-bottom-nav a:hover {
-            color: #f97316;
-        }
-        .mobile-bottom-nav a i {
-            font-size: 1.25rem;
-            display: block;
-            margin-bottom: 2px;
-        }
-    </style>
+    <title>GasHub Marketplace - Gas Cylinders & Accessories</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- Professional Page Loader Spinner -->
-    <div id="pageLoader">
-        <div class="spinner-ring"></div>
-        <div class="spinner-text">Connecting to GasHubKE Firebase...</div>
-    </div>
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl font-bold text-orange-600">GasHub</span>
+                <span class="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-medium">Marketplace</span>
+            </div>
 
-    <!-- App Wrapper -->
-    <div id="app">
+            <!-- Search & Filters Navigation Bar -->
+            <div class="hidden md:flex items-center space-x-4 flex-1 max-w-md mx-8">
+                <input type="text" id="searchProducts" placeholder="Search gas cylinders, burners..." class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <select id="countyFilter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <option value="">All Counties (47)</option>
+                </select>
+            </div>
 
-        <!-- Announcement Bar -->
-        <div class="announcement-bar d-none d-md-block">
-            <div class="announcement-content">
-                <span>
-                    <i class="bi bi-shield-check text-warning"></i> Kenya's Premier LPG marketplace connecting households with verified suppliers
-                </span>
-                <span class="announcement-location">
-                    <i class="bi bi-geo-alt text-warning"></i> Serving all 47 Counties
-                </span>
+            <!-- Actions / Auth / Cart -->
+            <div class="flex items-center space-x-4">
+                <!-- Cart Button -->
+                <button id="cartBtn" class="relative p-2 text-gray-600 hover:text-orange-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <span id="cartCount" class="absolute top-0 right-0 bg-orange-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+
+                <!-- Auth State Section -->
+                <div id="userProfileSection" style="display: none;" class="flex items-center space-x-3">
+                    <span id="userEmailDisplay" class="text-sm font-medium text-gray-700 hidden sm:inline"></span>
+                    <button id="logoutBtn" class="text-sm text-red-600 hover:underline">Sign Out</button>
+                </div>
+                <button id="loginBtn" class="trigger-auth-popup bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 transition">
+                    Sign In
+                </button>
             </div>
         </div>
+    </header>
 
-        <!-- Main Header & Navbar -->
-        <header class="main-header sticky-top bg-white border-bottom shadow-sm">
-            <nav class="navbar navbar-expand-md py-1 py-md-2">
-                <div class="container d-flex justify-content-between align-items-center flex-nowrap">
-                    <!-- Brand Logo -->
-                    <a class="navbar-brand d-flex align-items-center flex-nowrap me-2" href="#" id="brandLogoLink" onclick="switchView('marketplaceView')">
-                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE Logo" class="brand-logo" width="48" height="48">
-                        <div class="ms-2 lh-sm text-truncate">
-                            <strong style="color: #1e293b; font-size: 1.05rem; display: block;">GasHubKE</strong>
-                            <small class="text-muted d-none d-sm-block" style="font-size: 0.7rem;">Modularized Architecture</small>
-                        </div>
-                    </a>
-
-                    <!-- Mobile Hamburger Toggle Button -->
-                    <button class="navbar-toggler border-0 shadow-none ms-auto me-1 d-md-none p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Toggle navigation">
-                        <i class="bi bi-list fs-2 text-dark"></i>
-                    </button>
-
-                    <!-- Desktop Navigation Links -->
-                    <div class="collapse navbar-collapse" id="desktopNavigation">
-                        <ul class="navbar-nav mx-auto align-items-center gap-3">
-                            <li class="nav-item">
-                                <a class="nav-link fw-medium text-dark active" href="#" onclick="switchView('marketplaceView')">Marketplace</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link fw-medium text-dark" id="supplierDashboardNavLink" href="#" onclick="switchView('supplierDashboardView')" style="display:none;">Supplier Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link fw-medium text-dark" id="customerOrdersNavLink" href="#" onclick="switchView('customerOrdersView')" style="display:none;">My Orders</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link fw-medium text-dark" id="profileSettingsNavLink" href="#" onclick="switchView('profileSettingsView')" style="display:none;">Settings</a>
-                            </li>
-                        </ul>
-
-                        <!-- Search & Right Actions -->
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="search-bar d-flex align-items-center bg-light rounded px-2 py-1 border">
-                                <i class="bi bi-search text-muted ms-1"></i>
-                                <input type="search" id="searchInput" placeholder="Search gas, refills..." aria-label="Search listings" class="border-0 bg-transparent outline-none px-2 py-1" style="width: 150px; font-size: 0.9rem;" oninput="filterProducts()">
-                            </div>
-
-                            <!-- Cart Link with Badge -->
-                            <a href="#" id="cartLink" class="text-dark text-decoration-none d-flex align-items-center position-relative px-2" onclick="switchView('cartCheckoutView')">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="9" cy="21" r="1"></circle>
-                                    <circle cx="20" cy="21" r="1"></circle>
-                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                                </svg>
-                                <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">0</span>
-                            </a>
-
-                            <a href="#" id="authLink" class="btn btn-outline-primary btn-sm px-3 fw-medium" data-bs-toggle="modal" data-bs-target="#authModal">Sign In</a>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        </header>
-
-        <!-- Offcanvas Mobile Menu -->
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
-            <div class="offcanvas-header border-bottom py-3">
-                <div class="d-flex align-items-center">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="48" height="48">
-                    <strong class="ms-2 fs-5">GasHubKE</strong>
-                </div>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body d-flex flex-column justify-content-between py-3">
-                <ul class="nav flex-column gap-2 fs-6">
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); switchView('marketplaceView');"><i class="bi bi-house-door me-2 text-primary"></i> Marketplace</a></li>
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" onclick="closeMobileMenu(); switchView('cartCheckoutView');"><i class="bi bi-cart3 me-2 text-primary"></i> Shopping Cart</a></li>
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" id="mobileOrdersLink" onclick="closeMobileMenu(); switchView('customerOrdersView');" style="display:none;"><i class="bi bi-box-seam me-2 text-primary"></i> My Orders</a></li>
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" id="mobileDashboardLink" onclick="closeMobileMenu(); switchView('supplierDashboardView');" style="display:none;"><i class="bi bi-speedometer2 me-2 text-primary"></i> Supplier Dashboard</a></li>
-                    <li><a href="#" class="nav-link text-dark fw-medium py-2" id="mobileSettingsLink" onclick="closeMobileMenu(); switchView('profileSettingsView');" style="display:none;"><i class="bi bi-gear me-2 text-primary"></i> Settings</a></li>
-                </ul>
-                <div class="mt-4 border-top pt-3">
-                    <a href="#" id="mobileAuthBtn" class="btn btn-primary w-100 py-2" data-bs-toggle="modal" data-bs-target="#authModal" onclick="closeMobileMenu()">Sign In / Register</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Views Container -->
-        <main class="container pt-3 pt-md-4 pb-5 mb-5">
-            
-            <!-- 1. Marketplace View -->
-            <section id="marketplaceView" class="view active">
-                
-                <!-- Hero Scrolling Branded Gas Cylinders Banner -->
-                <div class="hero-cylinder-banner">
-                    <div class="scrolling-track">
-                        <div class="cylinder-promo-card">
-                            <img src="assets/progas.png" alt="ProGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">ProGas</span>
-                                <span class="promo-text">6kg & 13kg Refills Available</span>
-                            </div>
-                        </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/total.png" alt="TotalEnergies" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">TotalEnergies</span>
-                                <span class="promo-text">Safe & Certified Clean Energy</span>
-                            </div>
-                        </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/afrigas.png" alt="AfriGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">AfriGas</span>
-                                <span class="promo-text">Instant Delivery in Your Zone</span>
-                            </div>
-                        </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/kgas.png" alt="K-Gas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">K-Gas</span>
-                                <span class="promo-text">Trusted Household Power</span>
-                            </div>
-                        </div>
-                        <!-- Duplicate set for infinite marquee loop -->
-                        <div class="cylinder-promo-card">
-                            <img src="assets/progas.png" alt="ProGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">ProGas</span>
-                                <span class="promo-text">6kg & 13kg Refills Available</span>
-                            </div>
-                        </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/total.png" alt="TotalEnergies" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">TotalEnergies</span>
-                                <span class="promo-text">Safe & Certified Clean Energy</span>
-                            </div>
-                        </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/afrigas.png" alt="AfriGas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">AfriGas</span>
-                                <span class="promo-text">Instant Delivery in Your Zone</span>
-                            </div>
-                        </div>
-                        <div class="cylinder-promo-card">
-                            <img src="assets/kgas.png" alt="K-Gas" onerror="this.src='https://images.unsplash.com/photo-1585713181558-97c258e235ae?w=100&auto=format&fit=crop&q=60'">
-                            <div>
-                                <span class="brand-name">K-Gas</span>
-                                <span class="promo-text">Trusted Household Power</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Comprehensive Filter Section -->
-                <div class="filter-container mb-4">
-                    <div class="row align-items-center g-2">
-                        <div class="col-lg-2 col-md-12 mb-1 mb-lg-0">
-                            <span class="fw-bold text-dark d-flex align-items-center gap-1" style="font-size: 0.95rem;">
-                                <i class="bi bi-funnel text-primary"></i> Filter Listings:
-                            </span>
-                        </div>
-                        <div class="col-lg-10 col-md-12">
-                            <div class="row g-2">
-                                <div class="col-6 col-md-3">
-                                    <select id="filterLocation" class="form-select form-select-sm mb-0" onchange="filterProducts()">
-                                        <option value="">All 47 Counties</option>
-                                    </select>
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <select id="filterBrand" class="form-select form-select-sm mb-0" onchange="filterProducts()">
-                                        <option value="">All Brands</option>
-                                        <option value="ProGas">ProGas</option>
-                                        <option value="TotalEnergies">TotalEnergies</option>
-                                        <option value="AfriGas">AfriGas</option>
-                                        <option value="K-Gas">K-Gas</option>
-                                        <option value="Hashi">Hashi</option>
-                                        <option value="Lake Gas">Lake Gas</option>
-                                    </select>
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <select id="filterSize" class="form-select form-select-sm mb-0" onchange="filterProducts()">
-                                        <option value="">All Sizes</option>
-                                        <option value="3kg">3kg Cylinder</option>
-                                        <option value="6kg">6kg Cylinder</option>
-                                        <option value="13kg">13kg Cylinder</option>
-                                        <option value="22.5kg">22.5kg Cylinder</option>
-                                        <option value="50kg">50kg Commercial</option>
-                                    </select>
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <select id="filterCategory" class="form-select form-select-sm mb-0" onchange="filterProducts()">
-                                        <option value="">All Categories</option>
-                                        <option value="refill">Refill</option>
-                                        <option value="cylinder_complete">Complete Set</option>
-                                        <option value="accessories">Accessories</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Grid Header -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h5 fw-bold mb-0 text-secondary">Verified Marketplace Offers</h2>
-                    <span id="resultCountBadge" class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.8rem;">Syncing Firestore...</span>
-                </div>
-
-                <!-- Product Grid -->
-                <div id="productGrid" class="row row-cols-1 row-cols-md-3 g-4">
-                    <!-- Populated dynamically via marketplace.js -->
-                </div>
-            </section>
-
-            <!-- 2. Supplier Dashboard View -->
-            <section id="supplierDashboardView" class="view">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h2 class="fw-bold mb-1">Supplier Dashboard</h2>
-                        <p class="text-muted mb-0">Manage your Firestore inventory listings and incoming gas orders.</p>
-                    </div>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                        <i class="bi bi-plus-lg me-1"></i> Add New Listing
-                    </button>
-                </div>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <div class="card p-3">
-                            <span class="text-muted small">Total Active Listings</span>
-                            <h3 class="fw-bold text-primary mt-1 mb-0" id="supplierListingCount">0</h3>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-3">
-                            <span class="text-muted small">Pending Orders</span>
-                            <h3 class="fw-bold text-warning mt-1 mb-0" id="supplierPendingOrders">0</h3>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-3">
-                            <span class="text-muted small">Total Revenue (KES)</span>
-                            <h3 class="fw-bold text-success mt-1 mb-0" id="supplierRevenue">KES 0</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="card p-4">
-                    <h4 class="h6 fw-bold mb-3">Your Inventory (Firestore Realtime)</h4>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Brand / Item</th>
-                                    <th>Size</th>
-                                    <th>Category</th>
-                                    <th>Price (KES)</th>
-                                    <th>Location</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="supplierInventoryTable">
-                                <!-- Populated by supplier-dashboard.js -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. Customer Orders View -->
-            <section id="customerOrdersView" class="view">
-                <div class="mb-4">
-                    <h2 class="fw-bold mb-1">My Orders</h2>
-                    <p class="text-muted mb-0">Track your live orders synced from Firestore.</p>
-                </div>
-                <div id="customerOrdersList" class="vstack gap-3">
-                    <!-- Populated by cart.js / order modules -->
-                </div>
-            </section>
-
-            <!-- 4. Profile Settings View -->
-            <section id="profileSettingsView" class="view">
-                <div class="mb-4">
-                    <h2 class="fw-bold mb-1">Account Settings</h2>
-                    <p class="text-muted mb-0">Update your Firebase user profile details.</p>
-                </div>
-                <div class="card p-4 mx-auto" style="max-width: 600px;">
-                    <form id="profileForm" onsubmit="saveProfile(event)">
-                        <div class="mb-3">
-                            <label class="form-label fw-medium">Full Name</label>
-                            <input type="text" id="profileName" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-medium">Email Address</label>
-                            <input type="email" id="profileEmail" class="form-control" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-medium">Phone Number (M-Pesa)</label>
-                            <input type="tel" id="profilePhone" class="form-control" placeholder="0712345678" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-medium">Delivery County / Region</label>
-                            <select id="profileCounty" class="form-select" required>
-                                <option value="">Select County</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-medium">Specific Delivery Address / Estate</label>
-                            <textarea id="profileAddress" class="form-control" rows="2" placeholder="e.g., Ruiru Town, Kihunguro Stage"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2">Save Profile</button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- 5. Cart & Checkout View -->
-            <section id="cartCheckoutView" class="view">
-                <div class="mb-4">
-                    <h2 class="fw-bold mb-1">Shopping Cart & Checkout</h2>
-                    <p class="text-muted mb-0">Complete instant M-Pesa STK push or cash delivery.</p>
-                </div>
-                <div class="row g-4">
-                    <div class="col-lg-8">
-                        <div class="card p-3 mb-3">
-                            <div class="table-responsive">
-                                <table class="table align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Item</th>
-                                            <th>Price</th>
-                                            <th>Qty</th>
-                                            <th>Subtotal</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="cartTableBody">
-                                        <!-- Populated by cart.js -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="card p-4">
-                            <h4 class="h6 fw-bold mb-3 border-bottom pb-2">Order Summary</h4>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Subtotal</span>
-                                <span id="cartSubtotal" class="fw-medium">KES 0</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Estimated Delivery</span>
-                                <span class="fw-medium text-success">FREE</span>
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-between mb-3">
-                                <strong class="fs-5">Total</strong>
-                                <strong id="cartTotal" class="fs-5 text-primary">KES 0</strong>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-medium">Payment Method</label>
-                                <select id="paymentMethod" class="form-select form-select-sm">
-                                    <option value="mpesa">M-Pesa Instant STK Push</option>
-                                    <option value="cash">Cash on Delivery</option>
-                                </select>
-                            </div>
-                            <button class="btn btn-primary w-100 py-2 fw-bold" onclick="completeCheckout()">
-                                Place Order (Firestore)
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        </main>
+    <!-- Mobile Search Bar View -->
+    <div class="bg-white border-b border-gray-200 px-4 py-3 md:hidden flex space-x-2">
+        <input type="text" id="searchProductsMobile" placeholder="Search gas cylinders..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+        <select id="countyFilterMobile" class="px-2 py-2 border border-gray-300 rounded-lg text-sm bg-white">
+            <option value="">Counties</option>
+        </select>
     </div>
 
-    <!-- Mobile Bottom Navigation Bar -->
-    <nav class="mobile-bottom-nav d-md-none">
-        <a href="#" class="active" onclick="switchView('marketplaceView'); setActiveNav(this)">
-            <i class="bi bi-shop"></i>
-            <span>Marketplace</span>
-        </a>
-        <a href="#" onclick="switchView('cartCheckoutView'); setActiveNav(this)">
-            <i class="bi bi-cart3"></i>
-            <span>Cart</span>
-        </a>
-        <a href="#" id="bottomNavOrders" onclick="switchView('customerOrdersView'); setActiveNav(this)" style="display:none;">
-            <i class="bi bi-box-seam"></i>
-            <span>Orders</span>
-        </a>
-        <a href="#" id="bottomNavDashboard" onclick="switchView('supplierDashboardView'); setActiveNav(this)" style="display:none;">
-            <i class="bi bi-speedometer2"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="#" id="bottomNavProfile" onclick="switchView('profileSettingsView'); setActiveNav(this)" style="display:none;">
-            <i class="bi bi-person"></i>
-            <span>Profile</span>
-        </a>
-        <a href="#" id="bottomNavAuth" data-bs-toggle="modal" data-bs-target="#authModal">
-            <i class="bi bi-box-arrow-in-right"></i>
-            <span>Sign In</span>
-        </a>
-    </nav>
+    <!-- Main Content Marketplace -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Available Gas Cylinders & Accessories</h1>
+                <p class="text-sm text-gray-500 mt-1">Order cooking gas directly from verified suppliers near you.</p>
+            </div>
+            <a href="supplier-dashboard.html" id="supplierDashboardLink" class="hidden text-sm bg-gray-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition">
+                Supplier Dashboard
+            </a>
+        </div>
 
-    <!-- Professional Footer -->
-    <footer class="bg-dark text-white pt-5 pb-4 mt-auto border-top">
-        <div class="container mb-4">
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg" alt="GasHubKE" class="brand-logo" width="40" height="40">
-                        <span class="ms-2 fw-bold fs-5 text-white">GasHubKE</span>
-                    </div>
-                    <p class="text-white-50 small">Kenya's premier online cooking gas marketplace powered by Firebase real-time database.</p>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <h5 class="text-white fs-6 fw-bold mb-3">Quick Links</h5>
-                    <ul class="list-unstyled vstack gap-2 small">
-                        <li><a href="#" class="text-white-50 text-decoration-none" onclick="switchView('marketplaceView')">Marketplace</a></li>
-                        <li><a href="#" class="text-white-50 text-decoration-none" onclick="switchView('cartCheckoutView')">Shopping Cart</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h5 class="text-white fs-6 fw-bold mb-3">Coverage</h5>
-                    <p class="text-white-50 small mb-0">Nairobi, Kiambu, Mombasa, Kisumu, Nakuru, and all 47 Counties.</p>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h5 class="text-white fs-6 fw-bold mb-3">Customer Support</h5>
-                    <p class="text-white-50 small mb-1"><i class="bi bi-telephone text-primary me-2"></i> +254 700 000000</p>
-                    <p class="text-white-50 small"><i class="bi bi-envelope text-primary me-2"></i> support@gashubke.com</p>
-                </div>
+        <!-- Dynamic Product Listings Grid -->
+        <div id="productContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Rendered cards from marketplace.js inject here -->
+            <div class="col-span-full text-center py-16 text-gray-400">
+                Loading marketplace listings...
             </div>
-            <hr class="border-secondary my-4">
-            <div class="text-center text-white-50 small">
-                &copy; 2026 GasHubKE. All rights reserved.
-            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-500">
+            &copy; 2026 GasHub Marketplace. All rights reserved.
         </div>
     </footer>
 
-    <!-- Auth Modal -->
-    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold">Sign In / Register (Firebase)</h5>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="authForm" onsubmit="handleAuth(event)">
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">Email Address</label>
-                            <input type="email" id="authEmail" class="form-control" placeholder="user@example.com" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">Password (Min 6 chars)</label>
-                            <input type="password" id="authPassword" class="form-control" placeholder="••••••••" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">Account Role</label>
-                            <select id="authRole" class="form-select">
-                                <option value="customer">Customer / Household</option>
-                                <option value="supplier">Gas Supplier / Distributor</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-medium">Authenticate</button>
-                    </form>
-                </div>
+    <!-- Auth Modal Template (Pop-up handled via auth.js) -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
+            <button id="closeAuthModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">&times;</button>
+            <h2 class="text-xl font-bold mb-4 text-gray-900">Sign in to GasHub</h2>
+            <p class="text-sm text-gray-600 mb-6">Access your shopping cart, orders, or list your gas cylinder products as a vendor.</p>
+            <div class="space-y-4">
+                <button id="googleSignInBtn" class="w-full flex items-center justify-center border border-gray-300 rounded-lg py-2.5 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    Continue with Google
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Add Product Modal (For Suppliers) -->
-    <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold">Add New Firestore Listing</h5>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addProductForm" onsubmit="saveNewProduct(event)">
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">Brand Name</label>
-                            <select id="newProdBrand" class="form-select" required>
-                                <option value="ProGas">ProGas</option>
-                                <option value="TotalEnergies">TotalEnergies</option>
-                                <option value="AfriGas">AfriGas</option>
-                                <option value="K-Gas">K-Gas</option>
-                                <option value="Hashi">Hashi</option>
-                                <option value="Lake Gas">Lake Gas</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">Cylinder Size</label>
-                            <select id="newProdSize" class="form-select" required>
-                                <option value="3kg">3kg Cylinder</option>
-                                <option value="6kg">6kg Cylinder</option>
-                                <option value="13kg">13kg Cylinder</option>
-                                <option value="22.5kg">22.5kg Cylinder</option>
-                                <option value="50kg">50kg Commercial</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">Category</label>
-                            <select id="newProdCategory" class="form-select" required>
-                                <option value="refill">Refill</option>
-                                <option value="cylinder_complete">Complete Set</option>
-                                <option value="accessories">Accessories</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">Price (KES)</label>
-                            <input type="number" id="newProdPrice" class="form-control" placeholder="1200" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">County / Delivery Zone</label>
-                            <select id="newProdCounty" class="form-select" required>
-                                <option value="">Select County</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2">Publish to Firestore</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Modular Script Execution Order -->
+    <!-- 1. Firebase Core Configuration & Initialization -->
+    <script type="module" src="firebase-config.js"></script>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 2. Counties Data & Dropdown Populator -->
+    <script type="module" src="counties.js"></script>
 
-    <!-- Firebase SDK (Compat v9) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <!-- 3. Storage and Vendor Helpers -->
+    <script type="module" src="storage.js"></script>
+    <script type="module" src="vendor.js"></script>
 
-    <!-- ======================================================
-         LINKED MODULAR JAVASCRIPT FILES (public/js/)
-    ====================================================== -->
-    <script src="./public/js/firebase-config.js"></script>
-    <script src="./public/js/counties.js"></script>
-    <script src="./public/js/auth.js"></script>
-    <script src="./public/js/marketplace.js"></script>
-    <script src="./public/js/cart.js"></script>
-    <script src="./public/js/supplier-dashboard.js"></script>
-    <script src="./public/js/storage.js"></script>
-    <script src="./public/js/vendor.js"></script>
+    <!-- 4. Core Feature Modules -->
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="marketplace.js"></script>
+    <script type="module" src="cart.js"></script>
+    <script type="module" src="supplier-dashboard.js"></script>
 
-    <!-- Global App Initializer -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Hide Loader once modules load
-            const loader = document.getElementById('pageLoader');
-            if (loader) {
-                loader.style.opacity = '0';
-                setTimeout(() => { loader.style.display = 'none'; }, 400);
-            }
-        });
-
-        function switchView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            const target = document.getElementById(viewId);
-            if (target) target.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function setActiveNav(el) {
-            document.querySelectorAll('.mobile-bottom-nav a').forEach(a => a.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        function closeMobileMenu() {
-            const mobileMenuEl = document.getElementById('mobileMenu');
-            if (mobileMenuEl) {
-                const bsOffcanvas = bootstrap.Offcanvas.getInstance(mobileMenuEl);
-                if (bsOffcanvas) bsOffcanvas.hide();
-            }
-        }
-    </script>
 </body>
 </html>
