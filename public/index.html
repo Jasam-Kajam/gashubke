@@ -3,117 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GasHub Marketplace - Gas Cylinders & Accessories</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>GasHub Marketplace - LPG & Cooking Gas Delivery in Kenya</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 70px; /* Space for mobile bottom nav */
+        }
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+        }
+        .product-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+        }
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1030;
+        }
+        .mobile-bottom-nav a {
+            color: #6c757d;
+            text-align: center;
+            text-decoration: none;
+            font-size: 0.75rem;
+        }
+        .mobile-bottom-nav a i {
+            display: block;
+            font-size: 1.25rem;
+            margin-bottom: 2px;
+        }
+        .mobile-bottom-nav a.active, .mobile-bottom-nav a:hover {
+            color: #0d6efd;
+        }
+        #pageLoader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body>
 
-    <!-- Header & Navigation -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <!-- Brand Logo -->
-            <div class="flex items-center space-x-3">
-                <span class="text-2xl font-bold text-orange-600">GasHub</span>
-                <span class="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-medium">Marketplace</span>
-            </div>
-
-            <!-- Search & Filters Navigation Bar -->
-            <div class="hidden md:flex items-center space-x-4 flex-1 max-w-md mx-8">
-                <input type="text" id="searchProducts" placeholder="Search gas cylinders, burners..." class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                <select id="countyFilter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <option value="">All Counties (47)</option>
-                </select>
-            </div>
-
-            <!-- Actions / Auth / Cart -->
-            <div class="flex items-center space-x-4">
-                <!-- Cart Button -->
-                <button id="cartBtn" class="relative p-2 text-gray-600 hover:text-orange-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <span id="cartCount" class="absolute top-0 right-0 bg-orange-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
-                </button>
-
-                <!-- Auth State Section -->
-                <div id="userProfileSection" style="display: none;" class="flex items-center space-x-3">
-                    <span id="userEmailDisplay" class="text-sm font-medium text-gray-700 hidden sm:inline"></span>
-                    <button id="logoutBtn" class="text-sm text-red-600 hover:underline">Sign Out</button>
-                </div>
-                <button id="loginBtn" class="trigger-auth-popup bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 transition">
-                    Sign In
-                </button>
-            </div>
+    <!-- Professional Page Loader -->
+    <div id="pageLoader">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-2" role="status"></div>
+            <p class="text-muted fw-bold">Loading GasHubKE...</p>
         </div>
-    </header>
-
-    <!-- Mobile Search Bar View -->
-    <div class="bg-white border-b border-gray-200 px-4 py-3 md:hidden flex space-x-2">
-        <input type="text" id="searchProductsMobile" placeholder="Search gas cylinders..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-        <select id="countyFilterMobile" class="px-2 py-2 border border-gray-300 rounded-lg text-sm bg-white">
-            <option value="">Counties</option>
-        </select>
     </div>
 
-    <!-- Main Content Marketplace -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Available Gas Cylinders & Accessories</h1>
-                <p class="text-sm text-gray-500 mt-1">Order cooking gas directly from verified suppliers near you.</p>
-            </div>
-            <a href="supplier-dashboard.html" id="supplierDashboardLink" class="hidden text-sm bg-gray-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition">
-                Supplier Dashboard
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="switchView('marketplaceView')">
+                <i class="bi bi-fire text-warning"></i> GasHub<span class="text-primary">KE</span>
             </a>
-        </div>
-
-        <!-- Dynamic Product Listings Grid -->
-        <div id="productContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Rendered cards from marketplace.js inject here -->
-            <div class="col-span-full text-center py-16 text-gray-400">
-                Loading marketplace listings...
+            
+            <div class="d-flex align-items-center">
+                <!-- Cart Button -->
+                <button class="btn btn-outline-light position-relative me-2" onclick="switchView('cartCheckoutView')">
+                    <i class="bi bi-cart3"></i>
+                    <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                </button>
+                
+                <!-- Desktop Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="switchView('marketplaceView')">Marketplace</a>
+                        </li>
+                        <li class="nav-item" id="supplierDashboardNavLink" style="display:none;">
+                            <a class="nav-link" href="#" onclick="switchView('supplierDashboardView')">Supplier Dashboard</a>
+                        </li>
+                        <li class="nav-item" id="customerOrdersNavLink" style="display:none;">
+                            <a class="nav-link" href="#" onclick="switchView('customerOrdersView')">My Orders</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-primary btn-sm" href="#" id="authLink" data-bs-toggle="modal" data-bs-target="#authModal">Sign In</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container my-4">
+
+        <!-- 1. Marketplace View -->
+        <section id="marketplaceView" class="view active">
+            <!-- Hero Banner -->
+            <div class="p-4 p-md-5 mb-4 rounded text-bg-primary shadow-sm">
+                <div class="container-fluid py-2">
+                    <h1 class="display-6 fw-bold">Fast & Verified Cooking Gas Delivery</h1>
+                    <p class="col-md-8 fs-6">Order 6Kg, 13Kg, or 50Kg cylinders and accessories from verified local distributors near you instantly.</p>
+                    <div class="input-group mt-3" style="max-width: 600px;">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by brand (e.g. ProGas, K-Gas, Total)..." oninput="filterProducts()">
+                        <button class="btn btn-warning fw-bold text-dark" type="button"><i class="bi bi-search"></i> Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="row g-2 mb-4">
+                <div class="col-md-4">
+                    <select id="locationFilter" class="form-select" onchange="filterProducts()">
+                        <option value="">All Delivery Zones / Counties</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="sizeFilter" class="form-select" onchange="filterProducts()">
+                        <option value="">All Cylinder Sizes</option>
+                        <option value="6 Kg">6 Kg</option>
+                        <option value="13 Kg">13 Kg</option>
+                        <option value="22 Kg">22 Kg</option>
+                        <option value="50 Kg">50 Kg</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="categoryFilter" class="form-select" onchange="filterProducts()">
+                        <option value="">All Categories</option>
+                        <option value="Gas Refill">Gas Refill</option>
+                        <option value="Complete Cylinder">Complete Cylinder</option>
+                        <option value="Accessory">Accessory & Burners</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="row" id="productGrid">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted mt-2">Loading catalog...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Supplier Dashboard View -->
+        <section id="supplierDashboardView" class="view">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Supplier Management Dashboard</h2>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <i class="bi bi-plus-lg"></i> Add New Listing
+                </button>
+            </div>
+
+            <!-- Dashboard Stats Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card p-3 text-center shadow-sm">
+                        <h6 class="text-muted">Active Listings</h6>
+                        <h3 id="supplierListingCount" class="fw-bold text-primary mb-0">0</h3>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-3 text-center shadow-sm">
+                        <h6 class="text-muted">Total Estimated Revenue</h6>
+                        <h3 id="supplierRevenue" class="fw-bold text-success mb-0">KES 0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Table Container -->
+            <div class="card p-4 shadow-sm">
+                <h4 class="mb-3">Your Inventory & Listings</h4>
+                <div id="supplierInventoryTable">
+                    <p class="text-muted">Loading inventory...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Customer Orders View -->
+        <section id="customerOrdersView" class="view">
+            <div class="card p-4 shadow-sm">
+                <h2 class="mb-4">Order History</h2>
+                <div id="customerOrdersList">
+                    <p class="text-muted">Sign in to view your orders.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Cart & Checkout View -->
+        <section id="cartCheckoutView" class="view">
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="card p-4 shadow-sm">
+                        <h3 class="mb-3">Shopping Cart</h3>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Price</th>
+                                        <th>Qty</th>
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartTableBody">
+                                    <tr><td colspan="5" class="text-center py-4 text-muted">Your shopping cart is empty.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card p-4 shadow-sm">
+                        <h4 class="mb-3">Summary</h4>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span id="cartSubtotal" class="fw-bold">KES 0</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fs-5 fw-bold">Total</span>
+                            <span id="cartTotal" class="fs-5 fw-bold text-primary">KES 0</span>
+                        </div>
+                        <button class="btn btn-success w-100 py-2 fw-bold" onclick="completeCheckout()">
+                            <i class="bi bi-phone"></i> Checkout via M-Pesa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Profile Settings View -->
+        <section id="profileSettingsView" class="view">
+            <div class="card p-4 mx-auto shadow-sm" style="max-width: 600px;">
+                <h2 class="mb-4">Account Settings</h2>
+                <form id="profileForm">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name / Business Name</label>
+                        <input type="text" id="profileName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number (M-Pesa)</label>
+                        <input type="text" id="profilePhone" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">County / Zone</label>
+                        <select id="profileCounty" class="form-select county-select" required></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Delivery Address / Landmark</label>
+                        <input type="text" id="profileAddress" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2">Save Profile Changes</button>
+                </form>
+                <button class="btn btn-outline-danger w-100 py-2 mt-3" onclick="handleLogout()">Sign Out</button>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-500">
-            &copy; 2026 GasHub Marketplace. All rights reserved.
-        </div>
-    </footer>
-
-    <!-- Auth Modal Template (Pop-up handled via auth.js) -->
-    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
-            <button id="closeAuthModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">&times;</button>
-            <h2 class="text-xl font-bold mb-4 text-gray-900">Sign in to GasHub</h2>
-            <p class="text-sm text-gray-600 mb-6">Access your shopping cart, orders, or list your gas cylinder products as a vendor.</p>
-            <div class="space-y-4">
-                <button id="googleSignInBtn" class="w-full flex items-center justify-center border border-gray-300 rounded-lg py-2.5 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-                    Continue with Google
-                </button>
+    <!-- Authentication Modal -->
+    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Sign In to GasHubKE</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" id="loginEmail" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" id="loginPassword" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2">Sign In</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modular Script Execution Order -->
-    <!-- 1. Firebase Core Configuration & Initialization -->
-    <script type="module" src="firebase-config.js"></script>
+    <!-- Add Product Modal (For Suppliers) -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Publish New Gas Listing</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="supplierListingForm">
+                        <div class="mb-3">
+                            <label class="form-label">Brand / Title</label>
+                            <input type="text" id="newProdBrand" class="form-control" placeholder="e.g. ProGas 6Kg Refill" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cylinder Size</label>
+                            <select id="newProdSize" class="form-select" required>
+                                <option value="6 Kg">6 Kg</option>
+                                <option value="13 Kg">13 Kg</option>
+                                <option value="22 Kg">22 Kg</option>
+                                <option value="50 Kg">50 Kg</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select id="newProdCategory" class="form-select" required>
+                                <option value="Gas Refill">Gas Refill</option>
+                                <option value="Complete Cylinder">Complete Cylinder</option>
+                                <option value="Accessory">Accessory & Burners</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price (KES)</label>
+                            <input type="number" id="newProdPrice" class="form-control" placeholder="1199" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Delivery Zone / County</label>
+                            <select id="newProdCounty" class="form-select county-select" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Product Image</label>
+                            <input type="file" id="supplierItemImage" class="form-control" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 py-2">Publish Listing</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- 2. Counties Data & Dropdown Populator -->
-    <script type="module" src="counties.js"></script>
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav d-md-none">
+        <a href="#" class="active" onclick="switchView('marketplaceView')">
+            <i class="bi bi-house-door"></i>
+            Marketplace
+        </a>
+        <a href="#" onclick="switchView('cartCheckoutView')">
+            <i class="bi bi-cart3"></i>
+            Cart
+        </a>
+        <a href="#" onclick="switchView('customerOrdersView')">
+            <i class="bi bi-box-seam"></i>
+            Orders
+        </a>
+        <a href="#" onclick="switchView('profileSettingsView')">
+            <i class="bi bi-person"></i>
+            Account
+        </a>
+    </nav>
 
-    <!-- 3. Storage and Vendor Helpers -->
-    <script type="module" src="storage.js"></script>
-    <script type="module" src="vendor.js"></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- 4. Core Feature Modules -->
-    <script type="module" src="auth.js"></script>
-    <script type="module" src="marketplace.js"></script>
-    <script type="module" src="cart.js"></script>
-    <script type="module" src="supplier-dashboard.js"></script>
-
+    <!-- Master App Script Module -->
+    <script type="module" src="./js/app.js"></script>
 </body>
 </html>
