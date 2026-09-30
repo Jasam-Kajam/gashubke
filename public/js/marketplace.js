@@ -5,7 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // ============================================================
-// GAS HUB KE - MARKETPLACE
+// GAS HUB KE - MARKETPLACE.JS
 // ============================================================
 
 let productGrid;
@@ -19,7 +19,7 @@ let searchInput;
 
 
 // ============================================================
-// NORMALIZATION HELPERS
+// NORMALIZATION
 // ============================================================
 
 function normalize(value) {
@@ -41,6 +41,7 @@ function normalizeKey(value) {
 // ============================================================
 
 function getListingBrand(item) {
+
     const possibleBrand =
         item.brand ||
         item.gasBrand ||
@@ -53,14 +54,20 @@ function getListingBrand(item) {
         return normalizeKey(possibleBrand);
     }
 
-    // If no dedicated brand field exists, detect it from title
+    // Detect brand from listing title if no brand field exists
     const title = normalizeKey(item.title || "");
 
-    if (title.includes("totalenergies") || title.includes("totalgas")) {
+    if (
+        title.includes("totalenergies") ||
+        title.includes("totalgas")
+    ) {
         return "total";
     }
 
-    if (title.includes("progas") || title === "pro") {
+    if (
+        title.includes("progas") ||
+        title === "pro"
+    ) {
         return "pro";
     }
 
@@ -68,15 +75,21 @@ function getListingBrand(item) {
         return "kgas";
     }
 
-    if (title.includes("olampishigas") || title.includes("olampishi")) {
+    if (
+        title.includes("olampishigas") ||
+        title.includes("olampishi")
+    ) {
         return "ola";
     }
 
-    if (title.includes("menegas") || title.includes("menegas")) {
+    if (title.includes("menegas")) {
         return "menegas";
     }
 
-    if (title.includes("afrigas") || title.includes("afri")) {
+    if (
+        title.includes("afrigas") ||
+        title.includes("afri")
+    ) {
         return "afrigas";
     }
 
@@ -84,7 +97,10 @@ function getListingBrand(item) {
         return "rubis";
     }
 
-    if (title.includes("hashigas") || title.includes("hashi")) {
+    if (
+        title.includes("hashigas") ||
+        title.includes("hashi")
+    ) {
         return "hashi";
     }
 
@@ -93,26 +109,62 @@ function getListingBrand(item) {
 
 
 // ============================================================
-// BRAND ALIASES
+// BRAND MATCH
 // ============================================================
 
 function brandMatches(item, selectedBrand) {
-    if (!selectedBrand) return true;
+
+    if (!selectedBrand) {
+        return true;
+    }
 
     const selected = normalizeKey(selectedBrand);
     const listingBrand = getListingBrand(item);
 
-    if (!listingBrand) return false;
+    if (!listingBrand) {
+        return false;
+    }
 
     const aliases = {
-        pro: ["pro", "progas"],
-        kgas: ["kgas"],
-        ola: ["ola", "olampishi", "olampishigas"],
-        total: ["total", "totalgas", "totalenergies"],
-        menegas: ["menegas"],
-        afrigas: ["afrigas", "afri"],
-        rubis: ["rubis"],
-        hashi: ["hashi", "hashigas"]
+
+        pro: [
+            "pro",
+            "progas"
+        ],
+
+        kgas: [
+            "kgas"
+        ],
+
+        ola: [
+            "ola",
+            "olampishi",
+            "olampishigas"
+        ],
+
+        total: [
+            "total",
+            "totalgas",
+            "totalenergies"
+        ],
+
+        menegas: [
+            "menegas"
+        ],
+
+        afrigas: [
+            "afrigas",
+            "afri"
+        ],
+
+        rubis: [
+            "rubis"
+        ],
+
+        hashi: [
+            "hashi",
+            "hashigas"
+        ]
     };
 
     if (aliases[selected]) {
@@ -124,29 +176,38 @@ function brandMatches(item, selectedBrand) {
 
 
 // ============================================================
-// LOCATION MATCHING
+// LOCATION MATCH
 // ============================================================
 
 function locationMatches(item, selectedLocation) {
-    if (!selectedLocation) return true;
+
+    if (!selectedLocation) {
+        return true;
+    }
 
     const selected = normalize(selectedLocation);
 
     const possibleLocations = [
+
         item.location,
         item.town,
         item.city,
         item.county,
         item.area,
+
         item.supplierLocation,
         item.supplierTown,
         item.supplierCounty,
+
         item.deliveryLocation,
         item.deliveryArea
     ];
 
     return possibleLocations.some(value => {
-        if (!value) return false;
+
+        if (!value) {
+            return false;
+        }
 
         const location = normalize(value);
 
@@ -160,14 +221,22 @@ function locationMatches(item, selectedLocation) {
 
 
 // ============================================================
-// SIZE MATCHING
+// SIZE MATCH
 // ============================================================
 
 function sizeMatches(item, selectedSize) {
-    if (!selectedSize) return true;
+
+    if (!selectedSize) {
+        return true;
+    }
 
     const selected = normalizeKey(selectedSize);
-    const itemSize = normalizeKey(item.size);
+
+    const itemSize = normalizeKey(
+        item.size ||
+        item.weight ||
+        ""
+    );
 
     return (
         itemSize === selected ||
@@ -178,20 +247,25 @@ function sizeMatches(item, selectedSize) {
 
 
 // ============================================================
-// CATEGORY MATCHING
+// CATEGORY MATCH
 // ============================================================
 
 function categoryMatches(item, selectedCategory) {
-    if (!selectedCategory) return true;
 
-    const selected = normalizeKey(selectedCategory);
+    if (!selectedCategory) {
+        return true;
+    }
 
-    const itemCategory = normalizeKey(
-        item.category ||
-        item.productCategory ||
-        item.type ||
-        ""
-    );
+    const selected =
+        normalizeKey(selectedCategory);
+
+    const itemCategory =
+        normalizeKey(
+            item.category ||
+            item.productCategory ||
+            item.type ||
+            ""
+        );
 
     return (
         itemCategory === selected ||
@@ -206,11 +280,15 @@ function categoryMatches(item, selectedCategory) {
 // ============================================================
 
 window.switchView = function(viewId) {
-    document.querySelectorAll(".view").forEach(v => {
-        v.style.display = "none";
-    });
 
-    const target = document.getElementById(viewId);
+    document
+        .querySelectorAll(".view")
+        .forEach(view => {
+            view.style.display = "none";
+        });
+
+    const target =
+        document.getElementById(viewId);
 
     if (target) {
         target.style.display = "block";
@@ -219,80 +297,397 @@ window.switchView = function(viewId) {
 
 
 // ============================================================
-// CART
+// MULTI-PHOTO IMAGE TICKER
 // ============================================================
 
-window.addToListingCart = function(id, title, price, location) {
+function createImageTicker(images, title) {
 
-    const currentUser = auth.currentUser;
+    if (!Array.isArray(images)) {
+        return "";
+    }
+
+    // Remove invalid/empty URLs
+    const validImages = images.filter(
+        image =>
+            image &&
+            String(image).trim() !== ""
+    );
+
+    if (validImages.length === 0) {
+        return "";
+    }
+
+
+    // --------------------------------------------------------
+    // SINGLE IMAGE
+    // --------------------------------------------------------
+
+    if (validImages.length === 1) {
+
+        return `
+            <div class="listing-image-ticker">
+
+                <div class="listing-image-track">
+
+                    <div class="listing-image-slide">
+
+                        <img
+                            src="${validImages[0]}"
+                            alt="${title}"
+                            loading="lazy"
+                            onerror="
+                                this.parentElement.parentElement.style.display='none';
+                            "
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+    }
+
+
+    // --------------------------------------------------------
+    // MULTIPLE IMAGES
+    // --------------------------------------------------------
+
+    const tickerId =
+        "ticker-" +
+        Math.random()
+            .toString(36)
+            .substring(2, 12);
+
+
+    const slides = validImages
+        .map((image, index) => {
+
+            return `
+                <div class="listing-image-slide">
+
+                    <img
+                        src="${image}"
+                        alt="${title} - Photo ${index + 1}"
+                        loading="${index === 0 ? "eager" : "lazy"}"
+                        onerror="
+                            this.style.visibility='hidden';
+                        "
+                    >
+
+                </div>
+            `;
+
+        })
+        .join("");
+
+
+    const indicators = validImages
+        .map((_, index) => {
+
+            return `
+                <span
+                    class="listing-image-dot ${
+                        index === 0 ? "active" : ""
+                    }"
+                    data-slide="${index}">
+                </span>
+            `;
+
+        })
+        .join("");
+
+
+    // --------------------------------------------------------
+    // CREATE TICKER HTML
+    // --------------------------------------------------------
+
+    const tickerHTML = `
+        <div
+            id="${tickerId}"
+            class="listing-image-ticker"
+        >
+
+            <div class="listing-image-track">
+
+                ${slides}
+
+            </div>
+
+
+            <div class="listing-image-indicators">
+
+                ${indicators}
+
+            </div>
+
+
+            <div class="listing-image-counter">
+
+                1 / ${validImages.length}
+
+            </div>
+
+        </div>
+    `;
+
+
+    // --------------------------------------------------------
+    // START AUTOMATIC SLIDESHOW
+    // --------------------------------------------------------
+
+    setTimeout(() => {
+
+        const ticker =
+            document.getElementById(tickerId);
+
+        if (!ticker) {
+            return;
+        }
+
+        const track =
+            ticker.querySelector(
+                ".listing-image-track"
+            );
+
+        const dots =
+            ticker.querySelectorAll(
+                ".listing-image-dot"
+            );
+
+        const counter =
+            ticker.querySelector(
+                ".listing-image-counter"
+            );
+
+        let currentIndex = 0;
+
+        const totalImages =
+            validImages.length;
+
+
+        // Automatic ticker
+        const interval =
+            setInterval(() => {
+
+                // Stop if ticker has been removed
+                if (!document.body.contains(ticker)) {
+
+                    clearInterval(interval);
+
+                    return;
+                }
+
+
+                currentIndex++;
+
+                if (
+                    currentIndex >= totalImages
+                ) {
+                    currentIndex = 0;
+                }
+
+
+                // Move image track
+                if (track) {
+
+                    track.style.transform =
+                        `translateX(-${currentIndex * 100}%)`;
+                }
+
+
+                // Update dots
+                dots.forEach(
+                    (dot, index) => {
+
+                        dot.classList.toggle(
+                            "active",
+                            index === currentIndex
+                        );
+                    }
+                );
+
+
+                // Update counter
+                if (counter) {
+
+                    counter.textContent =
+                        `${currentIndex + 1} / ${totalImages}`;
+                }
+
+
+            }, 3000);
+
+
+    }, 100);
+
+
+    return tickerHTML;
+}
+
+
+// ============================================================
+// CART - ADD ITEM
+// ============================================================
+
+window.addToListingCart = function(
+    id,
+    title,
+    price,
+    location
+) {
+
+    const currentUser =
+        auth.currentUser;
 
     if (!currentUser) {
-        alert("Please sign in or create an account to add items to your cart.");
 
-        const authModal = document.getElementById("authModal");
+        alert(
+            "Please sign in or create an account to add items to your cart."
+        );
+
+        const authModal =
+            document.getElementById(
+                "authModal"
+            );
 
         if (authModal) {
-            authModal.style.display = "block";
+            authModal.style.display =
+                "block";
         }
 
         return;
     }
 
-    let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
 
-    const existingIndex = cart.findIndex(item => item.id === id);
+    let cart =
+        JSON.parse(
+            localStorage.getItem(
+                "gas_cart"
+            )
+        ) || [];
+
+
+    const existingIndex =
+        cart.findIndex(
+            item => item.id === id
+        );
+
 
     if (existingIndex > -1) {
+
         cart[existingIndex].quantity += 1;
+
     } else {
+
         cart.push({
+
             id,
+
             title,
-            price: Number(price) || 0,
+
+            price:
+                Number(price) || 0,
+
             location,
+
             quantity: 1
+
         });
     }
 
-    localStorage.setItem("gas_cart", JSON.stringify(cart));
+
+    localStorage.setItem(
+        "gas_cart",
+        JSON.stringify(cart)
+    );
+
 
     updateCartUI();
 
-    alert(`${title} added to your cart.`);
+    alert(
+        `${title} added to your cart.`
+    );
 };
 
 
-window.updateCartQuantity = function(id, delta) {
+// ============================================================
+// CART - UPDATE QUANTITY
+// ============================================================
 
-    let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
+window.updateCartQuantity = function(
+    id,
+    delta
+) {
 
-    const index = cart.findIndex(item => item.id === id);
+    let cart =
+        JSON.parse(
+            localStorage.getItem(
+                "gas_cart"
+            )
+        ) || [];
+
+
+    const index =
+        cart.findIndex(
+            item => item.id === id
+        );
+
 
     if (index > -1) {
 
         cart[index].quantity += delta;
 
-        if (cart[index].quantity <= 0) {
+
+        if (
+            cart[index].quantity <= 0
+        ) {
+
             cart.splice(index, 1);
         }
     }
 
-    localStorage.setItem("gas_cart", JSON.stringify(cart));
+
+    localStorage.setItem(
+        "gas_cart",
+        JSON.stringify(cart)
+    );
+
 
     renderCartView();
+
     updateCartUI();
 };
 
 
+// ============================================================
+// CART - REMOVE
+// ============================================================
+
 window.removeFromCart = function(id) {
 
-    let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
+    let cart =
+        JSON.parse(
+            localStorage.getItem(
+                "gas_cart"
+            )
+        ) || [];
 
-    cart = cart.filter(item => item.id !== id);
 
-    localStorage.setItem("gas_cart", JSON.stringify(cart));
+    cart =
+        cart.filter(
+            item => item.id !== id
+        );
+
+
+    localStorage.setItem(
+        "gas_cart",
+        JSON.stringify(cart)
+    );
+
 
     renderCartView();
+
     updateCartUI();
 };
 
@@ -303,26 +698,50 @@ window.removeFromCart = function(id) {
 
 function updateCartUI() {
 
-    let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
+    const cart =
+        JSON.parse(
+            localStorage.getItem(
+                "gas_cart"
+            )
+        ) || [];
 
-    const totalCount = cart.reduce(
-        (sum, item) => sum + Number(item.quantity || 0),
-        0
-    );
 
-    const cartLink = document.getElementById("cartLink");
+    const totalCount =
+        cart.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.quantity || 0
+                ),
+            0
+        );
 
-    if (!cartLink) return;
+
+    const cartLink =
+        document.getElementById(
+            "cartLink"
+        );
+
+
+    if (!cartLink) {
+        return;
+    }
+
 
     cartLink.innerHTML = `
-        <span style="
-            position:relative;
-            display:inline-flex;
-            align-items:center;
-            cursor:pointer;
-        " title="Cart">
 
-            <svg xmlns="http://www.w3.org/2000/svg"
+        <span
+            style="
+                position:relative;
+                display:inline-flex;
+                align-items:center;
+                cursor:pointer;
+            "
+            title="Cart"
+        >
+
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
                 width="22"
                 height="22"
                 viewBox="0 0 24 24"
@@ -330,30 +749,47 @@ function updateCartUI() {
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
-                stroke-linejoin="round">
+                stroke-linejoin="round"
+            >
 
-                <circle cx="9" cy="21" r="1"></circle>
-                <circle cx="20" cy="21" r="1"></circle>
+                <circle
+                    cx="9"
+                    cy="21"
+                    r="1"
+                ></circle>
 
-                <path d="
-                    M1 1h4l2.68 13.39
-                    a2 2 0 0 0 2 1.61h9.72
-                    a2 2 0 0 0 2-1.61L23 6H6
-                "></path>
+                <circle
+                    cx="20"
+                    cy="21"
+                    r="1"
+                ></circle>
+
+                <path
+                    d="
+                        M1 1h4l2.68 13.39
+                        a2 2 0 0 0 2 1.61h9.72
+                        a2 2 0 0 0 2-1.61L23 6H6
+                    "
+                ></path>
 
             </svg>
 
+
             ${
                 totalCount > 0
-                    ? `<span id="cartCount"
-                        class="cart-badge"
-                        style="
-                            position:absolute;
-                            top:-8px;
-                            right:-10px;
-                        ">
-                        ${totalCount}
-                    </span>`
+                    ? `
+                        <span
+                            id="cartCount"
+                            class="cart-badge"
+                            style="
+                                position:absolute;
+                                top:-8px;
+                                right:-10px;
+                            "
+                        >
+                            ${totalCount}
+                        </span>
+                    `
                     : ""
             }
 
@@ -369,18 +805,33 @@ function updateCartUI() {
 function renderCartView() {
 
     const cartItemsList =
-        document.getElementById("cartItemsList");
+        document.getElementById(
+            "cartItemsList"
+        );
 
     const cartSubtotal =
-        document.getElementById("cartSubtotal");
+        document.getElementById(
+            "cartSubtotal"
+        );
 
     const cartTotal =
-        document.getElementById("cartTotal");
+        document.getElementById(
+            "cartTotal"
+        );
 
-    if (!cartItemsList) return;
 
-    let cart =
-        JSON.parse(localStorage.getItem("gas_cart")) || [];
+    if (!cartItemsList) {
+        return;
+    }
+
+
+    const cart =
+        JSON.parse(
+            localStorage.getItem(
+                "gas_cart"
+            )
+        ) || [];
+
 
     if (cart.length === 0) {
 
@@ -388,69 +839,115 @@ function renderCartView() {
             "<p>Your cart is currently empty.</p>";
 
         if (cartSubtotal) {
-            cartSubtotal.textContent = "KES 0";
+            cartSubtotal.textContent =
+                "KES 0";
         }
 
         if (cartTotal) {
-            cartTotal.textContent = "KES 200";
+            cartTotal.textContent =
+                "KES 200";
         }
 
         return;
     }
 
+
     let html = "";
+
     let subtotal = 0;
+
 
     cart.forEach(item => {
 
-        const itemPrice = Number(item.price) || 0;
-        const quantity = Number(item.quantity) || 0;
+        const itemPrice =
+            Number(item.price) || 0;
 
-        const itemTotal = itemPrice * quantity;
+        const quantity =
+            Number(item.quantity) || 0;
+
+        const itemTotal =
+            itemPrice * quantity;
+
 
         subtotal += itemTotal;
 
+
         html += `
+
             <div class="cart-item-row">
 
                 <div>
-                    <strong>${item.title}</strong>
 
-                    <p style="
-                        font-size:0.85rem;
-                        color:var(--text-muted);
-                    ">
+                    <strong>
+                        ${item.title}
+                    </strong>
+
+                    <p
+                        style="
+                            font-size:0.85rem;
+                            color:var(--text-muted);
+                        "
+                    >
                         KES ${itemPrice} each
                     </p>
+
                 </div>
 
-                <div style="
-                    display:flex;
-                    align-items:center;
-                    gap:0.5rem;
-                ">
+
+                <div
+                    style="
+                        display:flex;
+                        align-items:center;
+                        gap:0.5rem;
+                    "
+                >
 
                     <button
                         type="button"
                         class="btn-secondary"
-                        style="padding:2px 10px;"
-                        onclick="window.updateCartQuantity('${item.id}', -1)">
+                        style="
+                            padding:2px 10px;
+                        "
+                        onclick="
+                            window.updateCartQuantity(
+                                '${item.id}',
+                                -1
+                            )
+                        "
+                    >
                         -
                     </button>
 
-                    <span>${quantity}</span>
+
+                    <span>
+                        ${quantity}
+                    </span>
+
 
                     <button
                         type="button"
                         class="btn-secondary"
-                        style="padding:2px 10px;"
-                        onclick="window.updateCartQuantity('${item.id}', 1)">
+                        style="
+                            padding:2px 10px;
+                        "
+                        onclick="
+                            window.updateCartQuantity(
+                                '${item.id}',
+                                1
+                            )
+                        "
+                    >
                         +
                     </button>
 
+
                     <button
                         type="button"
-                        onclick="window.removeFromCart('${item.id}')"
+                        onclick="
+                            window.removeFromCart(
+                                '${item.id}'
+                            )
+                        "
                         style="
                             background:#ef4444;
                             color:#fff;
@@ -460,7 +957,8 @@ function renderCartView() {
                             cursor:pointer;
                             margin-left:0.5rem;
                             font-size:0.85rem;
-                        ">
+                        "
+                    >
                         Remove
                     </button>
 
@@ -470,14 +968,22 @@ function renderCartView() {
         `;
     });
 
-    cartItemsList.innerHTML = html;
+
+    cartItemsList.innerHTML =
+        html;
+
 
     if (cartSubtotal) {
-        cartSubtotal.textContent = `KES ${subtotal}`;
+
+        cartSubtotal.textContent =
+            `KES ${subtotal}`;
     }
 
+
     if (cartTotal) {
-        cartTotal.textContent = `KES ${subtotal + 200}`;
+
+        cartTotal.textContent =
+            `KES ${subtotal + 200}`;
     }
 }
 
@@ -488,48 +994,90 @@ function renderCartView() {
 
 async function loadListings() {
 
-    if (!productGrid) return;
+    if (!productGrid) {
+        return;
+    }
 
-    productGrid.innerHTML =
-        "<p>Loading gas suppliers & inventory...</p>";
+
+    productGrid.innerHTML = `
+        <p>
+            Loading gas suppliers & inventory...
+        </p>
+    `;
+
 
     try {
 
-        const listingsRef = collection(db, "listings");
+        const listingsRef =
+            collection(
+                db,
+                "listings"
+            );
+
 
         const querySnapshot =
-            await getDocs(listingsRef);
+            await getDocs(
+                listingsRef
+            );
 
-        productGrid.innerHTML = "";
+
+        productGrid.innerHTML =
+            "";
+
 
         if (querySnapshot.empty) {
 
-            productGrid.innerHTML =
-                "<p>No active cooking gas listings found.</p>";
+            productGrid.innerHTML = `
+                <p>
+                    No active cooking gas listings found.
+                </p>
+            `;
 
             return;
         }
 
 
         // ====================================================
-        // CURRENT FILTER VALUES
+        // FILTER VALUES
         // ====================================================
 
         const selectedSize =
-            filterSize ? normalize(filterSize.value) : "";
+            filterSize
+                ? normalize(
+                    filterSize.value
+                )
+                : "";
+
 
         const selectedCategory =
-            filterCategory ? normalize(filterCategory.value) : "";
+            filterCategory
+                ? normalize(
+                    filterCategory.value
+                )
+                : "";
+
 
         const selectedLocation =
-            filterLocation ? normalize(filterLocation.value) : "";
+            filterLocation
+                ? normalize(
+                    filterLocation.value
+                )
+                : "";
+
 
         const selectedBrand =
-            filterBrand ? normalize(filterBrand.value) : "";
+            filterBrand
+                ? normalize(
+                    filterBrand.value
+                )
+                : "";
+
 
         const searchQuery =
             searchInput
-                ? normalize(searchInput.value)
+                ? normalize(
+                    searchInput.value
+                )
                 : "";
 
 
@@ -537,305 +1085,383 @@ async function loadListings() {
 
 
         // ====================================================
-        // PROCESS EACH LISTING
+        // PROCESS LISTINGS
         // ====================================================
 
-        querySnapshot.forEach(docSnap => {
+        querySnapshot.forEach(
+            docSnap => {
 
-            const item = docSnap.data();
+                const item =
+                    docSnap.data();
 
-            const itemId = docSnap.id;
-
-
-            // ------------------------------------------------
-            // SIZE
-            // ------------------------------------------------
-
-            if (!sizeMatches(item, selectedSize)) {
-                return;
-            }
+                const itemId =
+                    docSnap.id;
 
 
-            // ------------------------------------------------
-            // CATEGORY
-            // ------------------------------------------------
+                // --------------------------------------------
+                // SIZE
+                // --------------------------------------------
 
-            if (!categoryMatches(item, selectedCategory)) {
-                return;
-            }
-
-
-            // ------------------------------------------------
-            // LOCATION
-            // ------------------------------------------------
-
-            if (!locationMatches(item, selectedLocation)) {
-                return;
-            }
-
-
-            // ------------------------------------------------
-            // BRAND
-            // ------------------------------------------------
-
-            if (!brandMatches(item, selectedBrand)) {
-                return;
-            }
-
-
-            // ------------------------------------------------
-            // SEARCH
-            // ------------------------------------------------
-
-            if (searchQuery) {
-
-                const searchableText = [
-
-                    item.title,
-                    item.description,
-                    item.location,
-                    item.town,
-                    item.city,
-                    item.county,
-                    item.area,
-                    item.brand,
-                    item.gasBrand,
-                    item.category,
-                    item.size
-
-                ]
-                    .filter(Boolean)
-                    .map(normalize)
-                    .join(" ");
-
-                if (!searchableText.includes(searchQuery)) {
+                if (
+                    !sizeMatches(
+                        item,
+                        selectedSize
+                    )
+                ) {
                     return;
                 }
-            }
 
 
-            matchCount++;
+                // --------------------------------------------
+                // CATEGORY
+                // --------------------------------------------
+
+                if (
+                    !categoryMatches(
+                        item,
+                        selectedCategory
+                    )
+                ) {
+                    return;
+                }
 
 
-            // =================================================
-            // PRODUCT CARD
-            // =================================================
+                // --------------------------------------------
+                // LOCATION
+                // --------------------------------------------
 
-            const card =
-                document.createElement("div");
-
-            card.className = "product-card";
-
-
-            const mapPinSvg = `
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    style="
-                        vertical-align:middle;
-                        margin-right:4px;
-                        color:var(--primary);
-                    ">
-
-                    <path d="
-                        M21 10
-                        c0 7-9 13-9 13
-                        S3 17 3 10
-                        a9 9 0 0 1 18 0z
-                    "></path>
-
-                    <circle
-                        cx="12"
-                        cy="10"
-                        r="3">
-                    </circle>
-
-                </svg>
-            `;
+                if (
+                    !locationMatches(
+                        item,
+                        selectedLocation
+                    )
+                ) {
+                    return;
+                }
 
 
-            // =================================================
-            // IMAGES
-            // =================================================
+                // --------------------------------------------
+                // BRAND
+                // --------------------------------------------
 
-            const displayImages =
-                item.images &&
-                item.images.length > 0
-
-                    ? item.images
-
-                    : item.imageUrls &&
-                      item.imageUrls.length > 0
-
-                        ? item.imageUrls
-
-                        : item.imageUrl
-
-                            ? [item.imageUrl]
-
-                            : [];
+                if (
+                    !brandMatches(
+                        item,
+                        selectedBrand
+                    )
+                ) {
+                    return;
+                }
 
 
-            const primaryImage =
-                displayImages.length > 0
-                    ? displayImages[0]
-                    : "";
+                // --------------------------------------------
+                // SEARCH
+                // --------------------------------------------
+
+                if (searchQuery) {
+
+                    const searchableText = [
+
+                        item.title,
+                        item.description,
+
+                        item.location,
+                        item.town,
+                        item.city,
+                        item.county,
+                        item.area,
+
+                        item.brand,
+                        item.gasBrand,
+
+                        item.category,
+                        item.size
+
+                    ]
+                        .filter(Boolean)
+                        .map(normalize)
+                        .join(" ");
 
 
-            // =================================================
-            // SAFE DISPLAY VALUES
-            // =================================================
-
-            const title =
-                item.title || "Cooking Gas";
-
-            const price =
-                item.price !== undefined &&
-                item.price !== null &&
-                item.price !== ""
-                    ? item.price
-                    : "Price on request";
-
-            const size =
-                item.size || "Size not specified";
-
-            const location =
-                item.location ||
-                item.town ||
-                item.city ||
-                "Local Delivery";
-
-            const description =
-                item.description || "";
-
-
-            // =================================================
-            // ESCAPE VALUES FOR HTML
-            // =================================================
-
-            const safeTitle =
-                String(title)
-                    .replace(/'/g, "\\'")
-                    .replace(/"/g, "&quot;");
-
-
-            const safeLocation =
-                String(location)
-                    .replace(/'/g, "\\'")
-                    .replace(/"/g, "&quot;");
-
-
-            // =================================================
-            // CARD HTML
-            // =================================================
-
-            card.innerHTML = `
-
-                <div>
-
-                    ${
-                        primaryImage
-                            ? `
-                                <div
-                                    class="card-img-container"
-                                    style="
-                                        background:#f8fafc;
-                                        border-radius:6px;
-                                        margin-bottom:10px;
-                                        overflow:hidden;
-                                        display:flex;
-                                        align-items:center;
-                                        justify-content:center;
-                                        height:180px;
-                                    ">
-
-                                    <img
-                                        src="${primaryImage}"
-                                        alt="${safeTitle}"
-                                        style="
-                                            width:100%;
-                                            height:100%;
-                                            object-fit:contain;
-                                        "
-                                        loading="lazy"
-                                        onerror="
-                                            this.parentElement.style.display='none';
-                                        "
-                                    >
-
-                                </div>
-                            `
-                            : ""
+                    if (
+                        !searchableText.includes(
+                            searchQuery
+                        )
+                    ) {
+                        return;
                     }
+                }
 
 
-                    <div class="card-body">
+                matchCount++;
 
-                        <h4>${title}</h4>
 
-                        <p class="price">
-                            KES ${price}
+                // =================================================
+                // PRODUCT CARD
+                // =================================================
 
-                            <span style="
-                                font-size:0.8rem;
-                                font-weight:normal;
-                                color:var(--text-muted);
-                            ">
-                                (${size})
-                            </span>
-                        </p>
+                const card =
+                    document.createElement(
+                        "div"
+                    );
 
-                        <p class="location">
-                            ${mapPinSvg}
-                            ${location}
-                        </p>
 
-                        <p style="
-                            font-size:0.85rem;
-                            color:var(--text-muted);
-                            line-height:1.4;
-                        ">
-                            ${description}
-                        </p>
+                card.className =
+                    "product-card";
+
+
+                // =================================================
+                // MAP PIN
+                // =================================================
+
+                const mapPinSvg = `
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        style="
+                            vertical-align:middle;
+                            margin-right:4px;
+                            color:var(--primary);
+                        "
+                    >
+
+                        <path
+                            d="
+                                M21 10
+                                c0 7-9 13-9 13
+                                S3 17 3 10
+                                a9 9 0 0 1 18 0z
+                            "
+                        ></path>
+
+                        <circle
+                            cx="12"
+                            cy="10"
+                            r="3"
+                        ></circle>
+
+                    </svg>
+                `;
+
+
+                // =================================================
+                // IMAGES
+                // =================================================
+
+                let displayImages = [];
+
+
+                if (
+                    Array.isArray(item.images) &&
+                    item.images.length > 0
+                ) {
+
+                    displayImages =
+                        item.images;
+
+                } else if (
+                    Array.isArray(item.imageUrls) &&
+                    item.imageUrls.length > 0
+                ) {
+
+                    displayImages =
+                        item.imageUrls;
+
+                } else if (
+                    item.imageUrl
+                ) {
+
+                    displayImages = [
+                        item.imageUrl
+                    ];
+                }
+
+
+                // =================================================
+                // DISPLAY VALUES
+                // =================================================
+
+                const title =
+                    item.title ||
+                    "Cooking Gas";
+
+
+                const price =
+                    item.price !== undefined &&
+                    item.price !== null &&
+                    item.price !== ""
+                        ? item.price
+                        : "Price on request";
+
+
+                const size =
+                    item.size ||
+                    item.weight ||
+                    "Size not specified";
+
+
+                const location =
+                    item.location ||
+                    item.town ||
+                    item.city ||
+                    item.county ||
+                    "Local Delivery";
+
+
+                const description =
+                    item.description ||
+                    "";
+
+
+                // =================================================
+                // IMAGE TICKER
+                // =================================================
+
+                const imageTicker =
+                    createImageTicker(
+                        displayImages,
+                        title
+                    );
+
+
+                // =================================================
+                // SAFE BUTTON VALUES
+                // =================================================
+
+                const safeTitle =
+                    String(title)
+                        .replace(
+                            /\\/g,
+                            "\\\\"
+                        )
+                        .replace(
+                            /'/g,
+                            "\\'"
+                        );
+
+
+                const safeLocation =
+                    String(location)
+                        .replace(
+                            /\\/g,
+                            "\\\\"
+                        )
+                        .replace(
+                            /'/g,
+                            "\\'"
+                        );
+
+
+                // =================================================
+                // CARD HTML
+                // =================================================
+
+                card.innerHTML = `
+
+                    <div>
+
+                        ${
+                            imageTicker
+                                ? imageTicker
+                                : ""
+                        }
+
+
+                        <div
+                            class="card-body"
+                        >
+
+                            <h4>
+                                ${title}
+                            </h4>
+
+
+                            <p
+                                class="price"
+                            >
+
+                                KES ${price}
+
+                                <span
+                                    style="
+                                        font-size:0.8rem;
+                                        font-weight:normal;
+                                        color:var(--text-muted);
+                                    "
+                                >
+                                    (${size})
+                                </span>
+
+                            </p>
+
+
+                            <p
+                                class="location"
+                            >
+
+                                ${mapPinSvg}
+
+                                ${location}
+
+                            </p>
+
+
+                            <p
+                                style="
+                                    font-size:0.85rem;
+                                    color:var(--text-muted);
+                                    line-height:1.4;
+                                "
+                            >
+                                ${description}
+                            </p>
+
+                        </div>
 
                     </div>
 
-                </div>
+
+                    <div
+                        style="
+                            padding:0 1rem 1rem 1rem;
+                        "
+                    >
+
+                        <button
+                            class="btn-primary"
+                            onclick="
+                                window.addToListingCart(
+                                    '${itemId}',
+                                    '${safeTitle}',
+                                    ${Number(item.price) || 0},
+                                    '${safeLocation}'
+                                )
+                            "
+                        >
+
+                            Order Now
+
+                        </button>
+
+                    </div>
+
+                `;
 
 
-                <div style="
-                    padding:0 1rem 1rem 1rem;
-                ">
+                productGrid.appendChild(
+                    card
+                );
 
-                    <button
-                        class="btn-primary"
-                        onclick="
-                            window.addToListingCart(
-                                '${itemId}',
-                                '${safeTitle}',
-                                ${Number(item.price) || 0},
-                                '${safeLocation}'
-                            )
-                        ">
-
-                        Order Now
-
-                    </button>
-
-                </div>
-            `;
-
-
-            productGrid.appendChild(card);
-
-        });
+            }
+        );
 
 
         // ====================================================
@@ -845,21 +1471,28 @@ async function loadListings() {
         if (matchCount === 0) {
 
             productGrid.innerHTML = `
-                <div style="
-                    grid-column:1/-1;
-                    text-align:center;
-                    padding:40px 20px;
-                    color:var(--text-muted);
-                ">
 
-                    <h4>No listings found</h4>
+                <div
+                    style="
+                        grid-column:1/-1;
+                        text-align:center;
+                        padding:40px 20px;
+                        color:var(--text-muted);
+                    "
+                >
+
+                    <h4>
+                        No listings found
+                    </h4>
 
                     <p>
-                        Try changing your location, brand,
+                        Try changing your
+                        location, brand,
                         size or category filter.
                     </p>
 
                 </div>
+
             `;
         }
 
@@ -871,22 +1504,30 @@ async function loadListings() {
             err
         );
 
+
         productGrid.innerHTML = `
-            <div style="
-                grid-column:1/-1;
-                text-align:center;
-                padding:30px;
-            ">
+
+            <div
+                style="
+                    grid-column:1/-1;
+                    text-align:center;
+                    padding:30px;
+                "
+            >
 
                 <p>
                     Error loading platform inventory.
                 </p>
 
                 <small>
-                    ${err.message || "Please try again."}
+                    ${
+                        err.message ||
+                        "Please try again."
+                    }
                 </small>
 
             </div>
+
         `;
     }
 }
@@ -923,116 +1564,181 @@ function clearFilters() {
 
 
 // ============================================================
-// NAVIGATION + INITIALIZATION
+// INITIALIZE MARKETPLACE
 // ============================================================
 
 function initializeMarketplace() {
 
-    // Get elements after DOM is ready
+    // --------------------------------------------------------
+    // ELEMENTS
+    // --------------------------------------------------------
+
     productGrid =
-        document.getElementById("productGrid");
+        document.getElementById(
+            "productGrid"
+        );
+
 
     filterSize =
-        document.getElementById("filterSize");
+        document.getElementById(
+            "filterSize"
+        );
+
 
     filterCategory =
-        document.getElementById("filterCategory");
+        document.getElementById(
+            "filterCategory"
+        );
+
 
     filterLocation =
-        document.getElementById("filterLocation");
+        document.getElementById(
+            "filterLocation"
+        );
+
 
     filterBrand =
-        document.getElementById("filterBrand");
+        document.getElementById(
+            "filterBrand"
+        );
+
 
     clearFiltersBtn =
-        document.getElementById("clearFiltersBtn");
+        document.getElementById(
+            "clearFiltersBtn"
+        );
+
 
     searchBtn =
-        document.getElementById("searchBtn");
+        document.getElementById(
+            "searchBtn"
+        );
+
 
     searchInput =
-        document.getElementById("searchInput");
+        document.getElementById(
+            "searchInput"
+        );
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // CART
-    // ========================================================
+    // --------------------------------------------------------
 
     updateCartUI();
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // NAVIGATION
-    // ========================================================
+    // --------------------------------------------------------
 
     const homeLink =
-        document.getElementById("homeLink");
+        document.getElementById(
+            "homeLink"
+        );
+
 
     const cartLink =
-        document.getElementById("cartLink");
+        document.getElementById(
+            "cartLink"
+        );
+
 
     const hamburger =
-        document.querySelector(".hamburger");
+        document.querySelector(
+            ".hamburger"
+        );
+
 
     const navLinks =
-        document.querySelector(".nav-links");
+        document.querySelector(
+            ".nav-links"
+        );
 
+
+    // --------------------------------------------------------
+    // HOME
+    // --------------------------------------------------------
 
     if (homeLink) {
 
-        homeLink.addEventListener("click", e => {
+        homeLink.addEventListener(
+            "click",
+            e => {
 
-            e.preventDefault();
+                e.preventDefault();
 
-            switchView("marketplaceView");
+                switchView(
+                    "marketplaceView"
+                );
 
-            if (navLinks) {
-                navLinks.classList.remove("active");
+                if (navLinks) {
+                    navLinks.classList.remove(
+                        "active"
+                    );
+                }
             }
-
-        });
+        );
     }
 
+
+    // --------------------------------------------------------
+    // CART
+    // --------------------------------------------------------
 
     if (cartLink) {
 
-        cartLink.addEventListener("click", e => {
+        cartLink.addEventListener(
+            "click",
+            e => {
 
-            e.preventDefault();
+                e.preventDefault();
 
-            renderCartView();
+                renderCartView();
 
-            switchView("cartView");
+                switchView(
+                    "cartView"
+                );
 
-            if (navLinks) {
-                navLinks.classList.remove("active");
+                if (navLinks) {
+                    navLinks.classList.remove(
+                        "active"
+                    );
+                }
             }
-
-        });
+        );
     }
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // HAMBURGER
-    // ========================================================
+    // --------------------------------------------------------
 
-    if (hamburger && navLinks) {
+    if (
+        hamburger &&
+        navLinks
+    ) {
 
-        hamburger.addEventListener("click", e => {
+        hamburger.addEventListener(
+            "click",
+            e => {
 
-            e.preventDefault();
+                e.preventDefault();
 
-            navLinks.classList.toggle("active");
-
-        });
+                navLinks.classList.toggle(
+                    "active"
+                );
+            }
+        );
     }
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // FILTER EVENTS
-    // ========================================================
+    // --------------------------------------------------------
 
     if (filterSize) {
+
         filterSize.addEventListener(
             "change",
             loadListings
@@ -1041,6 +1747,7 @@ function initializeMarketplace() {
 
 
     if (filterCategory) {
+
         filterCategory.addEventListener(
             "change",
             loadListings
@@ -1049,6 +1756,7 @@ function initializeMarketplace() {
 
 
     if (filterLocation) {
+
         filterLocation.addEventListener(
             "change",
             loadListings
@@ -1057,6 +1765,7 @@ function initializeMarketplace() {
 
 
     if (filterBrand) {
+
         filterBrand.addEventListener(
             "change",
             loadListings
@@ -1064,9 +1773,9 @@ function initializeMarketplace() {
     }
 
 
-    // ========================================================
-    // CLEAR
-    // ========================================================
+    // --------------------------------------------------------
+    // CLEAR FILTERS
+    // --------------------------------------------------------
 
     if (clearFiltersBtn) {
 
@@ -1077,9 +1786,9 @@ function initializeMarketplace() {
     }
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // SEARCH
-    // ========================================================
+    // --------------------------------------------------------
 
     if (searchBtn) {
 
@@ -1096,19 +1805,22 @@ function initializeMarketplace() {
             "keypress",
             e => {
 
-                if (e.key === "Enter") {
+                if (
+                    e.key === "Enter"
+                ) {
+
                     e.preventDefault();
+
                     loadListings();
                 }
-
             }
         );
     }
 
 
-    // ========================================================
-    // INITIAL LOAD
-    // ========================================================
+    // --------------------------------------------------------
+    // FIRST LOAD
+    // --------------------------------------------------------
 
     loadListings();
 }
@@ -1118,7 +1830,9 @@ function initializeMarketplace() {
 // START
 // ============================================================
 
-if (document.readyState === "loading") {
+if (
+    document.readyState === "loading"
+) {
 
     document.addEventListener(
         "DOMContentLoaded",
