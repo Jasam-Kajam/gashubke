@@ -1,97 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>GasHubKE - Kenya's Online Cooking Gas Hub</title>
 
     <meta name="description"
-          content="Fast, reliable cooking gas delivery. Find the best cooking gas prices, refills, cylinders, and accessories from verified local suppliers on GasHubKE.">
+          content="Fast, reliable cooking gas delivery. Find cooking gas prices, refills, cylinders, and accessories from verified local suppliers on GasHubKE.">
 
     <meta name="keywords"
-          content="GasHubKE, cooking gas delivery Kenya, gas refill near me, 6kg gas cylinder, 13kg gas price, cooking gas platform, LPG suppliers Kenya">
+          content="GasHubKE, cooking gas delivery Kenya, gas refill near me, 6kg gas cylinder, 13kg gas price, LPG suppliers Kenya">
 
-    <meta name="author" content="GasHubKE">
+    <meta name="author"
+          content="GasHubKE">
 
-    <link rel="canonical" href="https://gashubke.com/">
+    <link rel="canonical"
+          href="https://gashubke.com/">
 
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gashubke.com/">
-    <meta property="og:title" content="GasHubKE - Kenya's Online Cooking Gas Hub">
+    <!-- =========================================================
+         OPEN GRAPH
+    ========================================================== -->
+
+    <meta property="og:type"
+          content="website">
+
+    <meta property="og:url"
+          content="https://gashubke.com/">
+
+    <meta property="og:title"
+          content="GasHubKE - Kenya's Online Cooking Gas Hub">
+
     <meta property="og:description"
           content="Connect with trusted cooking gas suppliers and retailers for fast delivery on refills and cylinders.">
+
     <meta property="og:image"
           content="https://gashubke.com/assets/og-banner.jpg">
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="GasHubKE - Cooking Gas Platform">
+
+    <!-- =========================================================
+         TWITTER
+    ========================================================== -->
+
+    <meta name="twitter:card"
+          content="summary_large_image">
+
+    <meta name="twitter:title"
+          content="GasHubKE - Cooking Gas Platform">
+
     <meta name="twitter:description"
           content="Compare prices and order cooking gas cylinders and refills directly from verified local suppliers.">
+
     <meta name="twitter:image"
           content="https://gashubke.com/assets/twitter-banner.jpg">
 
-    <link rel="stylesheet" href="./css/styles.css">
+
+    <!-- =========================================================
+         MAIN CSS
+    ========================================================== -->
+
+    <link rel="stylesheet"
+          href="./css/styles.css">
+
 
     <style>
 
         /* =========================================================
            PAGE LOADER
-        ========================================================= */
+        ========================================================== */
 
         #pageLoader {
             position: fixed;
             inset: 0;
+
             background: #ffffff;
+
             z-index: 99999;
+
             display: flex;
             flex-direction: column;
+
             align-items: center;
             justify-content: center;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
+
+            transition:
+                opacity 0.4s ease,
+                visibility 0.4s ease;
         }
+
 
         .spinner-ring {
             width: 50px;
             height: 50px;
+
             border: 4px solid #f1f5f9;
             border-top-color: #f97316;
+
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+
+            animation:
+                gasHubSpin 0.8s linear infinite;
         }
+
 
         .spinner-text {
             margin-top: 1rem;
+
             font-size: 0.95rem;
             font-weight: 500;
+
             color: #64748b;
+
             letter-spacing: 0.5px;
         }
 
-        @keyframes spin {
+
+        @keyframes gasHubSpin {
+
             to {
                 transform: rotate(360deg);
             }
+
         }
 
 
         /* =========================================================
            HEADER
-        ========================================================= */
+        ========================================================== */
 
         .navbar {
             position: relative;
+
             width: 100%;
+
             z-index: 5000;
         }
 
 
         /* =========================================================
            HAMBURGER
-        ========================================================= */
+        ========================================================== */
 
         .hamburger {
+
             display: none;
+
             flex-direction: column;
             justify-content: space-between;
 
@@ -100,19 +157,25 @@
 
             background: transparent;
             border: none;
+
             padding: 0;
             margin-left: auto;
 
             cursor: pointer;
+
             z-index: 6000;
         }
 
+
         .hamburger span {
+
             display: block;
+
             width: 100%;
             height: 3px;
 
             background-color: #1e293b;
+
             border-radius: 3px;
 
             transition:
@@ -120,135 +183,217 @@
                 opacity 0.3s ease;
         }
 
+
         .hamburger.open span:nth-child(1) {
-            transform: translateY(9.5px) rotate(45deg);
+
+            transform:
+                translateY(9.5px)
+                rotate(45deg);
         }
 
+
         .hamburger.open span:nth-child(2) {
+
             opacity: 0;
         }
 
+
         .hamburger.open span:nth-child(3) {
-            transform: translateY(-9.5px) rotate(-45deg);
+
+            transform:
+                translateY(-9.5px)
+                rotate(-45deg);
         }
 
 
         /* =========================================================
            DESKTOP NAVIGATION
-        ========================================================= */
+        ========================================================== */
 
         .nav-links {
+
             display: flex;
+
             align-items: center;
+
             gap: 1.5rem;
+
             margin-left: auto;
         }
 
+
         .nav-links a {
+
             font-weight: 500;
+
             color: #1e293b;
+
             text-decoration: none;
-            transition: color 0.2s ease;
+
+            transition:
+                color 0.2s ease;
         }
 
+
         .nav-links a:hover {
+
             color: #f97316;
         }
 
 
         /* =========================================================
            SEARCH
-        ========================================================= */
+        ========================================================== */
 
         .search-bar {
+
             display: flex;
+
             align-items: center;
+
             background: #f1f5f9;
+
             border-radius: 6px;
+
             padding: 0.2rem 0.5rem;
         }
 
+
         .search-bar input {
+
             border: none;
+
             background: transparent;
+
             outline: none;
+
             padding: 0.5rem;
+
             width: 180px;
         }
 
 
         /* =========================================================
-           FLOATING FILTER BAR
-        ========================================================= */
+           MARKETPLACE
+        ========================================================== */
+
+        #marketplaceView {
+
+            position: relative;
+        }
+
+
+        /* =========================================================
+           STICKY FILTER BAR
+           
+           IMPORTANT:
+           It is intentionally NOT fixed.
+
+           This allows it to remain near the bottom while
+           browsing the marketplace, but once the marketplace
+           section ends, it scrolls away and does not cover
+           the footer.
+        ========================================================== */
 
         .floating-filter-bar {
-            position: fixed;
 
-            left: 50%;
+            position: sticky;
+
             bottom: 22px;
 
-            transform: translateX(-50%);
+            width: min(
+                1100px,
+                calc(100% - 30px)
+            );
 
-            width: min(1100px, calc(100% - 30px));
+            margin:
+                0 auto 22px;
 
             z-index: 4000;
 
             display: flex;
+
             align-items: center;
+
             gap: 12px;
 
             padding: 12px 16px;
 
-            background: rgba(255, 255, 255, 0.97);
+            background:
+                rgba(255, 255, 255, 0.97);
 
-            border: 1px solid #e2e8f0;
+            border:
+                1px solid #e2e8f0;
+
             border-radius: 16px;
 
             box-shadow:
-                0 10px 30px rgba(15, 23, 42, 0.14),
-                0 3px 8px rgba(15, 23, 42, 0.06);
+                0 10px 30px
+                rgba(15, 23, 42, 0.14),
+
+                0 3px 8px
+                rgba(15, 23, 42, 0.06);
 
             backdrop-filter: blur(10px);
 
             overflow-x: auto;
+
             scrollbar-width: thin;
         }
 
+
         .floating-filter-bar h3 {
+
             flex-shrink: 0;
 
             margin: 0;
 
             font-size: 0.9rem;
+
             font-weight: 700;
 
             color: #1e293b;
         }
 
+
         .filter-control {
+
             display: flex;
+
             align-items: center;
+
             gap: 6px;
 
             flex-shrink: 0;
         }
 
+
         .filter-control label {
+
             font-size: 0.78rem;
+
             font-weight: 600;
+
             color: #64748b;
+
             white-space: nowrap;
         }
 
+
         .filter-control select {
+
             min-width: 125px;
 
-            padding: 8px 30px 8px 10px;
+            padding:
+                8px 30px 8px 10px;
 
-            border: 1px solid #cbd5e1;
+            border:
+                1px solid #cbd5e1;
+
             border-radius: 8px;
 
             background: #ffffff;
+
             color: #1e293b;
 
             font-size: 0.82rem;
@@ -258,95 +403,123 @@
             cursor: pointer;
         }
 
+
         .filter-control select:focus {
+
             border-color: #f97316;
-            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12);
+
+            box-shadow:
+                0 0 0 2px
+                rgba(249, 115, 22, 0.12);
         }
 
+
         .clear-filters-btn {
+
             flex-shrink: 0;
 
             padding: 8px 12px;
 
             border: none;
+
             border-radius: 8px;
 
             background: #fff7ed;
+
             color: #ea580c;
 
             font-size: 0.8rem;
+
             font-weight: 600;
 
             cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
         }
 
+
         .clear-filters-btn:hover {
+
             background: #ffedd5;
+
+            transform: translateY(-1px);
         }
 
 
         /* =========================================================
            PRODUCT GRID
-        ========================================================= */
+        ========================================================== */
 
         .product-grid {
-            padding-bottom: 110px;
+
+            padding-bottom: 20px;
         }
 
 
         /* =========================================================
            MOBILE NAVIGATION
-        ========================================================= */
+        ========================================================== */
 
         @media (max-width: 768px) {
 
             .navbar {
-                padding: 0.8rem 1rem !important;
+
+                padding:
+                    0.8rem 1rem !important;
             }
 
+
             .hamburger {
+
                 display: flex;
             }
 
-            /*
-             IMPORTANT:
-             !important is used here because the original HTML
-             had inline display:flex on .nav-links.
-            */
 
             .nav-links {
+
                 position: absolute;
 
                 top: 100%;
+
                 left: 0;
                 right: 0;
 
                 display: none !important;
 
                 flex-direction: column !important;
+
                 align-items: stretch !important;
 
                 gap: 0 !important;
 
                 margin-left: 0 !important;
 
-                padding: 0.7rem 1rem 1rem;
+                padding:
+                    0.7rem 1rem 1rem;
 
                 background: #ffffff;
 
-                border-bottom: 1px solid #e2e8f0;
+                border-bottom:
+                    1px solid #e2e8f0;
 
                 box-shadow:
-                    0 12px 25px rgba(15, 23, 42, 0.12);
+                    0 12px 25px
+                    rgba(15, 23, 42, 0.12);
 
                 z-index: 5000;
             }
 
+
             .nav-links.active {
+
                 display: flex !important;
             }
 
+
             .nav-links a {
+
                 display: flex !important;
 
                 align-items: center;
@@ -357,42 +530,60 @@
 
                 padding: 10px 8px;
 
-                border-bottom: 1px solid #f1f5f9;
+                border-bottom:
+                    1px solid #f1f5f9;
             }
 
+
             .nav-links a:last-child {
+
                 border-bottom: none;
             }
 
+
             .search-bar {
+
                 width: 100%;
+
                 max-width: 180px;
             }
 
+
             .search-bar input {
+
                 width: 100%;
             }
 
-            /*
-             Keep logo + hamburger + search in the header
-             without allowing the nav to push everything around.
-            */
 
             .logo-container {
+
                 max-width: 45%;
             }
 
+
             .logo-container img {
+
                 max-width: 100%;
+
                 height: 42px !important;
             }
 
-            /* Floating filter on mobile */
+
+            /* =====================================================
+               STICKY FILTER - MOBILE
+            ====================================================== */
 
             .floating-filter-bar {
+
+                position: sticky;
+
                 bottom: 14px;
 
-                width: calc(100% - 20px);
+                width:
+                    calc(100% - 20px);
+
+                margin:
+                    0 auto 14px;
 
                 padding: 10px;
 
@@ -401,22 +592,33 @@
                 gap: 8px;
             }
 
+
             .floating-filter-bar h3 {
+
                 display: none;
             }
 
+
             .filter-control {
+
                 flex-direction: column;
+
                 align-items: stretch;
+
                 gap: 3px;
             }
 
+
             .filter-control label {
+
                 font-size: 0.7rem;
             }
 
+
             .filter-control select {
+
                 min-width: 110px;
+
                 max-width: 125px;
 
                 padding: 8px;
@@ -424,80 +626,156 @@
                 font-size: 0.75rem;
             }
 
+
             .clear-filters-btn {
-                padding: 8px 10px;
+
+                padding:
+                    8px 10px;
             }
 
+
             .product-grid {
-                padding-bottom: 125px !important;
+
+                padding-bottom: 20px !important;
             }
+
+
+            .cart-container-grid {
+
+                grid-template-columns:
+                    1fr !important;
+            }
+
         }
 
 
         /* =========================================================
            SMALL PHONES
-        ========================================================= */
+        ========================================================== */
 
         @media (max-width: 480px) {
 
             .search-bar {
+
                 max-width: 125px;
             }
 
+
             .search-bar input {
+
                 width: 80px;
             }
 
+
             .floating-filter-bar {
-                width: calc(100% - 12px);
+
+                width:
+                    calc(100% - 12px);
 
                 bottom: 8px;
+
+                margin-bottom: 8px;
 
                 padding: 8px;
 
                 gap: 6px;
             }
 
+
             .filter-control select {
+
                 min-width: 95px;
+
                 max-width: 105px;
 
                 font-size: 0.7rem;
             }
 
+
             .clear-filters-btn {
+
                 font-size: 0.7rem;
+
                 padding: 8px;
             }
+
         }
 
 
         /* =========================================================
-           CART MOBILE
-        ========================================================= */
+           FILTER LOADING STATE
+        ========================================================== */
 
-        @media (max-width: 768px) {
-            .cart-container-grid {
-                grid-template-columns: 1fr !important;
-            }
+        .filter-loading {
+
+            opacity: 0.65;
+
+            pointer-events: none;
+        }
+
+
+        /* =========================================================
+           EMPTY PRODUCT STATE
+        ========================================================== */
+
+        .marketplace-empty-state {
+
+            grid-column: 1 / -1;
+
+            text-align: center;
+
+            padding: 3rem 1rem;
+
+            color: #64748b;
+        }
+
+
+        .marketplace-empty-state h3 {
+
+            margin-bottom: 0.5rem;
+
+            color: #1e293b;
+        }
+
+
+        /* =========================================================
+           ACCESSIBILITY
+        ========================================================== */
+
+        button:focus-visible,
+        select:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        a:focus-visible {
+
+            outline:
+                3px solid
+                rgba(249, 115, 22, 0.35);
+
+            outline-offset: 2px;
         }
 
     </style>
 
 
-    <!-- Schema -->
+    <!-- =========================================================
+         STRUCTURED DATA
+    ========================================================== -->
+
     <script type="application/ld+json">
+
     {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "GasHubKE",
-      "url": "https://gashubke.com/",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://gashubke.com/?s={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "GasHubKE",
+        "url": "https://gashubke.com/",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://gashubke.com/?s={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
     }
+
     </script>
 
 </head>
@@ -511,10 +789,13 @@
 ========================================================= -->
 
 <div id="pageLoader">
+
     <div class="spinner-ring"></div>
+
     <div class="spinner-text">
-        Loading GasHubKE...
+        Connecting to GasHubKE Firebase...
     </div>
+
 </div>
 
 
@@ -522,8 +803,9 @@
      HEADER
 ========================================================= -->
 
-<header class="navbar"
-        style="
+<header
+    class="navbar"
+    style="
         display:flex;
         align-items:center;
         justify-content:space-between;
@@ -531,23 +813,34 @@
         background:#fff;
         border-bottom:1px solid #e2e8f0;
         gap:1rem;
-        ">
+    "
+>
 
 
-    <!-- LOGO -->
+    <!-- =====================================================
+         LOGO
+    ====================================================== -->
 
-    <div class="logo-container" style="flex-shrink:0;">
+    <div
+        class="logo-container"
+        style="flex-shrink:0;"
+    >
 
         <img
             src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg"
             alt="GasHubKE Logo"
-            style="height:45px;object-fit:contain;"
+            style="
+                height:45px;
+                object-fit:contain;
+            "
         >
 
     </div>
 
 
-    <!-- SEARCH BAR -->
+    <!-- =====================================================
+         SEARCH
+    ====================================================== -->
 
     <div class="search-bar">
 
@@ -561,10 +854,17 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            style="margin:0 8px;flex-shrink:0;"
+            style="
+                margin:0 8px;
+                flex-shrink:0;
+            "
         >
 
-            <circle cx="11" cy="11" r="8"></circle>
+            <circle
+                cx="11"
+                cy="11"
+                r="8">
+            </circle>
 
             <line
                 x1="21"
@@ -575,21 +875,29 @@
 
         </svg>
 
+
         <input
             type="search"
             id="searchInput"
-            placeholder="Search"
+            placeholder="Search gas, cylinders..."
             aria-label="Search listings"
         >
 
-        <button id="searchBtn" style="display:none;">
+
+        <button
+            id="searchBtn"
+            type="button"
+            style="display:none;"
+        >
             Search
         </button>
 
     </div>
 
 
-    <!-- HAMBURGER -->
+    <!-- =====================================================
+         HAMBURGER
+    ====================================================== -->
 
     <button
         class="hamburger"
@@ -606,7 +914,9 @@
     </button>
 
 
-    <!-- NAVIGATION -->
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
 
     <nav
         class="nav-links"
@@ -614,9 +924,13 @@
         aria-label="Main Navigation"
     >
 
-        <a href="#" id="homeLink">
+        <a
+            href="#"
+            id="homeLink"
+        >
             Marketplace
         </a>
+
 
         <a
             href="#"
@@ -625,6 +939,7 @@
         >
             Supplier Dashboard
         </a>
+
 
         <a
             href="#"
@@ -635,14 +950,16 @@
         </a>
 
 
-        <!-- CART -->
+        <!-- =================================================
+             CART
+        ================================================== -->
 
         <a
             href="#"
             id="cartLink"
             style="
-            display:flex;
-            align-items:center;
+                display:flex;
+                align-items:center;
             "
         >
 
@@ -658,22 +975,36 @@
                 stroke-linejoin="round"
             >
 
-                <circle cx="9" cy="21" r="1"></circle>
+                <circle
+                    cx="9"
+                    cy="21"
+                    r="1">
+                </circle>
 
-                <circle cx="20" cy="21" r="1"></circle>
+                <circle
+                    cx="20"
+                    cy="21"
+                    r="1">
+                </circle>
 
                 <path
-                    d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6">
+                    d="
+                        M1 1h4l2.68 13.39
+                        a2 2 0 0 0 2 1.61h9.72
+                        a2 2 0 0 0 2-1.61L23 6H6
+                    "
+                >
                 </path>
 
             </svg>
 
+
             <span
                 id="cartCount"
                 style="
-                margin-left:4px;
-                font-weight:bold;
-                color:#f97316;
+                    margin-left:4px;
+                    font-weight:bold;
+                    color:#f97316;
                 "
             >
                 0
@@ -682,7 +1013,9 @@
         </a>
 
 
-        <!-- AUTH -->
+        <!-- =================================================
+             AUTH
+        ================================================== -->
 
         <a
             href="#"
@@ -703,9 +1036,9 @@
 <main
     class="container"
     style="
-    max-width:1200px;
-    margin:0 auto;
-    padding:2rem 1rem;
+        max-width:1200px;
+        margin:0 auto;
+        padding:2rem 1rem;
     "
 >
 
@@ -720,20 +1053,26 @@
 >
 
 
-    <!-- HERO -->
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
     <div class="marketplace-hero">
 
         <img
             src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDpk_ohiIb9N3HD_2Am6tT0BIMLLyP3JAobCB-bxRhaki6KvVhOG1MDJM72EM-PCoSL93AfOe6STGvoZb4g9Nvqmpr6e01hWst-yd_ShLW7rlnPYYMPDJ7jr_bE5oV_CQXmaCqMyL7oEfH19wS9eGRmkS-w_Zprs4wPOibtEHu2DAki9fzR2CuXEusVJG8/s903/Gemini_Generated_Image_i5vbmti5vbmti5vb_1.jpeg"
-            alt="GasHubKE Promotional Banner"
+            alt="GasHubKE Cooking Gas Marketplace"
         >
 
     </div>
 
 
     <!-- =====================================================
-         FLOATING FILTER BAR
+         DYNAMIC FILTER BAR
+         
+         LOCATION AND BRAND OPTIONS ARE INTENTIONALLY EMPTY.
+         
+         marketplace.js should populate them from Firestore.
     ====================================================== -->
 
     <div
@@ -746,125 +1085,81 @@
         </h3>
 
 
-        <!-- LOCATION -->
+        <!-- =================================================
+             LOCATION
+        ================================================== -->
 
         <div class="filter-control">
 
-            <label for="filterLocation">
+            <label
+                for="filterLocation"
+            >
                 Location
             </label>
 
-            <select id="filterLocation">
+
+            <select
+                id="filterLocation"
+                aria-label="Filter by location"
+            >
 
                 <option value="">
                     All Locations
                 </option>
 
-                <option value="nairobi">
-                    Nairobi
-                </option>
-
-                <option value="mombasa">
-                    Mombasa
-                </option>
-
-                <option value="kisumu">
-                    Kisumu
-                </option>
-
-                <option value="nakuru">
-                    Nakuru
-                </option>
-
-                <option value="eldoret">
-                    Eldoret
-                </option>
-
-                <option value="kiambu">
-                    Kiambu
-                </option>
-
-                <option value="machakos">
-                    Machakos
-                </option>
-
-                <option value="kakamega">
-                    Kakamega
-                </option>
-
-                <option value="meru">
-                    Meru
-                </option>
-
-                <option value="nyeri">
-                    Nyeri
-                </option>
-
             </select>
 
         </div>
 
 
-        <!-- BRAND -->
+        <!-- =================================================
+             BRAND
+             
+             No brands are hardcoded.
+             marketplace.js extracts brand information from
+             listing titles stored in Firestore.
+        ================================================== -->
 
         <div class="filter-control">
 
-            <label for="filterBrand">
+            <label
+                for="filterBrand"
+            >
                 Brand
             </label>
 
-            <select id="filterBrand">
+
+            <select
+                id="filterBrand"
+                aria-label="Filter by gas brand"
+            >
 
                 <option value="">
                     All Brands
                 </option>
 
-                <option value="pro">
-                    ProGas
-                </option>
-
-                <option value="kgas">
-                    K-Gas
-                </option>
-
-                <option value="ola">
-                    Ola Mpishi Gas
-                </option>
-
-                <option value="total">
-                    Total Gas
-                </option>
-
-                <option value="menegas">
-                    MenGas
-                </option>
-
-                <option value="afrigas">
-                    AfriGas
-                </option>
-
-                <option value="rubis">
-                    Rubis Gas
-                </option>
-
-                <option value="hashi">
-                    Hashi Gas
-                </option>
-
             </select>
 
         </div>
 
 
-        <!-- SIZE -->
+        <!-- =================================================
+             SIZE
+        ================================================== -->
 
         <div class="filter-control">
 
-            <label for="filterSize">
+            <label
+                for="filterSize"
+            >
                 Size
             </label>
 
-            <select id="filterSize">
+
+            <select
+                id="filterSize"
+                aria-label="Filter by cylinder size"
+            >
 
                 <option value="">
                     All Sizes
@@ -891,15 +1186,23 @@
         </div>
 
 
-        <!-- CATEGORY -->
+        <!-- =================================================
+             CATEGORY
+        ================================================== -->
 
         <div class="filter-control">
 
-            <label for="filterCategory">
+            <label
+                for="filterCategory"
+            >
                 Category
             </label>
 
-            <select id="filterCategory">
+
+            <select
+                id="filterCategory"
+                aria-label="Filter by category"
+            >
 
                 <option value="">
                     All Categories
@@ -922,7 +1225,9 @@
         </div>
 
 
-        <!-- CLEAR -->
+        <!-- =================================================
+             CLEAR FILTERS
+        ================================================== -->
 
         <button
             type="button"
@@ -936,7 +1241,7 @@
 
 
     <!-- =====================================================
-         PRODUCTS
+         PRODUCT GRID
     ====================================================== -->
 
     <div
@@ -944,13 +1249,19 @@
         id="productGrid"
         aria-live="polite"
         style="
-        display:grid;
-        grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-        gap:1.5rem;
+            display:grid;
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(220px,1fr)
+                );
+            gap:1.5rem;
         "
     >
 
-        <!-- Dynamic listings load here -->
+        <!--
+            Firestore listings are rendered by marketplace.js.
+        -->
 
     </div>
 
@@ -975,12 +1286,19 @@
     <div
         class="supplier-stats-grid"
         style="
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-        gap:1rem;
-        margin-bottom:1.5rem;
+            display:grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(220px,1fr)
+                );
+            gap:1rem;
+            margin-bottom:1.5rem;
         "
     >
+
+
+        <!-- TOTAL ORDERS -->
 
         <div
             class="card"
@@ -989,8 +1307,8 @@
 
             <h4
                 style="
-                font-size:.9rem;
-                color:#64748b;
+                    font-size:.9rem;
+                    color:#64748b;
                 "
             >
                 Total Orders Received
@@ -999,10 +1317,10 @@
             <p
                 id="statTotalOrders"
                 style="
-                font-size:1.5rem;
-                font-weight:bold;
-                margin-top:.5rem;
-                color:var(--primary);
+                    font-size:1.5rem;
+                    font-weight:bold;
+                    margin-top:.5rem;
+                    color:var(--primary);
                 "
             >
                 0
@@ -1011,6 +1329,8 @@
         </div>
 
 
+        <!-- ACTIVE LISTINGS -->
+
         <div
             class="card"
             style="padding:1.25rem;"
@@ -1018,8 +1338,8 @@
 
             <h4
                 style="
-                font-size:.9rem;
-                color:#64748b;
+                    font-size:.9rem;
+                    color:#64748b;
                 "
             >
                 Active Listings
@@ -1028,10 +1348,10 @@
             <p
                 id="statActiveListings"
                 style="
-                font-size:1.5rem;
-                font-weight:bold;
-                margin-top:.5rem;
-                color:var(--primary);
+                    font-size:1.5rem;
+                    font-weight:bold;
+                    margin-top:.5rem;
+                    color:var(--primary);
                 "
             >
                 0
@@ -1040,6 +1360,8 @@
         </div>
 
 
+        <!-- REVENUE -->
+
         <div
             class="card"
             style="padding:1.25rem;"
@@ -1047,8 +1369,8 @@
 
             <h4
                 style="
-                font-size:.9rem;
-                color:#64748b;
+                    font-size:.9rem;
+                    color:#64748b;
                 "
             >
                 Total Revenue (KES)
@@ -1057,10 +1379,10 @@
             <p
                 id="statRevenue"
                 style="
-                font-size:1.5rem;
-                font-weight:bold;
-                margin-top:.5rem;
-                color:var(--primary);
+                    font-size:1.5rem;
+                    font-weight:bold;
+                    margin-top:.5rem;
+                    color:var(--primary);
                 "
             >
                 0
@@ -1071,12 +1393,14 @@
     </div>
 
 
+    <!-- SUPPLIER TABS -->
+
     <div
         class="supplier-tabs"
         style="
-        margin-bottom:1rem;
-        display:flex;
-        gap:1rem;
+            margin-bottom:1rem;
+            display:flex;
+            gap:1rem;
         "
     >
 
@@ -1089,14 +1413,15 @@
             Manage Inventory
         </button>
 
+
         <button
             type="button"
             class="btn-secondary"
             id="tabOrdersBtn"
             onclick="window.switchSupplierTab('orders')"
             style="
-            background:#e2e8f0;
-            color:#1e293b;
+                background:#e2e8f0;
+                color:#1e293b;
             "
         >
             Customer Orders
@@ -1104,6 +1429,8 @@
 
     </div>
 
+
+    <!-- SUPPLIER LISTINGS -->
 
     <div id="supplierListingsTabContent">
 
@@ -1117,12 +1444,14 @@
                 Post New Listing
             </h3>
 
+
             <input
                 type="text"
                 id="supplierItemTitle"
                 placeholder="Product Title (e.g. 13kg Total Gas Refill)"
                 required
             >
+
 
             <select
                 id="supplierItemSize"
@@ -1172,6 +1501,8 @@
                 type="number"
                 id="supplierItemPrice"
                 placeholder="Price (KES)"
+                min="0"
+                step="1"
                 required
             >
 
@@ -1179,14 +1510,15 @@
             <label
                 for="supplierItemImage"
                 style="
-                font-size:.9rem;
-                color:#64748b;
-                margin-top:.5rem;
-                display:block;
+                    font-size:.9rem;
+                    color:#64748b;
+                    margin-top:.5rem;
+                    display:block;
                 "
             >
                 Product Images (Max 5)
             </label>
+
 
             <input
                 type="file"
@@ -1214,21 +1546,27 @@
         </form>
 
 
+        <!-- MY LISTINGS -->
+
         <div class="my-listings">
 
             <h3>
                 Your Active Listings
             </h3>
 
+
             <div
                 id="supplierListingsGrid"
                 style="margin-top:1rem;"
-            ></div>
+            >
+            </div>
 
         </div>
 
     </div>
 
+
+    <!-- SUPPLIER ORDERS -->
 
     <div
         id="supplierOrdersTabContent"
@@ -1240,6 +1578,7 @@
             <h3>
                 Incoming Customer Orders
             </h3>
+
 
             <div
                 id="supplierOrdersList"
@@ -1273,17 +1612,19 @@
         My Orders & Account Portal
     </h2>
 
+
     <div
         class="card"
         style="
-        padding:1.5rem;
-        margin-top:1rem;
+            padding:1.5rem;
+            margin-top:1rem;
         "
     >
 
         <h3>
             Order History
         </h3>
+
 
         <div
             id="customerOrdersList"
@@ -1319,11 +1660,14 @@
     <div
         class="cart-container-grid"
         style="
-        display:grid;
-        grid-template-columns:2fr 1fr;
-        gap:2rem;
+            display:grid;
+            grid-template-columns:2fr 1fr;
+            gap:2rem;
         "
     >
+
+
+        <!-- CART ITEMS -->
 
         <div
             class="cart-items-card card"
@@ -1333,6 +1677,7 @@
             <h3>
                 Review Items
             </h3>
+
 
             <div
                 id="cartItemsList"
@@ -1348,6 +1693,8 @@
         </div>
 
 
+        <!-- CART SUMMARY -->
+
         <div
             class="cart-summary-card card"
             style="padding:1.5rem;"
@@ -1357,18 +1704,20 @@
                 Order Summary
             </h3>
 
+
             <div
                 class="summary-row"
                 style="
-                margin-top:1rem;
-                display:flex;
-                justify-content:space-between;
+                    margin-top:1rem;
+                    display:flex;
+                    justify-content:space-between;
                 "
             >
 
                 <span>
                     Subtotal
                 </span>
+
 
                 <span id="cartSubtotal">
                     KES 0
@@ -1380,15 +1729,16 @@
             <div
                 class="summary-row"
                 style="
-                display:flex;
-                justify-content:space-between;
-                margin-top:.5rem;
+                    display:flex;
+                    justify-content:space-between;
+                    margin-top:.5rem;
                 "
             >
 
                 <span>
                     Estimated Delivery
                 </span>
+
 
                 <span>
                     KES 200
@@ -1399,9 +1749,10 @@
 
             <hr
                 style="
-                margin:1rem 0;
-                border:0;
-                border-top:1px solid #e2e8f0;
+                    margin:1rem 0;
+                    border:0;
+                    border-top:
+                        1px solid #e2e8f0;
                 "
             >
 
@@ -1409,15 +1760,16 @@
             <div
                 class="summary-row total-row"
                 style="
-                display:flex;
-                justify-content:space-between;
-                font-size:1.2rem;
+                    display:flex;
+                    justify-content:space-between;
+                    font-size:1.2rem;
                 "
             >
 
                 <strong>
                     Total
                 </strong>
+
 
                 <strong id="cartTotal">
                     KES 200
@@ -1426,6 +1778,8 @@
             </div>
 
 
+            <!-- CHECKOUT -->
+
             <form
                 id="checkoutForm"
                 style="margin-top:1.5rem;"
@@ -1433,8 +1787,8 @@
 
                 <h4
                     style="
-                    margin-bottom:.75rem;
-                    font-size:.95rem;
+                        margin-bottom:.75rem;
+                        font-size:.95rem;
                     "
                 >
                     Delivery Details
@@ -1446,11 +1800,11 @@
                     id="deliveryName"
                     placeholder="Full Name"
                     style="
-                    width:100%;
-                    padding:.5rem;
-                    margin-bottom:.5rem;
-                    border-radius:4px;
-                    border:1px solid #cbd5e1;
+                        width:100%;
+                        padding:.5rem;
+                        margin-bottom:.5rem;
+                        border-radius:4px;
+                        border:1px solid #cbd5e1;
                     "
                     required
                 >
@@ -1461,11 +1815,11 @@
                     id="deliveryPhone"
                     placeholder="Phone Number (e.g. 0712345678)"
                     style="
-                    width:100%;
-                    padding:.5rem;
-                    margin-bottom:.5rem;
-                    border-radius:4px;
-                    border:1px solid #cbd5e1;
+                        width:100%;
+                        padding:.5rem;
+                        margin-bottom:.5rem;
+                        border-radius:4px;
+                        border:1px solid #cbd5e1;
                     "
                     required
                 >
@@ -1476,11 +1830,11 @@
                     id="deliveryAddress"
                     placeholder="Delivery Location / Estate / House No."
                     style="
-                    width:100%;
-                    padding:.5rem;
-                    margin-bottom:1rem;
-                    border-radius:4px;
-                    border:1px solid #cbd5e1;
+                        width:100%;
+                        padding:.5rem;
+                        margin-bottom:1rem;
+                        border-radius:4px;
+                        border:1px solid #cbd5e1;
                     "
                     required
                 >
@@ -1490,8 +1844,8 @@
                     type="submit"
                     class="btn-primary"
                     style="
-                    width:100%;
-                    padding:.75rem;
+                        width:100%;
+                        padding:.75rem;
                     "
                 >
                     Place Order & Pay via M-Pesa
@@ -1515,6 +1869,7 @@
     class="modal"
     role="dialog"
     aria-modal="true"
+    aria-labelledby="authModalTitle"
     style="display:none;"
 >
 
@@ -1524,6 +1879,7 @@
             id="closeModal"
             class="close"
             role="button"
+            tabindex="0"
             aria-label="Close modal"
         >
             &times;
@@ -1541,16 +1897,21 @@
                 type="email"
                 id="authEmail"
                 placeholder="Email Address"
+                autocomplete="email"
                 required
             >
+
 
             <input
                 type="password"
                 id="authPassword"
                 placeholder="Password"
+                autocomplete="current-password"
                 required
             >
 
+
+            <!-- SUPPLIER REGISTRATION FIELDS -->
 
             <div
                 id="vendorFields"
@@ -1564,7 +1925,9 @@
                 >
 
 
-                <select id="supplierCounty">
+                <select
+                    id="supplierCounty"
+                >
 
                     <option value="">
                         Select County
@@ -1573,7 +1936,9 @@
                 </select>
 
 
-                <select id="supplierArea">
+                <select
+                    id="supplierArea"
+                >
 
                     <option value="">
                         Select Town / Area First
@@ -1582,7 +1947,9 @@
                 </select>
 
 
-                <select id="userRole">
+                <select
+                    id="userRole"
+                >
 
                     <option value="customer">
                         Customer
@@ -1609,10 +1976,10 @@
             <p
                 id="toggleAuthMode"
                 style="
-                cursor:pointer;
-                margin-top:1rem;
-                font-size:.9rem;
-                text-align:center;
+                    cursor:pointer;
+                    margin-top:1rem;
+                    font-size:.9rem;
+                    text-align:center;
                 "
             >
                 Need an account? Register
@@ -1634,38 +2001,44 @@
 <footer
     class="site-footer"
     style="
-    background:#1e293b;
-    color:#fff;
-    padding:3rem 1rem 1rem;
+        background:#1e293b;
+        color:#fff;
+        padding:3rem 1rem 1rem;
     "
 >
 
     <div
         class="footer-container"
         style="
-        max-width:1200px;
-        margin:0 auto;
-        display:flex;
-        flex-wrap:wrap;
-        gap:2rem;
-        justify-content:space-between;
+            max-width:1200px;
+            margin:0 auto;
+            display:flex;
+            flex-wrap:wrap;
+            gap:2rem;
+            justify-content:space-between;
         "
     >
+
+
+        <!-- BRAND -->
 
         <div
             class="footer-col"
             style="max-width:300px;"
         >
 
-            <h3 style="margin-bottom:1rem;">
+            <h3
+                style="margin-bottom:1rem;"
+            >
                 GasHubKE
             </h3>
 
+
             <p
                 style="
-                color:#cbd5e1;
-                line-height:1.5;
-                font-size:.9rem;
+                    color:#cbd5e1;
+                    line-height:1.5;
+                    font-size:.9rem;
                 "
             >
                 Connecting verified cooking gas suppliers,
@@ -1676,53 +2049,81 @@
         </div>
 
 
+        <!-- QUICK LINKS -->
+
         <div class="footer-col">
 
-            <h4 style="margin-bottom:1rem;">
+            <h4
+                style="margin-bottom:1rem;"
+            >
                 Quick Links
             </h4>
 
+
             <ul
                 style="
-                list-style:none;
-                padding:0;
+                    list-style:none;
+                    padding:0;
                 "
             >
 
                 <li style="margin-bottom:.5rem;">
+
                     <a
                         href="#"
-                        style="color:#94a3b8;text-decoration:none;"
+                        style="
+                            color:#94a3b8;
+                            text-decoration:none;
+                        "
                     >
                         About Us
                     </a>
+
                 </li>
 
+
                 <li style="margin-bottom:.5rem;">
+
                     <a
                         href="#"
-                        style="color:#94a3b8;text-decoration:none;"
+                        style="
+                            color:#94a3b8;
+                            text-decoration:none;
+                        "
                     >
                         Supplier Guidelines
                     </a>
+
                 </li>
 
+
                 <li style="margin-bottom:.5rem;">
+
                     <a
                         href="#"
-                        style="color:#94a3b8;text-decoration:none;"
+                        style="
+                            color:#94a3b8;
+                            text-decoration:none;
+                        "
                     >
                         Safety & Compliance
                     </a>
+
                 </li>
 
+
                 <li style="margin-bottom:.5rem;">
+
                     <a
                         href="#"
-                        style="color:#94a3b8;text-decoration:none;"
+                        style="
+                            color:#94a3b8;
+                            text-decoration:none;
+                        "
                     >
                         Contact Support
                     </a>
+
                 </li>
 
             </ul>
@@ -1730,35 +2131,51 @@
         </div>
 
 
+        <!-- LEGAL -->
+
         <div class="footer-col">
 
-            <h4 style="margin-bottom:1rem;">
+            <h4
+                style="margin-bottom:1rem;"
+            >
                 Legal
             </h4>
 
+
             <ul
                 style="
-                list-style:none;
-                padding:0;
+                    list-style:none;
+                    padding:0;
                 "
             >
 
                 <li style="margin-bottom:.5rem;">
+
                     <a
                         href="#"
-                        style="color:#94a3b8;text-decoration:none;"
+                        style="
+                            color:#94a3b8;
+                            text-decoration:none;
+                        "
                     >
                         Privacy Policy
                     </a>
+
                 </li>
 
+
                 <li style="margin-bottom:.5rem;">
+
                     <a
                         href="#"
-                        style="color:#94a3b8;text-decoration:none;"
+                        style="
+                            color:#94a3b8;
+                            text-decoration:none;
+                        "
                     >
                         Terms of Service
                     </a>
+
                 </li>
 
             </ul>
@@ -1768,22 +2185,29 @@
     </div>
 
 
+    <!-- FOOTER BOTTOM -->
+
     <div
         class="footer-bottom"
         style="
-        text-align:center;
-        margin-top:2rem;
-        padding-top:1rem;
-        border-top:1px solid #334155;
-        color:#94a3b8;
-        font-size:.85rem;
+            text-align:center;
+            margin-top:2rem;
+            padding-top:1rem;
+            border-top:1px solid #334155;
+            color:#94a3b8;
+            font-size:.85rem;
         "
     >
 
         <p>
+
             &copy;
+
             <span id="currentYear"></span>
-            GasHubKE. All rights reserved.
+
+            GasHubKE.
+            All rights reserved.
+
         </p>
 
     </div>
@@ -1799,31 +2223,29 @@
 
     /* =========================================================
        PAGE LOADER
-    ========================================================= */
+    ========================================================== */
 
     window.addEventListener('load', () => {
 
         const loader =
             document.getElementById('pageLoader');
 
-        if (loader) {
+        if (!loader) return;
 
-            loader.style.opacity = '0';
+        loader.style.opacity = '0';
 
-            setTimeout(() => {
+        setTimeout(() => {
 
-                loader.style.display = 'none';
+            loader.style.display = 'none';
 
-            }, 400);
-
-        }
+        }, 400);
 
     });
 
 
     /* =========================================================
        YEAR
-    ========================================================= */
+    ========================================================== */
 
     const yearElement =
         document.getElementById('currentYear');
@@ -1838,92 +2260,123 @@
 
     /* =========================================================
        MOBILE HAMBURGER
-    ========================================================= */
+    ========================================================== */
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener(
+        'DOMContentLoaded',
+        () => {
 
-        const hamburgerBtn =
-            document.getElementById('hamburgerBtn');
-
-        const navLinks =
-            document.getElementById('navLinks');
-
-
-        if (hamburgerBtn && navLinks) {
-
-            hamburgerBtn.addEventListener('click', (event) => {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                const isOpen =
-                    navLinks.classList.toggle('active');
-
-                hamburgerBtn.classList.toggle(
-                    'open',
-                    isOpen
+            const hamburgerBtn =
+                document.getElementById(
+                    'hamburgerBtn'
                 );
 
-                hamburgerBtn.setAttribute(
-                    'aria-expanded',
-                    String(isOpen)
+            const navLinks =
+                document.getElementById(
+                    'navLinks'
                 );
 
-            });
+
+            if (!hamburgerBtn || !navLinks) {
+                return;
+            }
 
 
-            /* Close after clicking a navigation link */
+            hamburgerBtn.addEventListener(
+                'click',
+                (event) => {
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const isOpen =
+                        navLinks.classList.toggle(
+                            'active'
+                        );
+
+                    hamburgerBtn.classList.toggle(
+                        'open',
+                        isOpen
+                    );
+
+                    hamburgerBtn.setAttribute(
+                        'aria-expanded',
+                        String(isOpen)
+                    );
+
+                }
+            );
+
+
+            /* Close after navigation */
 
             navLinks
                 .querySelectorAll('a')
                 .forEach(link => {
 
-                    link.addEventListener('click', () => {
+                    link.addEventListener(
+                        'click',
+                        () => {
 
-                        navLinks.classList.remove('active');
+                            navLinks.classList.remove(
+                                'active'
+                            );
 
-                        hamburgerBtn.classList.remove('open');
+                            hamburgerBtn.classList.remove(
+                                'open'
+                            );
+
+                            hamburgerBtn.setAttribute(
+                                'aria-expanded',
+                                'false'
+                            );
+
+                        }
+                    );
+
+                });
+
+
+            /* Close outside */
+
+            document.addEventListener(
+                'click',
+                (event) => {
+
+                    if (
+                        !hamburgerBtn.contains(
+                            event.target
+                        ) &&
+                        !navLinks.contains(
+                            event.target
+                        )
+                    ) {
+
+                        navLinks.classList.remove(
+                            'active'
+                        );
+
+                        hamburgerBtn.classList.remove(
+                            'open'
+                        );
 
                         hamburgerBtn.setAttribute(
                             'aria-expanded',
                             'false'
                         );
 
-                    });
-
-                });
-
-
-            /* Close when clicking outside */
-
-            document.addEventListener('click', (event) => {
-
-                if (
-                    !hamburgerBtn.contains(event.target) &&
-                    !navLinks.contains(event.target)
-                ) {
-
-                    navLinks.classList.remove('active');
-
-                    hamburgerBtn.classList.remove('open');
-
-                    hamburgerBtn.setAttribute(
-                        'aria-expanded',
-                        'false'
-                    );
+                    }
 
                 }
-
-            });
+            );
 
         }
-
-    });
+    );
 
 
     /* =========================================================
-       NAVIGATION
-    ========================================================= */
+       NAVIGATION ELEMENTS
+    ========================================================== */
 
     const homeLink =
         document.getElementById('homeLink');
@@ -1951,6 +2404,10 @@
         document.getElementById('closeModal');
 
 
+    /* =========================================================
+       VIEW MANAGEMENT
+    ========================================================== */
+
     function hideAllViews() {
 
         document
@@ -1966,285 +2423,512 @@
 
     /* =========================================================
        LOGIN UI
-    ========================================================= */
+    ========================================================== */
 
-    window.handlePostLoginUI = function(role) {
+    window.handlePostLoginUI =
+        function(role) {
 
-        hideAllViews();
-
-        if (authModal) {
-
-            authModal.style.display = 'none';
-
-        }
+            hideAllViews();
 
 
-        document
-            .getElementById('marketplaceView')
-            .style.display = 'block';
+            if (authModal) {
 
-
-        if (
-            role === 'vendor' ||
-            role === 'supplier'
-        ) {
-
-            if (supplierDashboardNavLink) {
-
-                supplierDashboardNavLink.style.display =
-                    'inline-block';
-
-            }
-
-            if (customerOrdersNavLink) {
-
-                customerOrdersNavLink.style.display =
+                authModal.style.display =
                     'none';
 
             }
 
-        } else {
 
-            if (customerOrdersNavLink) {
+            const marketplaceView =
+                document.getElementById(
+                    'marketplaceView'
+                );
 
-                customerOrdersNavLink.style.display =
-                    'inline-block';
+            if (marketplaceView) {
 
-            }
-
-            if (supplierDashboardNavLink) {
-
-                supplierDashboardNavLink.style.display =
-                    'none';
+                marketplaceView.style.display =
+                    'block';
 
             }
 
-        }
+
+            if (
+                role === 'vendor' ||
+                role === 'supplier'
+            ) {
+
+                if (
+                    supplierDashboardNavLink
+                ) {
+
+                    supplierDashboardNavLink.style.display =
+                        'inline-block';
+
+                }
 
 
-        if (authLink) {
+                if (
+                    customerOrdersNavLink
+                ) {
 
-            authLink.textContent = 'Sign Out';
+                    customerOrdersNavLink.style.display =
+                        'none';
 
-        }
+                }
 
-    };
+            } else {
+
+                if (
+                    customerOrdersNavLink
+                ) {
+
+                    customerOrdersNavLink.style.display =
+                        'inline-block';
+
+                }
+
+
+                if (
+                    supplierDashboardNavLink
+                ) {
+
+                    supplierDashboardNavLink.style.display =
+                        'none';
+
+                }
+
+            }
+
+
+            if (authLink) {
+
+                authLink.textContent =
+                    'Sign Out';
+
+            }
+
+        };
 
 
     /* =========================================================
        LOGOUT UI
-    ========================================================= */
+    ========================================================== */
 
-    window.handlePostLogoutUI = function() {
+    window.handlePostLogoutUI =
+        function() {
 
-        hideAllViews();
-
-        document
-            .getElementById('marketplaceView')
-            .style.display = 'block';
+            hideAllViews();
 
 
-        if (supplierDashboardNavLink) {
+            const marketplaceView =
+                document.getElementById(
+                    'marketplaceView'
+                );
 
-            supplierDashboardNavLink.style.display =
-                'none';
+            if (marketplaceView) {
 
-        }
+                marketplaceView.style.display =
+                    'block';
 
-
-        if (customerOrdersNavLink) {
-
-            customerOrdersNavLink.style.display =
-                'none';
-
-        }
+            }
 
 
-        if (authLink) {
+            if (
+                supplierDashboardNavLink
+            ) {
 
-            authLink.textContent = 'Sign In';
+                supplierDashboardNavLink.style.display =
+                    'none';
 
-        }
+            }
 
-    };
+
+            if (
+                customerOrdersNavLink
+            ) {
+
+                customerOrdersNavLink.style.display =
+                    'none';
+
+            }
+
+
+            if (authLink) {
+
+                authLink.textContent =
+                    'Sign In';
+
+            }
+
+        };
 
 
     /* =========================================================
        HOME
-    ========================================================= */
+    ========================================================== */
 
     if (homeLink) {
 
-        homeLink.addEventListener('click', (event) => {
+        homeLink.addEventListener(
+            'click',
+            (event) => {
 
-            event.preventDefault();
+                event.preventDefault();
 
-            hideAllViews();
+                hideAllViews();
 
-            document
-                .getElementById('marketplaceView')
-                .style.display = 'block';
 
-        });
+                const marketplaceView =
+                    document.getElementById(
+                        'marketplaceView'
+                    );
+
+                if (marketplaceView) {
+
+                    marketplaceView.style.display =
+                        'block';
+
+                }
+
+            }
+        );
 
     }
 
 
     /* =========================================================
        CART
-    ========================================================= */
+    ========================================================== */
 
     if (cartLink) {
 
-        cartLink.addEventListener('click', (event) => {
+        cartLink.addEventListener(
+            'click',
+            (event) => {
 
-            event.preventDefault();
+                event.preventDefault();
 
-            hideAllViews();
+                hideAllViews();
 
-            document
-                .getElementById('cartView')
-                .style.display = 'block';
 
-        });
+                const cartView =
+                    document.getElementById(
+                        'cartView'
+                    );
+
+                if (cartView) {
+
+                    cartView.style.display =
+                        'block';
+
+                }
+
+            }
+        );
 
     }
 
 
     /* =========================================================
        SUPPLIER DASHBOARD
-    ========================================================= */
+    ========================================================== */
 
     if (supplierDashboardNavLink) {
 
         supplierDashboardNavLink
-            .addEventListener('click', (event) => {
+            .addEventListener(
+                'click',
+                (event) => {
 
-                event.preventDefault();
+                    event.preventDefault();
 
-                hideAllViews();
+                    hideAllViews();
 
-                document
-                    .getElementById(
-                        'supplierDashboardView'
-                    )
-                    .style.display = 'block';
 
-            });
+                    const dashboard =
+                        document.getElementById(
+                            'supplierDashboardView'
+                        );
+
+                    if (dashboard) {
+
+                        dashboard.style.display =
+                            'block';
+
+                    }
+
+                }
+            );
 
     }
 
 
     /* =========================================================
        CUSTOMER ORDERS
-    ========================================================= */
+    ========================================================== */
 
     if (customerOrdersNavLink) {
 
         customerOrdersNavLink
-            .addEventListener('click', (event) => {
+            .addEventListener(
+                'click',
+                (event) => {
 
-                event.preventDefault();
+                    event.preventDefault();
 
-                hideAllViews();
+                    hideAllViews();
 
-                document
-                    .getElementById(
-                        'customerOrdersView'
-                    )
-                    .style.display = 'block';
 
-            });
+                    const orders =
+                        document.getElementById(
+                            'customerOrdersView'
+                        );
+
+                    if (orders) {
+
+                        orders.style.display =
+                            'block';
+
+                    }
+
+                }
+            );
 
     }
 
 
     /* =========================================================
        AUTH MODAL
-    ========================================================= */
+    ========================================================== */
 
     if (authLink && authModal) {
 
-        authLink.addEventListener('click', (event) => {
+        authLink.addEventListener(
+            'click',
+            (event) => {
 
-            event.preventDefault();
+                event.preventDefault();
 
-            authModal.style.display = 'flex';
+                authModal.style.display =
+                    'flex';
 
-        });
+            }
+        );
 
     }
 
 
     if (closeModal && authModal) {
 
-        closeModal.addEventListener('click', () => {
+        closeModal.addEventListener(
+            'click',
+            () => {
 
-            authModal.style.display = 'none';
+                authModal.style.display =
+                    'none';
 
-        });
+            }
+        );
 
     }
 
 
-    window.addEventListener('click', (event) => {
+    window.addEventListener(
+        'click',
+        (event) => {
 
-        if (event.target === authModal) {
+            if (
+                event.target === authModal
+            ) {
 
-            authModal.style.display = 'none';
+                authModal.style.display =
+                    'none';
+
+            }
 
         }
+    );
 
-    });
+
+    /* =========================================================
+       FILTER CHANGE EVENTS
+       
+       marketplace.js listens to these events and refreshes
+       the Firestore listings.
+    ========================================================== */
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        () => {
+
+            const filterIds = [
+
+                'filterLocation',
+
+                'filterBrand',
+
+                'filterSize',
+
+                'filterCategory'
+
+            ];
+
+
+            filterIds.forEach(id => {
+
+                const filter =
+                    document.getElementById(id);
+
+                if (!filter) return;
+
+
+                filter.addEventListener(
+                    'change',
+                    () => {
+
+                        document.dispatchEvent(
+                            new CustomEvent(
+                                'gashubkeFiltersChanged'
+                            )
+                        );
+
+                    }
+                );
+
+            });
+
+        }
+    );
 
 
     /* =========================================================
        CLEAR FILTERS
-    ========================================================= */
+    ========================================================== */
 
     const clearFiltersBtn =
-        document.getElementById('clearFiltersBtn');
+        document.getElementById(
+            'clearFiltersBtn'
+        );
+
 
     if (clearFiltersBtn) {
 
-        clearFiltersBtn.addEventListener('click', () => {
+        clearFiltersBtn.addEventListener(
+            'click',
+            () => {
 
-            const filterLocation =
-                document.getElementById('filterLocation');
+                const filterLocation =
+                    document.getElementById(
+                        'filterLocation'
+                    );
 
-            const filterBrand =
-                document.getElementById('filterBrand');
+                const filterBrand =
+                    document.getElementById(
+                        'filterBrand'
+                    );
 
-            const filterSize =
-                document.getElementById('filterSize');
+                const filterSize =
+                    document.getElementById(
+                        'filterSize'
+                    );
 
-            const filterCategory =
-                document.getElementById('filterCategory');
-
-
-            if (filterLocation)
-                filterLocation.value = '';
-
-            if (filterBrand)
-                filterBrand.value = '';
-
-            if (filterSize)
-                filterSize.value = '';
-
-            if (filterCategory)
-                filterCategory.value = '';
+                const filterCategory =
+                    document.getElementById(
+                        'filterCategory'
+                    );
 
 
-            /*
-             Let marketplace.js refresh the listings
-             if it listens to the filter controls.
-            */
+                if (filterLocation) {
 
-            document.dispatchEvent(
-                new CustomEvent('gashubkeFiltersCleared')
-            );
+                    filterLocation.value = '';
 
-        });
+                }
+
+
+                if (filterBrand) {
+
+                    filterBrand.value = '';
+
+                }
+
+
+                if (filterSize) {
+
+                    filterSize.value = '';
+
+                }
+
+
+                if (filterCategory) {
+
+                    filterCategory.value = '';
+
+                }
+
+
+                document.dispatchEvent(
+                    new CustomEvent(
+                        'gashubkeFiltersCleared'
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       CLOSE AUTH MODAL WITH ESC
+    ========================================================== */
+
+    document.addEventListener(
+        'keydown',
+        (event) => {
+
+            if (
+                event.key === 'Escape' &&
+                authModal &&
+                authModal.style.display === 'flex'
+            ) {
+
+                authModal.style.display =
+                    'none';
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       ACCESSIBLE MODAL CLOSE
+    ========================================================== */
+
+    if (closeModal) {
+
+        closeModal.addEventListener(
+            'keydown',
+            (event) => {
+
+                if (
+                    event.key === 'Enter' ||
+                    event.key === ' '
+                ) {
+
+                    event.preventDefault();
+
+                    if (authModal) {
+
+                        authModal.style.display =
+                            'none';
+
+                    }
+
+                }
+
+            }
+        );
 
     }
 
@@ -2260,20 +2944,24 @@
     src="./js/firebase-config.js">
 </script>
 
+
 <script
     type="module"
     src="./js/auth.js">
 </script>
+
 
 <script
     type="module"
     src="./js/counties.js">
 </script>
 
+
 <script
     type="module"
     src="./js/marketplace.js">
 </script>
+
 
 <script
     type="module"
@@ -2282,4 +2970,5 @@
 
 
 </body>
+
 </html>
