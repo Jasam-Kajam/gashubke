@@ -11,6 +11,7 @@ import {
 // ============================================================
 // GAS HUB KE - MARKETPLACE.JS
 // Production Marketplace
+// Dynamic Firestore Location + Brand Filters
 // ============================================================
 
 let productGrid;
@@ -91,13 +92,14 @@ function formatLocation(location) {
     }
 
 
-    // String location
+    // STRING
     if (typeof location === "string") {
+
         return location.trim();
     }
 
 
-    // Array location
+    // ARRAY
     if (Array.isArray(location)) {
 
         return location
@@ -108,7 +110,7 @@ function formatLocation(location) {
     }
 
 
-    // Object location
+    // OBJECT
     if (typeof location === "object") {
 
         const town =
@@ -118,6 +120,7 @@ function formatLocation(location) {
             location.area ||
             location.location ||
             "";
+
 
         const county =
             location.county ||
@@ -135,6 +138,7 @@ function formatLocation(location) {
             town ||
             county ||
             location.name ||
+            location.label ||
             ""
         );
     }
@@ -155,7 +159,7 @@ function extractSupplierLocation(profile) {
     }
 
 
-    // Preferred registered location object
+    // REGISTERED LOCATION
     if (profile.supplierLocation) {
 
         const location =
@@ -163,18 +167,24 @@ function extractSupplierLocation(profile) {
                 profile.supplierLocation
             );
 
+
         if (location) {
             return location;
         }
     }
 
 
-    // Other possible registered location objects
+    // OTHER LOCATION OBJECTS
     const nestedLocations = [
+
         profile.location,
+
         profile.address,
+
         profile.businessLocation,
+
         profile.registeredLocation
+
     ];
 
 
@@ -183,13 +193,14 @@ function extractSupplierLocation(profile) {
         const formatted =
             formatLocation(location);
 
+
         if (formatted) {
             return formatted;
         }
     }
 
 
-    // Separate registration fields
+    // SEPARATE REGISTRATION FIELDS
     const town =
         profile.town ||
         profile.townName ||
@@ -198,11 +209,19 @@ function extractSupplierLocation(profile) {
         profile.registeredTown ||
         "";
 
+
     const county =
         profile.county ||
         profile.countyName ||
         profile.businessCounty ||
         profile.registeredCounty ||
+        "";
+
+
+    const area =
+        profile.area ||
+        profile.businessArea ||
+        profile.supplierArea ||
         "";
 
 
@@ -214,6 +233,11 @@ function extractSupplierLocation(profile) {
 
     if (town) {
         return String(town);
+    }
+
+
+    if (area) {
+        return String(area);
     }
 
 
@@ -229,12 +253,6 @@ function extractSupplierLocation(profile) {
 // ============================================================
 // LOAD SUPPLIER PROFILE LOCATION
 // ============================================================
-//
-// The listing should ideally contain supplierLocation.
-// This function provides compatibility with existing listings
-// that only contain supplierId.
-//
-// ============================================================
 
 async function getSupplierLocation(supplierId) {
 
@@ -248,9 +266,7 @@ async function getSupplierLocation(supplierId) {
 
 
     if (
-        supplierLocationCache.has(
-            cacheKey
-        )
+        supplierLocationCache.has(cacheKey)
     ) {
 
         return supplierLocationCache.get(
@@ -262,7 +278,7 @@ async function getSupplierLocation(supplierId) {
     try {
 
         // ----------------------------------------------------
-        // FIRST: suppliers collection
+        // SUPPLIERS COLLECTION
         // ----------------------------------------------------
 
         const supplierRef =
@@ -292,13 +308,14 @@ async function getSupplierLocation(supplierId) {
                     location
                 );
 
+
                 return location;
             }
         }
 
 
         // ----------------------------------------------------
-        // SECOND: users collection
+        // USERS COLLECTION
         // ----------------------------------------------------
 
         const userRef =
@@ -328,6 +345,7 @@ async function getSupplierLocation(supplierId) {
                     location
                 );
 
+
                 return location;
             }
         }
@@ -354,15 +372,13 @@ async function getSupplierLocation(supplierId) {
 
 
 // ============================================================
-// RESOLVE AUTHORITATIVE PRODUCT LOCATION
+// RESOLVE LISTING LOCATION
 // ============================================================
 
-async function resolveListingLocation(
-    item
-) {
+async function resolveListingLocation(item) {
 
     // --------------------------------------------------------
-    // 1. LOCATION SAVED DIRECTLY FROM SUPPLIER REGISTRATION
+    // 1. STRUCTURED LISTING LOCATION
     // --------------------------------------------------------
 
     if (item.supplierLocation) {
@@ -372,6 +388,7 @@ async function resolveListingLocation(
                 item.supplierLocation
             );
 
+
         if (location) {
             return location;
         }
@@ -379,15 +396,18 @@ async function resolveListingLocation(
 
 
     // --------------------------------------------------------
-    // 2. REGISTERED SUPPLIER PROFILE
+    // 2. SUPPLIER PROFILE
     // --------------------------------------------------------
 
     const supplierId =
         item.supplierId ||
         item.supplierID ||
+        item.vendorId ||
+        item.vendorID ||
         item.sellerId ||
         item.sellerID ||
         item.ownerId ||
+        item.ownerID ||
         "";
 
 
@@ -407,7 +427,7 @@ async function resolveListingLocation(
 
 
     // --------------------------------------------------------
-    // 3. LEGACY FALLBACK
+    // 3. LEGACY FIELDS
     // --------------------------------------------------------
 
     const legacyLocations = [
@@ -448,12 +468,32 @@ async function resolveListingLocation(
 
 
 // ============================================================
-// BRAND DETECTION
+// DYNAMIC BRAND EXTRACTION
+// ============================================================
+//
+// Brands are stored inside the listing title.
+// Example:
+//
+// "Pro Gas 13 KG"
+// "TotalEnergies 6 KG"
+// "New Brand 3 KG"
+//
+// The code extracts everything before the KG size.
+// No brands are hardcoded.
 // ============================================================
 
 function getListingBrand(item) {
 
-    const possibleBrand =
+    if (!item) {
+        return "";
+    }
+
+
+    // --------------------------------------------------------
+    // If a real brand field exists, use it.
+    // --------------------------------------------------------
+
+    const explicitBrand =
         item.brand ||
         item.gasBrand ||
         item.productBrand ||
@@ -462,82 +502,265 @@ function getListingBrand(item) {
         "";
 
 
-    if (possibleBrand) {
+    if (explicitBrand) {
 
-        return normalizeKey(
-            possibleBrand
-        );
+        return String(
+            explicitBrand
+        ).trim();
     }
 
+
+    // --------------------------------------------------------
+    // BRAND FROM TITLE
+    // --------------------------------------------------------
 
     const title =
-        normalizeKey(
+        String(
             item.title || ""
+        ).trim();
+
+
+    if (!title) {
+        return "";
+    }
+
+
+    // Example:
+    // Pro Gas 13 KG
+    // TotalEnergies 6 KG
+    // Any New Brand 50 KG
+
+    const sizeMatch =
+        title.match(
+            /^(.+?)\s+\d+(?:\.\d+)?\s*KG\b/i
         );
 
 
-    if (
-        title.includes("totalenergies") ||
-        title.includes("totalgas")
-    ) {
-        return "total";
+    if (sizeMatch) {
+
+        return sizeMatch[1]
+            .trim()
+            .replace(/\s+/g, " ");
     }
 
 
-    if (
-        title.includes("progas") ||
-        title === "pro"
-    ) {
-        return "pro";
-    }
-
-
-    if (
-        title.includes("kgas")
-    ) {
-        return "kgas";
-    }
-
-
-    if (
-        title.includes("olampishigas") ||
-        title.includes("olampishi")
-    ) {
-        return "ola";
-    }
-
-
-    if (
-        title.includes("menegas")
-    ) {
-        return "menegas";
-    }
-
-
-    if (
-        title.includes("afrigas") ||
-        title.includes("afri")
-    ) {
-        return "afrigas";
-    }
-
-
-    if (
-        title.includes("rubis")
-    ) {
-        return "rubis";
-    }
-
-
-    if (
-        title.includes("hashigas") ||
-        title.includes("hashi")
-    ) {
-        return "hashi";
-    }
-
+    // --------------------------------------------------------
+    // FALLBACK
+    // --------------------------------------------------------
+    //
+    // If title has no KG size, do not assume a brand.
+    // This prevents the whole title becoming a fake brand.
+    // --------------------------------------------------------
 
     return "";
+}
+
+
+// ============================================================
+// POPULATE DYNAMIC LOCATION + BRAND FILTERS
+// ============================================================
+
+function populateDynamicFilters(
+    listingData
+) {
+
+    if (!filterLocation || !filterBrand) {
+        return;
+    }
+
+
+    const previousLocation =
+        filterLocation.value;
+
+
+    const previousBrand =
+        filterBrand.value;
+
+
+    const locations =
+        new Map();
+
+
+    const brands =
+        new Map();
+
+
+    listingData.forEach(
+        listing => {
+
+            const location =
+                String(
+                    listing.location || ""
+                ).trim();
+
+
+            if (
+                location &&
+                location !== "Location unavailable"
+            ) {
+
+                const key =
+                    normalize(location);
+
+
+                if (!locations.has(key)) {
+
+                    locations.set(
+                        key,
+                        location
+                    );
+                }
+            }
+
+
+            const brand =
+                getListingBrand(
+                    listing.item
+                );
+
+
+            if (brand) {
+
+                const key =
+                    normalize(brand);
+
+
+                if (!brands.has(key)) {
+
+                    brands.set(
+                        key,
+                        brand
+                    );
+                }
+            }
+        }
+    );
+
+
+    // --------------------------------------------------------
+    // LOCATIONS
+    // --------------------------------------------------------
+
+    filterLocation.innerHTML = `
+        <option value="">
+            All Locations
+        </option>
+    `;
+
+
+    [...locations.values()]
+        .sort(
+            (a, b) =>
+                a.localeCompare(
+                    b,
+                    undefined,
+                    {
+                        sensitivity: "base"
+                    }
+                )
+        )
+        .forEach(location => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                location;
+
+
+            option.textContent =
+                location;
+
+
+            filterLocation.appendChild(
+                option
+            );
+        });
+
+
+    // --------------------------------------------------------
+    // BRANDS
+    // --------------------------------------------------------
+
+    filterBrand.innerHTML = `
+        <option value="">
+            All Brands
+        </option>
+    `;
+
+
+    [...brands.values()]
+        .sort(
+            (a, b) =>
+                a.localeCompare(
+                    b,
+                    undefined,
+                    {
+                        sensitivity: "base"
+                    }
+                )
+        )
+        .forEach(brand => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                brand;
+
+
+            option.textContent =
+                brand;
+
+
+            filterBrand.appendChild(
+                option
+            );
+        });
+
+
+    // --------------------------------------------------------
+    // RESTORE PREVIOUS LOCATION
+    // --------------------------------------------------------
+
+    if (
+        previousLocation &&
+        [...filterLocation.options]
+            .some(
+                option =>
+                    normalize(option.value) ===
+                    normalize(previousLocation)
+            )
+    ) {
+
+        filterLocation.value =
+            previousLocation;
+    }
+
+
+    // --------------------------------------------------------
+    // RESTORE PREVIOUS BRAND
+    // --------------------------------------------------------
+
+    if (
+        previousBrand &&
+        [...filterBrand.options]
+            .some(
+                option =>
+                    normalize(option.value) ===
+                    normalize(previousBrand)
+            )
+    ) {
+
+        filterBrand.value =
+            previousBrand;
+    }
 }
 
 
@@ -555,12 +778,6 @@ function brandMatches(
     }
 
 
-    const selected =
-        normalizeKey(
-            selectedBrand
-        );
-
-
     const listingBrand =
         getListingBrand(item);
 
@@ -570,60 +787,9 @@ function brandMatches(
     }
 
 
-    const aliases = {
-
-        pro: [
-            "pro",
-            "progas"
-        ],
-
-        kgas: [
-            "kgas"
-        ],
-
-        ola: [
-            "ola",
-            "olampishi",
-            "olampishigas"
-        ],
-
-        total: [
-            "total",
-            "totalgas",
-            "totalenergies"
-        ],
-
-        menegas: [
-            "menegas"
-        ],
-
-        afrigas: [
-            "afrigas",
-            "afri"
-        ],
-
-        rubis: [
-            "rubis"
-        ],
-
-        hashi: [
-            "hashi",
-            "hashigas"
-        ]
-    };
-
-
-    if (aliases[selected]) {
-
-        return aliases[selected]
-            .includes(
-                listingBrand
-            );
-    }
-
-
     return (
-        listingBrand === selected
+        normalize(listingBrand) ===
+        normalize(selectedBrand)
     );
 }
 
@@ -812,10 +978,6 @@ function createImageTicker(
             .substring(2, 12);
 
 
-    // --------------------------------------------------------
-    // SINGLE IMAGE
-    // --------------------------------------------------------
-
     if (
         validImages.length === 1
     ) {
@@ -851,10 +1013,6 @@ function createImageTicker(
         `;
     }
 
-
-    // --------------------------------------------------------
-    // MULTIPLE IMAGES
-    // --------------------------------------------------------
 
     const slides =
         validImages
@@ -950,10 +1108,6 @@ function createImageTicker(
         </div>
     `;
 
-
-    // --------------------------------------------------------
-    // START TICKER
-    // --------------------------------------------------------
 
     setTimeout(
         () => {
@@ -1597,18 +1751,80 @@ async function loadListings() {
             );
 
 
+        // ====================================================
+        // RESOLVE ALL LISTINGS FIRST
+        // ====================================================
+
+        const listingData = [];
+
+
+        for (
+            const docSnap of querySnapshot.docs
+        ) {
+
+            const item =
+                docSnap.data();
+
+
+            const itemId =
+                docSnap.id;
+
+
+            const location =
+                await resolveListingLocation(
+                    item
+                );
+
+
+            listingData.push({
+
+                item,
+
+                itemId,
+
+                location
+
+            });
+        }
+
+
+        // ====================================================
+        // POPULATE DYNAMIC FILTERS
+        // ====================================================
+
+        populateDynamicFilters(
+            listingData
+        );
+
+
         productGrid.innerHTML =
             "";
 
 
         if (
-            querySnapshot.empty
+            listingData.length === 0
         ) {
 
             productGrid.innerHTML = `
-                <p>
-                    No active cooking gas listings found.
-                </p>
+
+                <div
+                    style="
+                        grid-column:1/-1;
+                        text-align:center;
+                        padding:40px 20px;
+                        color:var(--text-muted);
+                    "
+                >
+
+                    <h4>
+                        No active cooking gas listings found
+                    </h4>
+
+                    <p>
+                        New supplier listings will appear here.
+                    </p>
+
+                </div>
             `;
 
             return;
@@ -1663,39 +1879,6 @@ async function loadListings() {
 
 
         // ====================================================
-        // RESOLVE LOCATIONS BEFORE DISPLAY
-        // ====================================================
-
-        const listingData = [];
-
-
-        for (
-            const docSnap of querySnapshot.docs
-        ) {
-
-            const item =
-                docSnap.data();
-
-
-            const itemId =
-                docSnap.id;
-
-
-            const location =
-                await resolveListingLocation(
-                    item
-                );
-
-
-            listingData.push({
-                item,
-                itemId,
-                location
-            });
-        }
-
-
-        // ====================================================
         // PROCESS LISTINGS
         // ====================================================
 
@@ -1710,10 +1893,7 @@ async function loadListings() {
             } = listing;
 
 
-            // ------------------------------------------------
             // SIZE
-            // ------------------------------------------------
-
             if (
                 !sizeMatches(
                     item,
@@ -1724,10 +1904,7 @@ async function loadListings() {
             }
 
 
-            // ------------------------------------------------
             // CATEGORY
-            // ------------------------------------------------
-
             if (
                 !categoryMatches(
                     item,
@@ -1738,10 +1915,7 @@ async function loadListings() {
             }
 
 
-            // ------------------------------------------------
             // LOCATION
-            // ------------------------------------------------
-
             if (
                 !locationMatches(
                     location,
@@ -1752,10 +1926,7 @@ async function loadListings() {
             }
 
 
-            // ------------------------------------------------
             // BRAND
-            // ------------------------------------------------
-
             if (
                 !brandMatches(
                     item,
@@ -1766,10 +1937,7 @@ async function loadListings() {
             }
 
 
-            // ------------------------------------------------
             // SEARCH
-            // ------------------------------------------------
-
             if (searchQuery) {
 
                 const searchableText = [
@@ -1780,9 +1948,7 @@ async function loadListings() {
 
                     location,
 
-                    item.brand,
-
-                    item.gasBrand,
+                    getListingBrand(item),
 
                     item.category,
 
@@ -1801,6 +1967,7 @@ async function loadListings() {
                         searchQuery
                     )
                 ) {
+
                     continue;
                 }
             }
@@ -2178,10 +2345,6 @@ function clearFilters() {
 
 function initializeMarketplace() {
 
-    // --------------------------------------------------------
-    // ELEMENTS
-    // --------------------------------------------------------
-
     productGrid =
         document.getElementById(
             "productGrid"
@@ -2436,7 +2599,7 @@ function initializeMarketplace() {
 
 
     // --------------------------------------------------------
-    // LOAD
+    // INITIAL LOAD
     // --------------------------------------------------------
 
     loadListings();
