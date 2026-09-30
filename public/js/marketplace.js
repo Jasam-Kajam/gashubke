@@ -1,11 +1,16 @@
 import { db, auth } from "./firebase-config.js";
+
 import {
     collection,
-    getDocs
+    getDocs,
+    getDoc,
+    doc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 
 // ============================================================
 // GAS HUB KE - MARKETPLACE.JS
+// Production Marketplace
 // ============================================================
 
 let productGrid;
@@ -19,17 +24,27 @@ let searchInput;
 
 
 // ============================================================
+// SUPPLIER LOCATION CACHE
+// ============================================================
+
+const supplierLocationCache = new Map();
+
+
+// ============================================================
 // HELPERS
 // ============================================================
 
 function normalize(value) {
+
     return String(value ?? "")
         .toLowerCase()
         .trim()
         .replace(/\s+/g, " ");
 }
 
+
 function normalizeKey(value) {
+
     return normalize(value)
         .replace(/[-_]/g, "")
         .replace(/\s+/g, "");
@@ -41,6 +56,7 @@ function normalizeKey(value) {
 // ============================================================
 
 function escapeHTML(value) {
+
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -51,15 +67,383 @@ function escapeHTML(value) {
 
 
 // ============================================================
-// ESCAPE JAVASCRIPT STRING
+// ESCAPE JAVASCRIPT
 // ============================================================
 
 function escapeJS(value) {
+
     return String(value ?? "")
         .replace(/\\/g, "\\\\")
         .replace(/'/g, "\\'")
         .replace(/\r/g, "")
         .replace(/\n/g, "\\n");
+}
+
+
+// ============================================================
+// LOCATION TEXT
+// ============================================================
+
+function formatLocation(location) {
+
+    if (!location) {
+        return "";
+    }
+
+
+    // String location
+    if (typeof location === "string") {
+        return location.trim();
+    }
+
+
+    // Array location
+    if (Array.isArray(location)) {
+
+        return location
+            .filter(Boolean)
+            .map(value => formatLocation(value))
+            .filter(Boolean)
+            .join(", ");
+    }
+
+
+    // Object location
+    if (typeof location === "object") {
+
+        const town =
+            location.town ||
+            location.townName ||
+            location.city ||
+            location.area ||
+            location.location ||
+            "";
+
+        const county =
+            location.county ||
+            location.countyName ||
+            "";
+
+
+        if (town && county) {
+
+            return `${town}, ${county}`;
+        }
+
+
+        return (
+            town ||
+            county ||
+            location.name ||
+            ""
+        );
+    }
+
+
+    return String(location);
+}
+
+
+// ============================================================
+// GET SUPPLIER LOCATION FROM PROFILE
+// ============================================================
+
+function extractSupplierLocation(profile) {
+
+    if (!profile) {
+        return "";
+    }
+
+
+    // Preferred registered location object
+    if (profile.supplierLocation) {
+
+        const location =
+            formatLocation(
+                profile.supplierLocation
+            );
+
+        if (location) {
+            return location;
+        }
+    }
+
+
+    // Other possible registered location objects
+    const nestedLocations = [
+        profile.location,
+        profile.address,
+        profile.businessLocation,
+        profile.registeredLocation
+    ];
+
+
+    for (const location of nestedLocations) {
+
+        const formatted =
+            formatLocation(location);
+
+        if (formatted) {
+            return formatted;
+        }
+    }
+
+
+    // Separate registration fields
+    const town =
+        profile.town ||
+        profile.townName ||
+        profile.city ||
+        profile.businessTown ||
+        profile.registeredTown ||
+        "";
+
+    const county =
+        profile.county ||
+        profile.countyName ||
+        profile.businessCounty ||
+        profile.registeredCounty ||
+        "";
+
+
+    if (town && county) {
+
+        return `${town}, ${county}`;
+    }
+
+
+    if (town) {
+        return String(town);
+    }
+
+
+    if (county) {
+        return String(county);
+    }
+
+
+    return "";
+}
+
+
+// ============================================================
+// LOAD SUPPLIER PROFILE LOCATION
+// ============================================================
+//
+// The listing should ideally contain supplierLocation.
+// This function provides compatibility with existing listings
+// that only contain supplierId.
+//
+// ============================================================
+
+async function getSupplierLocation(supplierId) {
+
+    if (!supplierId) {
+        return "";
+    }
+
+
+    const cacheKey =
+        String(supplierId);
+
+
+    if (
+        supplierLocationCache.has(
+            cacheKey
+        )
+    ) {
+
+        return supplierLocationCache.get(
+            cacheKey
+        );
+    }
+
+
+    try {
+
+        // ----------------------------------------------------
+        // FIRST: suppliers collection
+        // ----------------------------------------------------
+
+        const supplierRef =
+            doc(
+                db,
+                "suppliers",
+                cacheKey
+            );
+
+
+        const supplierSnap =
+            await getDoc(supplierRef);
+
+
+        if (supplierSnap.exists()) {
+
+            const location =
+                extractSupplierLocation(
+                    supplierSnap.data()
+                );
+
+
+            if (location) {
+
+                supplierLocationCache.set(
+                    cacheKey,
+                    location
+                );
+
+                return location;
+            }
+        }
+
+
+        // ----------------------------------------------------
+        // SECOND: users collection
+        // ----------------------------------------------------
+
+        const userRef =
+            doc(
+                db,
+                "users",
+                cacheKey
+            );
+
+
+        const userSnap =
+            await getDoc(userRef);
+
+
+        if (userSnap.exists()) {
+
+            const location =
+                extractSupplierLocation(
+                    userSnap.data()
+                );
+
+
+            if (location) {
+
+                supplierLocationCache.set(
+                    cacheKey,
+                    location
+                );
+
+                return location;
+            }
+        }
+
+
+    } catch (error) {
+
+        console.warn(
+            "Unable to load supplier location:",
+            supplierId,
+            error
+        );
+    }
+
+
+    supplierLocationCache.set(
+        cacheKey,
+        ""
+    );
+
+
+    return "";
+}
+
+
+// ============================================================
+// RESOLVE AUTHORITATIVE PRODUCT LOCATION
+// ============================================================
+
+async function resolveListingLocation(
+    item
+) {
+
+    // --------------------------------------------------------
+    // 1. LOCATION SAVED DIRECTLY FROM SUPPLIER REGISTRATION
+    // --------------------------------------------------------
+
+    if (item.supplierLocation) {
+
+        const location =
+            formatLocation(
+                item.supplierLocation
+            );
+
+        if (location) {
+            return location;
+        }
+    }
+
+
+    // --------------------------------------------------------
+    // 2. REGISTERED SUPPLIER PROFILE
+    // --------------------------------------------------------
+
+    const supplierId =
+        item.supplierId ||
+        item.supplierID ||
+        item.sellerId ||
+        item.sellerID ||
+        item.ownerId ||
+        "";
+
+
+    if (supplierId) {
+
+        const supplierLocation =
+            await getSupplierLocation(
+                supplierId
+            );
+
+
+        if (supplierLocation) {
+
+            return supplierLocation;
+        }
+    }
+
+
+    // --------------------------------------------------------
+    // 3. LEGACY FALLBACK
+    // --------------------------------------------------------
+
+    const legacyLocations = [
+
+        item.location,
+
+        item.town,
+
+        item.city,
+
+        item.county,
+
+        item.area,
+
+        item.deliveryLocation,
+
+        item.deliveryArea
+
+    ];
+
+
+    for (
+        const location of legacyLocations
+    ) {
+
+        const formatted =
+            formatLocation(location);
+
+
+        if (formatted) {
+            return formatted;
+        }
+    }
+
+
+    return "Location unavailable";
 }
 
 
@@ -77,11 +461,20 @@ function getListingBrand(item) {
         item.product_brand ||
         "";
 
+
     if (possibleBrand) {
-        return normalizeKey(possibleBrand);
+
+        return normalizeKey(
+            possibleBrand
+        );
     }
 
-    const title = normalizeKey(item.title || "");
+
+    const title =
+        normalizeKey(
+            item.title || ""
+        );
+
 
     if (
         title.includes("totalenergies") ||
@@ -90,6 +483,7 @@ function getListingBrand(item) {
         return "total";
     }
 
+
     if (
         title.includes("progas") ||
         title === "pro"
@@ -97,9 +491,13 @@ function getListingBrand(item) {
         return "pro";
     }
 
-    if (title.includes("kgas")) {
+
+    if (
+        title.includes("kgas")
+    ) {
         return "kgas";
     }
+
 
     if (
         title.includes("olampishigas") ||
@@ -108,9 +506,13 @@ function getListingBrand(item) {
         return "ola";
     }
 
-    if (title.includes("menegas")) {
+
+    if (
+        title.includes("menegas")
+    ) {
         return "menegas";
     }
+
 
     if (
         title.includes("afrigas") ||
@@ -119,9 +521,13 @@ function getListingBrand(item) {
         return "afrigas";
     }
 
-    if (title.includes("rubis")) {
+
+    if (
+        title.includes("rubis")
+    ) {
         return "rubis";
     }
+
 
     if (
         title.includes("hashigas") ||
@@ -129,6 +535,7 @@ function getListingBrand(item) {
     ) {
         return "hashi";
     }
+
 
     return "";
 }
@@ -138,24 +545,41 @@ function getListingBrand(item) {
 // BRAND FILTER
 // ============================================================
 
-function brandMatches(item, selectedBrand) {
+function brandMatches(
+    item,
+    selectedBrand
+) {
 
     if (!selectedBrand) {
         return true;
     }
 
-    const selected = normalizeKey(selectedBrand);
-    const listingBrand = getListingBrand(item);
+
+    const selected =
+        normalizeKey(
+            selectedBrand
+        );
+
+
+    const listingBrand =
+        getListingBrand(item);
+
 
     if (!listingBrand) {
         return false;
     }
 
+
     const aliases = {
 
-        pro: ["pro", "progas"],
+        pro: [
+            "pro",
+            "progas"
+        ],
 
-        kgas: ["kgas"],
+        kgas: [
+            "kgas"
+        ],
 
         ola: [
             "ola",
@@ -169,14 +593,18 @@ function brandMatches(item, selectedBrand) {
             "totalenergies"
         ],
 
-        menegas: ["menegas"],
+        menegas: [
+            "menegas"
+        ],
 
         afrigas: [
             "afrigas",
             "afri"
         ],
 
-        rubis: ["rubis"],
+        rubis: [
+            "rubis"
+        ],
 
         hashi: [
             "hashi",
@@ -184,11 +612,19 @@ function brandMatches(item, selectedBrand) {
         ]
     };
 
+
     if (aliases[selected]) {
-        return aliases[selected].includes(listingBrand);
+
+        return aliases[selected]
+            .includes(
+                listingBrand
+            );
     }
 
-    return listingBrand === selected;
+
+    return (
+        listingBrand === selected
+    );
 }
 
 
@@ -196,41 +632,38 @@ function brandMatches(item, selectedBrand) {
 // LOCATION FILTER
 // ============================================================
 
-function locationMatches(item, selectedLocation) {
+function locationMatches(
+    location,
+    selectedLocation
+) {
 
     if (!selectedLocation) {
         return true;
     }
 
-    const selected = normalize(selectedLocation);
 
-    const possibleLocations = [
-        item.location,
-        item.town,
-        item.city,
-        item.county,
-        item.area,
-        item.supplierLocation,
-        item.supplierTown,
-        item.supplierCounty,
-        item.deliveryLocation,
-        item.deliveryArea
-    ];
-
-    return possibleLocations.some(value => {
-
-        if (!value) {
-            return false;
-        }
-
-        const location = normalize(value);
-
-        return (
-            location === selected ||
-            location.includes(selected) ||
-            selected.includes(location)
+    const selected =
+        normalize(
+            selectedLocation
         );
-    });
+
+
+    const actualLocation =
+        normalize(
+            location
+        );
+
+
+    if (!actualLocation) {
+        return false;
+    }
+
+
+    return (
+        actualLocation === selected ||
+        actualLocation.includes(selected) ||
+        selected.includes(actualLocation)
+    );
 }
 
 
@@ -238,19 +671,29 @@ function locationMatches(item, selectedLocation) {
 // SIZE FILTER
 // ============================================================
 
-function sizeMatches(item, selectedSize) {
+function sizeMatches(
+    item,
+    selectedSize
+) {
 
     if (!selectedSize) {
         return true;
     }
 
-    const selected = normalizeKey(selectedSize);
 
-    const itemSize = normalizeKey(
-        item.size ||
-        item.weight ||
-        ""
-    );
+    const selected =
+        normalizeKey(
+            selectedSize
+        );
+
+
+    const itemSize =
+        normalizeKey(
+            item.size ||
+            item.weight ||
+            ""
+        );
+
 
     return (
         itemSize === selected ||
@@ -264,14 +707,21 @@ function sizeMatches(item, selectedSize) {
 // CATEGORY FILTER
 // ============================================================
 
-function categoryMatches(item, selectedCategory) {
+function categoryMatches(
+    item,
+    selectedCategory
+) {
 
     if (!selectedCategory) {
         return true;
     }
 
+
     const selected =
-        normalizeKey(selectedCategory);
+        normalizeKey(
+            selectedCategory
+        );
+
 
     const itemCategory =
         normalizeKey(
@@ -280,6 +730,7 @@ function categoryMatches(item, selectedCategory) {
             item.type ||
             ""
         );
+
 
     return (
         itemCategory === selected ||
@@ -293,19 +744,28 @@ function categoryMatches(item, selectedCategory) {
 // VIEW SWITCHING
 // ============================================================
 
-window.switchView = function(viewId) {
+window.switchView =
+function(viewId) {
 
     document
         .querySelectorAll(".view")
         .forEach(view => {
-            view.style.display = "none";
+
+            view.style.display =
+                "none";
         });
 
+
     const target =
-        document.getElementById(viewId);
+        document.getElementById(
+            viewId
+        );
+
 
     if (target) {
-        target.style.display = "block";
+
+        target.style.display =
+            "block";
     }
 };
 
@@ -314,25 +774,36 @@ window.switchView = function(viewId) {
 // IMAGE TICKER
 // ============================================================
 
-function createImageTicker(images, title) {
+function createImageTicker(
+    images,
+    title
+) {
 
     if (!Array.isArray(images)) {
         return "";
     }
 
-    const validImages = images.filter(image =>
-        image &&
-        String(image).trim() !== ""
-    );
 
-    if (validImages.length === 0) {
+    const validImages =
+        [
+            ...new Set(
+                images
+                    .filter(Boolean)
+                    .map(
+                        image =>
+                            String(image).trim()
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+    if (
+        validImages.length === 0
+    ) {
         return "";
     }
 
-
-    // ========================================================
-    // UNIQUE TICKER ID
-    // ========================================================
 
     const tickerId =
         "ticker-" +
@@ -341,11 +812,13 @@ function createImageTicker(images, title) {
             .substring(2, 12);
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // SINGLE IMAGE
-    // ========================================================
+    // --------------------------------------------------------
 
-    if (validImages.length === 1) {
+    if (
+        validImages.length === 1
+    ) {
 
         return `
             <div
@@ -353,7 +826,9 @@ function createImageTicker(images, title) {
                 class="listing-image-ticker"
             >
 
-                <div class="listing-image-track">
+                <div
+                    class="listing-image-track"
+                >
 
                     <div
                         class="listing-image-slide active"
@@ -377,53 +852,69 @@ function createImageTicker(images, title) {
     }
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // MULTIPLE IMAGES
-    // ========================================================
+    // --------------------------------------------------------
 
-    const slides = validImages
-        .map((image, index) => {
+    const slides =
+        validImages
+            .map(
+                (image, index) => {
 
-            return `
-                <div
-                    class="
-                        listing-image-slide
-                        ${index === 0 ? "active" : ""}
-                    "
-                    data-slide="${index}"
-                >
+                    return `
+                        <div
+                            class="
+                                listing-image-slide
+                                ${
+                                    index === 0
+                                        ? "active"
+                                        : ""
+                                }
+                            "
+                            data-slide="${index}"
+                        >
 
-                    <img
-                        src="${escapeHTML(image)}"
-                        alt="${escapeHTML(title)} - Photo ${index + 1}"
-                        loading="${index === 0 ? "eager" : "lazy"}"
-                        onerror="
-                            this.style.visibility='hidden';
-                        "
-                    >
+                            <img
+                                src="${escapeHTML(image)}"
+                                alt="${escapeHTML(title)} - Photo ${index + 1}"
+                                loading="${
+                                    index === 0
+                                        ? "eager"
+                                        : "lazy"
+                                }"
+                                onerror="
+                                    this.style.visibility='hidden';
+                                "
+                            >
 
-                </div>
-            `;
+                        </div>
+                    `;
+                }
+            )
+            .join("");
 
-        })
-        .join("");
 
+    const indicators =
+        validImages
+            .map(
+                (_, index) => {
 
-    const indicators = validImages
-        .map((_, index) => {
-
-            return `
-                <span
-                    class="
-                        listing-image-dot
-                        ${index === 0 ? "active" : ""}
-                    "
-                    data-slide="${index}"
-                ></span>
-            `;
-
-        })
-        .join("");
+                    return `
+                        <span
+                            class="
+                                listing-image-dot
+                                ${
+                                    index === 0
+                                        ? "active"
+                                        : ""
+                                }
+                            "
+                            data-slide="${index}"
+                        ></span>
+                    `;
+                }
+            )
+            .join("");
 
 
     const html = `
@@ -432,136 +923,144 @@ function createImageTicker(images, title) {
             class="listing-image-ticker"
         >
 
-            <div class="listing-image-track">
+            <div
+                class="listing-image-track"
+            >
 
                 ${slides}
 
             </div>
 
 
-            <div class="listing-image-indicators">
+            <div
+                class="listing-image-indicators"
+            >
 
                 ${indicators}
 
             </div>
 
 
-            <div class="listing-image-counter">
-
+            <div
+                class="listing-image-counter"
+            >
                 1 / ${validImages.length}
-
             </div>
 
         </div>
     `;
 
 
-    // ========================================================
-    // START AUTOMATIC TICKER
-    // ========================================================
+    // --------------------------------------------------------
+    // START TICKER
+    // --------------------------------------------------------
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        const ticker =
-            document.getElementById(tickerId);
-
-        if (!ticker) {
-            return;
-        }
-
-
-        const tickerSlides =
-            ticker.querySelectorAll(
-                ".listing-image-slide"
-            );
+            const ticker =
+                document.getElementById(
+                    tickerId
+                );
 
 
-        const tickerDots =
-            ticker.querySelectorAll(
-                ".listing-image-dot"
-            );
+            if (!ticker) {
+                return;
+            }
 
 
-        const counter =
-            ticker.querySelector(
-                ".listing-image-counter"
-            );
+            const tickerSlides =
+                ticker.querySelectorAll(
+                    ".listing-image-slide"
+                );
 
 
-        let currentIndex = 0;
+            const tickerDots =
+                ticker.querySelectorAll(
+                    ".listing-image-dot"
+                );
 
 
-        const timer =
-            setInterval(() => {
-
-                // Listing disappeared from DOM
-                if (
-                    !document.body.contains(ticker)
-                ) {
-
-                    clearInterval(timer);
-
-                    return;
-                }
+            const counter =
+                ticker.querySelector(
+                    ".listing-image-counter"
+                );
 
 
-                // Remove active from current
-                if (tickerSlides[currentIndex]) {
-
-                    tickerSlides[currentIndex]
-                        .classList
-                        .remove("active");
-                }
+            let currentIndex = 0;
 
 
-                if (tickerDots[currentIndex]) {
+            const timer =
+                setInterval(
+                    () => {
 
-                    tickerDots[currentIndex]
-                        .classList
-                        .remove("active");
-                }
+                        if (
+                            !document.body.contains(
+                                ticker
+                            )
+                        ) {
 
+                            clearInterval(
+                                timer
+                            );
 
-                // Move to next
-                currentIndex++;
-
-
-                if (
-                    currentIndex >=
-                    tickerSlides.length
-                ) {
-                    currentIndex = 0;
-                }
+                            return;
+                        }
 
 
-                // Activate next
-                if (tickerSlides[currentIndex]) {
-
-                    tickerSlides[currentIndex]
-                        .classList
-                        .add("active");
-                }
+                        tickerSlides[
+                            currentIndex
+                        ]?.classList.remove(
+                            "active"
+                        );
 
 
-                if (tickerDots[currentIndex]) {
-
-                    tickerDots[currentIndex]
-                        .classList
-                        .add("active");
-                }
-
-
-                // Update counter
-                if (counter) {
-
-                    counter.textContent =
-                        `${currentIndex + 1} / ${tickerSlides.length}`;
-                }
+                        tickerDots[
+                            currentIndex
+                        ]?.classList.remove(
+                            "active"
+                        );
 
 
-            }, 3000);
+                        currentIndex++;
 
-    }, 100);
+
+                        if (
+                            currentIndex >=
+                            tickerSlides.length
+                        ) {
+
+                            currentIndex = 0;
+                        }
+
+
+                        tickerSlides[
+                            currentIndex
+                        ]?.classList.add(
+                            "active"
+                        );
+
+
+                        tickerDots[
+                            currentIndex
+                        ]?.classList.add(
+                            "active"
+                        );
+
+
+                        if (counter) {
+
+                            counter.textContent =
+                                `${currentIndex + 1} / ${tickerSlides.length}`;
+                        }
+
+                    },
+                    3000
+                );
+
+        },
+        100
+    );
 
 
     return html;
@@ -572,7 +1071,8 @@ function createImageTicker(images, title) {
 // CART
 // ============================================================
 
-window.addToListingCart = function(
+window.addToListingCart =
+function(
     id,
     title,
     price,
@@ -582,18 +1082,26 @@ window.addToListingCart = function(
     const currentUser =
         auth.currentUser;
 
+
     if (!currentUser) {
 
         alert(
             "Please sign in or create an account to add items to your cart."
         );
 
+
         const authModal =
-            document.getElementById("authModal");
+            document.getElementById(
+                "authModal"
+            );
+
 
         if (authModal) {
-            authModal.style.display = "block";
+
+            authModal.style.display =
+                "block";
         }
+
 
         return;
     }
@@ -601,27 +1109,40 @@ window.addToListingCart = function(
 
     let cart =
         JSON.parse(
-            localStorage.getItem("gas_cart")
+            localStorage.getItem(
+                "gas_cart"
+            )
         ) || [];
 
 
     const existingIndex =
         cart.findIndex(
-            item => item.id === id
+            item =>
+                item.id === id
         );
 
 
-    if (existingIndex > -1) {
+    if (
+        existingIndex > -1
+    ) {
 
-        cart[existingIndex].quantity += 1;
+        cart[
+            existingIndex
+        ].quantity += 1;
 
     } else {
 
         cart.push({
+
             id,
+
             title,
-            price: Number(price) || 0,
+
+            price:
+                Number(price) || 0,
+
             location,
+
             quantity: 1
         });
     }
@@ -635,37 +1156,52 @@ window.addToListingCart = function(
 
     updateCartUI();
 
+
     alert(
         `${title} added to your cart.`
     );
 };
 
 
-window.updateCartQuantity = function(
+// ============================================================
+// CART QUANTITY
+// ============================================================
+
+window.updateCartQuantity =
+function(
     id,
     delta
 ) {
 
     let cart =
         JSON.parse(
-            localStorage.getItem("gas_cart")
+            localStorage.getItem(
+                "gas_cart"
+            )
         ) || [];
 
 
     const index =
         cart.findIndex(
-            item => item.id === id
+            item =>
+                item.id === id
         );
 
 
     if (index > -1) {
 
-        cart[index].quantity += delta;
+        cart[index].quantity +=
+            Number(delta);
+
 
         if (
             cart[index].quantity <= 0
         ) {
-            cart.splice(index, 1);
+
+            cart.splice(
+                index,
+                1
+            );
         }
     }
 
@@ -677,21 +1213,30 @@ window.updateCartQuantity = function(
 
 
     renderCartView();
+
     updateCartUI();
 };
 
 
-window.removeFromCart = function(id) {
+// ============================================================
+// REMOVE CART ITEM
+// ============================================================
+
+window.removeFromCart =
+function(id) {
 
     let cart =
         JSON.parse(
-            localStorage.getItem("gas_cart")
+            localStorage.getItem(
+                "gas_cart"
+            )
         ) || [];
 
 
     cart =
         cart.filter(
-            item => item.id !== id
+            item =>
+                item.id !== id
         );
 
 
@@ -702,6 +1247,7 @@ window.removeFromCart = function(id) {
 
 
     renderCartView();
+
     updateCartUI();
 };
 
@@ -714,7 +1260,9 @@ function updateCartUI() {
 
     const cart =
         JSON.parse(
-            localStorage.getItem("gas_cart")
+            localStorage.getItem(
+                "gas_cart"
+            )
         ) || [];
 
 
@@ -722,13 +1270,17 @@ function updateCartUI() {
         cart.reduce(
             (sum, item) =>
                 sum +
-                Number(item.quantity || 0),
+                Number(
+                    item.quantity || 0
+                ),
             0
         );
 
 
     const cartLink =
-        document.getElementById("cartLink");
+        document.getElementById(
+            "cartLink"
+        );
 
 
     if (!cartLink) {
@@ -737,6 +1289,7 @@ function updateCartUI() {
 
 
     cartLink.innerHTML = `
+
         <span
             style="
                 position:relative;
@@ -816,10 +1369,12 @@ function renderCartView() {
             "cartItemsList"
         );
 
+
     const cartSubtotal =
         document.getElementById(
             "cartSubtotal"
         );
+
 
     const cartTotal =
         document.getElementById(
@@ -834,145 +1389,175 @@ function renderCartView() {
 
     const cart =
         JSON.parse(
-            localStorage.getItem("gas_cart")
+            localStorage.getItem(
+                "gas_cart"
+            )
         ) || [];
 
 
-    if (cart.length === 0) {
+    if (
+        cart.length === 0
+    ) {
 
         cartItemsList.innerHTML =
             "<p>Your cart is currently empty.</p>";
 
+
         if (cartSubtotal) {
-            cartSubtotal.textContent = "KES 0";
+
+            cartSubtotal.textContent =
+                "KES 0";
         }
 
+
         if (cartTotal) {
-            cartTotal.textContent = "KES 200";
+
+            cartTotal.textContent =
+                "KES 200";
         }
+
 
         return;
     }
 
 
     let html = "";
+
     let subtotal = 0;
 
 
-    cart.forEach(item => {
+    cart.forEach(
+        item => {
 
-        const itemPrice =
-            Number(item.price) || 0;
-
-        const quantity =
-            Number(item.quantity) || 0;
-
-        subtotal +=
-            itemPrice * quantity;
+            const itemPrice =
+                Number(item.price) || 0;
 
 
-        html += `
-            <div class="cart-item-row">
+            const quantity =
+                Number(item.quantity) || 0;
 
-                <div>
 
-                    <strong>
-                        ${escapeHTML(item.title)}
-                    </strong>
+            subtotal +=
+                itemPrice * quantity;
 
-                    <p
-                        style="
-                            font-size:0.85rem;
-                            color:var(--text-muted);
-                        "
-                    >
-                        KES ${itemPrice} each
-                    </p>
 
-                </div>
-
+            html += `
 
                 <div
-                    style="
-                        display:flex;
-                        align-items:center;
-                        gap:0.5rem;
-                    "
+                    class="cart-item-row"
                 >
 
-                    <button
-                        type="button"
-                        class="btn-secondary"
-                        style="padding:2px 10px;"
-                        onclick="
-                            window.updateCartQuantity(
-                                '${escapeJS(item.id)}',
-                                -1
-                            )
-                        "
-                    >
-                        -
-                    </button>
+                    <div>
+
+                        <strong>
+                            ${escapeHTML(item.title)}
+                        </strong>
+
+                        <p
+                            style="
+                                font-size:0.85rem;
+                                color:var(--text-muted);
+                            "
+                        >
+                            KES ${itemPrice} each
+                        </p>
+
+                        <small
+                            style="
+                                color:var(--text-muted);
+                            "
+                        >
+                            ${escapeHTML(item.location || "")}
+                        </small>
+
+                    </div>
 
 
-                    <span>
-                        ${quantity}
-                    </span>
-
-
-                    <button
-                        type="button"
-                        class="btn-secondary"
-                        style="padding:2px 10px;"
-                        onclick="
-                            window.updateCartQuantity(
-                                '${escapeJS(item.id)}',
-                                1
-                            )
-                        "
-                    >
-                        +
-                    </button>
-
-
-                    <button
-                        type="button"
-                        onclick="
-                            window.removeFromCart(
-                                '${escapeJS(item.id)}'
-                            )
-                        "
+                    <div
                         style="
-                            background:#ef4444;
-                            color:#fff;
-                            border:none;
-                            padding:4px 8px;
-                            border-radius:4px;
-                            cursor:pointer;
-                            margin-left:0.5rem;
-                            font-size:0.85rem;
+                            display:flex;
+                            align-items:center;
+                            gap:0.5rem;
                         "
                     >
-                        Remove
-                    </button>
+
+                        <button
+                            type="button"
+                            class="btn-secondary"
+                            style="padding:2px 10px;"
+                            onclick="
+                                window.updateCartQuantity(
+                                    '${escapeJS(item.id)}',
+                                    -1
+                                )
+                            "
+                        >
+                            -
+                        </button>
+
+
+                        <span>
+                            ${quantity}
+                        </span>
+
+
+                        <button
+                            type="button"
+                            class="btn-secondary"
+                            style="padding:2px 10px;"
+                            onclick="
+                                window.updateCartQuantity(
+                                    '${escapeJS(item.id)}',
+                                    1
+                                )
+                            "
+                        >
+                            +
+                        </button>
+
+
+                        <button
+                            type="button"
+                            onclick="
+                                window.removeFromCart(
+                                    '${escapeJS(item.id)}'
+                                )
+                            "
+                            style="
+                                background:#ef4444;
+                                color:#fff;
+                                border:none;
+                                padding:4px 8px;
+                                border-radius:4px;
+                                cursor:pointer;
+                                margin-left:0.5rem;
+                                font-size:0.85rem;
+                            "
+                        >
+                            Remove
+                        </button>
+
+                    </div>
 
                 </div>
+            `;
+        }
+    );
 
-            </div>
-        `;
-    });
 
-
-    cartItemsList.innerHTML = html;
+    cartItemsList.innerHTML =
+        html;
 
 
     if (cartSubtotal) {
+
         cartSubtotal.textContent =
             `KES ${subtotal}`;
     }
 
 
     if (cartTotal) {
+
         cartTotal.textContent =
             `KES ${subtotal + 200}`;
     }
@@ -1000,17 +1585,25 @@ async function loadListings() {
     try {
 
         const listingsRef =
-            collection(db, "listings");
+            collection(
+                db,
+                "listings"
+            );
 
 
         const querySnapshot =
-            await getDocs(listingsRef);
+            await getDocs(
+                listingsRef
+            );
 
 
-        productGrid.innerHTML = "";
+        productGrid.innerHTML =
+            "";
 
 
-        if (querySnapshot.empty) {
+        if (
+            querySnapshot.empty
+        ) {
 
             productGrid.innerHTML = `
                 <p>
@@ -1028,31 +1621,41 @@ async function loadListings() {
 
         const selectedSize =
             filterSize
-                ? normalize(filterSize.value)
+                ? normalize(
+                    filterSize.value
+                )
                 : "";
 
 
         const selectedCategory =
             filterCategory
-                ? normalize(filterCategory.value)
+                ? normalize(
+                    filterCategory.value
+                )
                 : "";
 
 
         const selectedLocation =
             filterLocation
-                ? normalize(filterLocation.value)
+                ? normalize(
+                    filterLocation.value
+                )
                 : "";
 
 
         const selectedBrand =
             filterBrand
-                ? normalize(filterBrand.value)
+                ? normalize(
+                    filterBrand.value
+                )
                 : "";
 
 
         const searchQuery =
             searchInput
-                ? normalize(searchInput.value)
+                ? normalize(
+                    searchInput.value
+                )
                 : "";
 
 
@@ -1060,16 +1663,51 @@ async function loadListings() {
 
 
         // ====================================================
-        // PROCESS LISTINGS
+        // RESOLVE LOCATIONS BEFORE DISPLAY
         // ====================================================
 
-        querySnapshot.forEach(docSnap => {
+        const listingData = [];
+
+
+        for (
+            const docSnap of querySnapshot.docs
+        ) {
 
             const item =
                 docSnap.data();
 
+
             const itemId =
                 docSnap.id;
+
+
+            const location =
+                await resolveListingLocation(
+                    item
+                );
+
+
+            listingData.push({
+                item,
+                itemId,
+                location
+            });
+        }
+
+
+        // ====================================================
+        // PROCESS LISTINGS
+        // ====================================================
+
+        for (
+            const listing of listingData
+        ) {
+
+            const {
+                item,
+                itemId,
+                location
+            } = listing;
 
 
             // ------------------------------------------------
@@ -1082,7 +1720,7 @@ async function loadListings() {
                     selectedSize
                 )
             ) {
-                return;
+                continue;
             }
 
 
@@ -1096,7 +1734,7 @@ async function loadListings() {
                     selectedCategory
                 )
             ) {
-                return;
+                continue;
             }
 
 
@@ -1106,11 +1744,11 @@ async function loadListings() {
 
             if (
                 !locationMatches(
-                    item,
+                    location,
                     selectedLocation
                 )
             ) {
-                return;
+                continue;
             }
 
 
@@ -1124,7 +1762,7 @@ async function loadListings() {
                     selectedBrand
                 )
             ) {
-                return;
+                continue;
             }
 
 
@@ -1137,19 +1775,20 @@ async function loadListings() {
                 const searchableText = [
 
                     item.title,
+
                     item.description,
 
-                    item.location,
-                    item.town,
-                    item.city,
-                    item.county,
-                    item.area,
+                    location,
 
                     item.brand,
+
                     item.gasBrand,
 
                     item.category,
-                    item.size
+
+                    item.size,
+
+                    item.weight
 
                 ]
                     .filter(Boolean)
@@ -1162,7 +1801,7 @@ async function loadListings() {
                         searchQuery
                     )
                 ) {
-                    return;
+                    continue;
                 }
             }
 
@@ -1189,6 +1828,7 @@ async function loadListings() {
             // =================================================
 
             const mapPinSvg = `
+
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="14"
@@ -1226,7 +1866,7 @@ async function loadListings() {
 
 
             // =================================================
-            // GET ALL IMAGES
+            // IMAGES
             // =================================================
 
             let displayImages = [];
@@ -1258,9 +1898,12 @@ async function loadListings() {
             }
 
 
-            // Remove duplicate image URLs
             displayImages =
-                [...new Set(displayImages)];
+                [
+                    ...new Set(
+                        displayImages
+                    )
+                ];
 
 
             // =================================================
@@ -1286,14 +1929,6 @@ async function loadListings() {
                 "Size not specified";
 
 
-            const location =
-                item.location ||
-                item.town ||
-                item.city ||
-                item.county ||
-                "Local Delivery";
-
-
             const description =
                 item.description ||
                 "";
@@ -1315,14 +1950,25 @@ async function loadListings() {
             // =================================================
 
             const safeTitle =
-                escapeJS(title);
+                escapeJS(
+                    title
+                );
+
 
             const safeLocation =
-                escapeJS(location);
+                escapeJS(
+                    location
+                );
+
+
+            const numericPrice =
+                Number(
+                    item.price
+                ) || 0;
 
 
             // =================================================
-            // CARD HTML
+            // CARD
             // =================================================
 
             card.innerHTML = `
@@ -1345,7 +1991,8 @@ async function loadListings() {
                             class="price"
                         >
 
-                            KES ${escapeHTML(price)}
+                            KES
+                            ${escapeHTML(price)}
 
                             <span
                                 style="
@@ -1362,11 +2009,14 @@ async function loadListings() {
 
                         <p
                             class="location"
+                            title="Supplier registered location"
                         >
 
                             ${mapPinSvg}
 
-                            ${escapeHTML(location)}
+                            ${escapeHTML(
+                                location
+                            )}
 
                         </p>
 
@@ -1378,7 +2028,9 @@ async function loadListings() {
                                 line-height:1.4;
                             "
                         >
-                            ${escapeHTML(description)}
+                            ${escapeHTML(
+                                description
+                            )}
                         </p>
 
                     </div>
@@ -1398,7 +2050,7 @@ async function loadListings() {
                             window.addToListingCart(
                                 '${escapeJS(itemId)}',
                                 '${safeTitle}',
-                                ${Number(item.price) || 0},
+                                ${numericPrice},
                                 '${safeLocation}'
                             )
                         "
@@ -1411,18 +2063,22 @@ async function loadListings() {
             `;
 
 
-            productGrid.appendChild(card);
-
-        });
+            productGrid.appendChild(
+                card
+            );
+        }
 
 
         // ====================================================
         // NO RESULTS
         // ====================================================
 
-        if (matchCount === 0) {
+        if (
+            matchCount === 0
+        ) {
 
             productGrid.innerHTML = `
+
                 <div
                     style="
                         grid-column:1/-1;
@@ -1455,6 +2111,7 @@ async function loadListings() {
 
 
         productGrid.innerHTML = `
+
             <div
                 style="
                     grid-column:1/-1;
@@ -1468,12 +2125,10 @@ async function loadListings() {
                 </p>
 
                 <small>
-                    ${
-                        escapeHTML(
-                            err.message ||
-                            "Please try again."
-                        )
-                    }
+                    ${escapeHTML(
+                        err.message ||
+                        "Please try again."
+                    )}
                 </small>
 
             </div>
@@ -1492,28 +2147,33 @@ function clearFilters() {
         filterLocation.value = "";
     }
 
+
     if (filterBrand) {
         filterBrand.value = "";
     }
+
 
     if (filterSize) {
         filterSize.value = "";
     }
 
+
     if (filterCategory) {
         filterCategory.value = "";
     }
 
+
     if (searchInput) {
         searchInput.value = "";
     }
+
 
     loadListings();
 }
 
 
 // ============================================================
-// INITIALIZE
+// INITIALIZE MARKETPLACE
 // ============================================================
 
 function initializeMarketplace() {
@@ -1527,35 +2187,42 @@ function initializeMarketplace() {
             "productGrid"
         );
 
+
     filterSize =
         document.getElementById(
             "filterSize"
         );
+
 
     filterCategory =
         document.getElementById(
             "filterCategory"
         );
 
+
     filterLocation =
         document.getElementById(
             "filterLocation"
         );
+
 
     filterBrand =
         document.getElementById(
             "filterBrand"
         );
 
+
     clearFiltersBtn =
         document.getElementById(
             "clearFiltersBtn"
         );
 
+
     searchBtn =
         document.getElementById(
             "searchBtn"
         );
+
 
     searchInput =
         document.getElementById(
@@ -1579,15 +2246,18 @@ function initializeMarketplace() {
             "homeLink"
         );
 
+
     const cartLink =
         document.getElementById(
             "cartLink"
         );
 
+
     const hamburger =
         document.querySelector(
             ".hamburger"
         );
+
 
     const navLinks =
         document.querySelector(
@@ -1607,11 +2277,14 @@ function initializeMarketplace() {
 
                 e.preventDefault();
 
+
                 switchView(
                     "marketplaceView"
                 );
 
+
                 if (navLinks) {
+
                     navLinks.classList.remove(
                         "active"
                     );
@@ -1633,13 +2306,17 @@ function initializeMarketplace() {
 
                 e.preventDefault();
 
+
                 renderCartView();
+
 
                 switchView(
                     "cartView"
                 );
 
+
                 if (navLinks) {
+
                     navLinks.classList.remove(
                         "active"
                     );
@@ -1664,6 +2341,7 @@ function initializeMarketplace() {
 
                 e.preventDefault();
 
+
                 navLinks.classList.toggle(
                     "active"
                 );
@@ -1677,27 +2355,34 @@ function initializeMarketplace() {
     // --------------------------------------------------------
 
     if (filterSize) {
+
         filterSize.addEventListener(
             "change",
             loadListings
         );
     }
 
+
     if (filterCategory) {
+
         filterCategory.addEventListener(
             "change",
             loadListings
         );
     }
 
+
     if (filterLocation) {
+
         filterLocation.addEventListener(
             "change",
             loadListings
         );
     }
 
+
     if (filterBrand) {
+
         filterBrand.addEventListener(
             "change",
             loadListings
