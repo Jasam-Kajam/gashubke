@@ -33,20 +33,25 @@ let isRegistering = false;
 
 
 // ============================================================
-// HELPER: GET FIELD VALUE
+// HELPER
 // ============================================================
 
 function getFieldValue(...ids) {
+
     for (const id of ids) {
+
         const element = document.getElementById(id);
 
         if (element && element.value) {
+
             const value = element.value.trim();
 
             if (value) {
                 return value;
             }
+
         }
+
     }
 
     return "";
@@ -54,7 +59,7 @@ function getFieldValue(...ids) {
 
 
 // ============================================================
-// BUILD SUPPLIER LOCATION
+// GET SUPPLIER LOCATION
 // FORMAT:
 // Ruiru, Kiambu
 // Westlands, Nairobi
@@ -64,9 +69,8 @@ function getFieldValue(...ids) {
 
 function getSupplierLocation() {
 
-    // IMPORTANT:
-    // Do NOT use "city" here.
-    // We want the actual town/area selected by the supplier.
+    // DO NOT use "city".
+    // Town/area must remain separate from county.
 
     const town = getFieldValue(
         "supplierTown",
@@ -97,6 +101,169 @@ function getSupplierLocation() {
 
 
 // ============================================================
+// UPDATE USER PROFILE
+// Can be imported and used from Settings page.
+//
+// Example:
+// await updateUserProfile({
+//     businessName: "ABC Gas",
+//     town: "Ruiru",
+//     county: "Kiambu"
+// });
+// ============================================================
+
+export async function updateUserProfile({
+    businessName = "",
+    town = "",
+    county = ""
+} = {}) {
+
+    const user = auth.currentUser;
+
+    if (!user) {
+        throw new Error(
+            "You must be signed in to update your profile."
+        );
+    }
+
+    businessName = businessName.trim();
+    town = town.trim();
+    county = county.trim();
+
+    // Build location exactly as:
+    // Ruiru, Kiambu
+    const location = [town, county]
+        .filter(Boolean)
+        .join(", ");
+
+    // ----------------------------------------------
+    // Update Firebase Authentication profile
+    // ----------------------------------------------
+
+    if (businessName) {
+
+        await updateProfile(user, {
+            displayName: businessName
+        });
+
+    }
+
+
+    // ----------------------------------------------
+    // Get existing Firestore profile
+    // ----------------------------------------------
+
+    const userRef = doc(
+        db,
+        "users",
+        user.uid
+    );
+
+    const existingDoc = await getDoc(userRef);
+
+    const existingData = existingDoc.exists()
+        ? existingDoc.data()
+        : {};
+
+    const role =
+        existingData.role || "customer";
+
+
+    // ----------------------------------------------
+    // Prepare updated Firestore data
+    // ----------------------------------------------
+
+    const updatedData = {
+
+        businessName:
+            businessName ||
+            existingData.businessName ||
+            "Independent Supplier",
+
+        email:
+            user.email ||
+            existingData.email ||
+            "",
+
+        role,
+
+        updatedAt:
+            new Date().toISOString()
+
+    };
+
+
+    // ----------------------------------------------
+    // Save location only when supplied
+    // ----------------------------------------------
+
+    if (town || county) {
+
+        updatedData.town = town;
+        updatedData.county = county;
+        updatedData.location = location;
+
+        updatedData.supplierLocation = {
+
+            town,
+
+            county,
+
+            display: location
+
+        };
+
+    }
+
+
+    // ----------------------------------------------
+    // Update Firestore
+    // ----------------------------------------------
+
+    await setDoc(
+        userRef,
+        updatedData,
+        {
+            merge: true
+        }
+    );
+
+
+    // Return updated profile
+    return {
+
+        uid: user.uid,
+
+        businessName:
+            updatedData.businessName,
+
+        email:
+            updatedData.email,
+
+        role:
+            updatedData.role,
+
+        town:
+            updatedData.town ||
+            existingData.town ||
+            "",
+
+        county:
+            updatedData.county ||
+            existingData.county ||
+            "",
+
+        location:
+            updatedData.location ||
+            existingData.location ||
+            ""
+
+    };
+
+}
+
+
+// ============================================================
 // AUTH LINK
 // ============================================================
 
@@ -119,7 +286,10 @@ if (authLink) {
             } catch (error) {
 
                 console.error("Logout error:", error);
-                alert("Unable to sign out. Please try again.");
+
+                alert(
+                    "Unable to sign out. Please try again."
+                );
 
             }
 
@@ -137,7 +307,7 @@ if (authLink) {
 
 
 // ============================================================
-// CLOSE AUTH MODAL
+// CLOSE MODAL
 // ============================================================
 
 if (closeModal) {
@@ -154,7 +324,7 @@ if (closeModal) {
 
 
 // ============================================================
-// TOGGLE LOGIN / REGISTRATION
+// LOGIN / REGISTER TOGGLE
 // ============================================================
 
 if (toggleAuthMode) {
@@ -166,7 +336,8 @@ if (toggleAuthMode) {
         if (isRegistering) {
 
             if (authModalTitle) {
-                authModalTitle.innerText = "Register Platform Account";
+                authModalTitle.innerText =
+                    "Register Platform Account";
             }
 
             if (authSubmitBtn) {
@@ -205,7 +376,7 @@ if (toggleAuthMode) {
 
 
 // ============================================================
-// AUTH FORM SUBMIT
+// LOGIN / REGISTRATION
 // ============================================================
 
 if (authForm) {
@@ -215,17 +386,24 @@ if (authForm) {
         e.preventDefault();
 
         const email =
-            document.getElementById("authEmail")?.value.trim() || "";
+            document.getElementById("authEmail")
+                ?.value.trim() || "";
 
         const password =
-            document.getElementById("authPassword")?.value || "";
+            document.getElementById("authPassword")
+                ?.value || "";
+
 
         if (!email || !password) {
 
-            alert("Please enter your email and password.");
+            alert(
+                "Please enter your email and password."
+            );
+
             return;
 
         }
+
 
         try {
 
@@ -236,13 +414,13 @@ if (authForm) {
             if (isRegistering) {
 
                 const role =
-                    getFieldValue("userRole") || "customer";
+                    getFieldValue("userRole") ||
+                    "customer";
 
                 const businessName =
                     getFieldValue("businessName") ||
                     "Independent Supplier";
 
-                // Get supplier location ONLY during registration.
                 const {
                     town,
                     county,
@@ -250,10 +428,7 @@ if (authForm) {
                 } = getSupplierLocation();
 
 
-                // ----------------------------------------------
-                // Validate supplier location
-                // ----------------------------------------------
-
+                // Supplier must have location
                 if (role === "supplier") {
 
                     if (!town) {
@@ -263,6 +438,7 @@ if (authForm) {
                         );
 
                         return;
+
                     }
 
                     if (!county) {
@@ -272,15 +448,13 @@ if (authForm) {
                         );
 
                         return;
+
                     }
 
                 }
 
 
-                // ----------------------------------------------
-                // Create Firebase Auth account
-                // ----------------------------------------------
-
+                // Create account
                 const userCredential =
                     await createUserWithEmailAndPassword(
                         auth,
@@ -288,13 +462,11 @@ if (authForm) {
                         password
                     );
 
-                const user = userCredential.user;
+                const user =
+                    userCredential.user;
 
 
-                // ----------------------------------------------
-                // Update Firebase Auth profile
-                // ----------------------------------------------
-
+                // Update Auth display name
                 try {
 
                     await updateProfile(user, {
@@ -304,17 +476,14 @@ if (authForm) {
                 } catch (profileError) {
 
                     console.warn(
-                        "Could not update Auth profile:",
+                        "Auth profile update failed:",
                         profileError
                     );
 
                 }
 
 
-                // ----------------------------------------------
-                // Firestore user data
-                // ----------------------------------------------
-
+                // Firestore data
                 const userData = {
 
                     email: user.email,
@@ -323,14 +492,11 @@ if (authForm) {
 
                     businessName,
 
-                    createdAt: new Date().toISOString()
+                    createdAt:
+                        new Date().toISOString()
 
                 };
 
-
-                // ----------------------------------------------
-                // Supplier location
-                // ----------------------------------------------
 
                 if (role === "supplier") {
 
@@ -342,9 +508,9 @@ if (authForm) {
 
                     userData.supplierLocation = {
 
-                        town: town,
+                        town,
 
-                        county: county,
+                        county,
 
                         display: location
 
@@ -353,17 +519,15 @@ if (authForm) {
                 }
 
 
-                // ----------------------------------------------
-                // Save user profile
-                // ----------------------------------------------
-
                 await setDoc(
                     doc(db, "users", user.uid),
                     userData
                 );
 
 
-                alert("Registration successful!");
+                alert(
+                    "Registration successful!"
+                );
 
 
                 if (authModal) {
@@ -391,14 +555,18 @@ if (authForm) {
                         password
                     );
 
-                const user = userCredential.user;
+                const user =
+                    userCredential.user;
+
 
                 const userDoc =
                     await getDoc(
                         doc(db, "users", user.uid)
                     );
 
+
                 let role = "customer";
+
 
                 if (userDoc.exists()) {
 
@@ -409,7 +577,9 @@ if (authForm) {
                 }
 
 
-                alert("Signed in successfully!");
+                alert(
+                    "Signed in successfully!"
+                );
 
 
                 if (authModal) {
@@ -425,6 +595,7 @@ if (authForm) {
 
             }
 
+
         } catch (error) {
 
             console.error(
@@ -436,56 +607,86 @@ if (authForm) {
                 error.message ||
                 "Authentication failed.";
 
+
             switch (error.code) {
 
                 case "auth/email-already-in-use":
+
                     message =
                         "An account with this email already exists.";
+
                     break;
+
 
                 case "auth/invalid-email":
+
                     message =
                         "Please enter a valid email address.";
+
                     break;
+
 
                 case "auth/weak-password":
+
                     message =
                         "Password is too weak. Please use a stronger password.";
+
                     break;
+
 
                 case "auth/invalid-credential":
+
                     message =
                         "Incorrect email or password.";
+
                     break;
+
 
                 case "auth/user-not-found":
+
                     message =
                         "No account exists with this email.";
+
                     break;
+
 
                 case "auth/wrong-password":
+
                     message =
                         "Incorrect password.";
+
                     break;
+
 
                 case "auth/network-request-failed":
+
                     message =
                         "Network error. Check your internet connection and try again.";
+
                     break;
+
 
                 case "auth/too-many-requests":
+
                     message =
                         "Too many attempts. Please try again later.";
+
                     break;
 
+
                 case "auth/operation-not-allowed":
+
                     message =
                         "This sign-in method is not enabled in Firebase.";
+
                     break;
 
             }
 
-            alert("Authentication Error: " + message);
+
+            alert(
+                "Authentication Error: " + message
+            );
 
         }
 
@@ -501,73 +702,94 @@ if (authForm) {
 const forgotPassword =
     document.getElementById("forgotPassword");
 
+
 if (forgotPassword) {
 
-    forgotPassword.addEventListener("click", async (e) => {
+    forgotPassword.addEventListener(
+        "click",
+        async (e) => {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        const email =
-            document.getElementById("authEmail")?.value.trim() || "";
+            const email =
+                document.getElementById("authEmail")
+                    ?.value.trim() || "";
 
-        if (!email) {
 
-            alert(
-                "Enter your email address first."
-            );
+            if (!email) {
 
-            return;
+                alert(
+                    "Enter your email address first."
+                );
 
-        }
-
-        try {
-
-            await sendPasswordResetEmail(
-                auth,
-                email
-            );
-
-            alert(
-                "Password reset email sent. Please check your inbox and spam folder."
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Password reset error:",
-                error
-            );
-
-            let message =
-                error.message ||
-                "Unable to send password reset email.";
-
-            switch (error.code) {
-
-                case "auth/invalid-email":
-                    message =
-                        "Please enter a valid email address.";
-                    break;
-
-                case "auth/user-not-found":
-                    message =
-                        "No account exists with this email.";
-                    break;
-
-                case "auth/network-request-failed":
-                    message =
-                        "Network error. Check your internet connection.";
-                    break;
+                return;
 
             }
 
-            alert(
-                "Password Reset Error: " + message
-            );
+
+            try {
+
+                await sendPasswordResetEmail(
+                    auth,
+                    email
+                );
+
+
+                alert(
+                    "Password reset email sent. Please check your inbox and spam folder."
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Password reset error:",
+                    error
+                );
+
+
+                let message =
+                    error.message ||
+                    "Unable to send password reset email.";
+
+
+                switch (error.code) {
+
+                    case "auth/invalid-email":
+
+                        message =
+                            "Please enter a valid email address.";
+
+                        break;
+
+
+                    case "auth/user-not-found":
+
+                        message =
+                            "No account exists with this email.";
+
+                        break;
+
+
+                    case "auth/network-request-failed":
+
+                        message =
+                            "Network error. Check your internet connection.";
+
+                        break;
+
+                }
+
+
+                alert(
+                    "Password Reset Error: " +
+                    message
+                );
+
+            }
 
         }
-
-    });
+    );
 
 }
 
@@ -576,50 +798,58 @@ if (forgotPassword) {
 // AUTH STATE
 // ============================================================
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(
+    auth,
+    async (user) => {
 
-    if (user) {
+        if (user) {
 
-        try {
+            try {
 
-            const userDoc =
-                await getDoc(
-                    doc(db, "users", user.uid)
+                const userDoc =
+                    await getDoc(
+                        doc(db, "users", user.uid)
+                    );
+
+
+                let role = "customer";
+
+
+                if (userDoc.exists()) {
+
+                    role =
+                        userDoc.data().role ||
+                        "customer";
+
+                }
+
+
+                if (window.handlePostLoginUI) {
+
+                    window.handlePostLoginUI(role);
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error loading user state:",
+                    error
                 );
 
-            let role = "customer";
-
-            if (userDoc.exists()) {
-
-                role =
-                    userDoc.data().role ||
-                    "customer";
-
             }
 
-            if (window.handlePostLoginUI) {
 
-                window.handlePostLoginUI(role);
+        } else {
+
+            if (window.handlePostLogoutUI) {
+
+                window.handlePostLogoutUI();
 
             }
-
-        } catch (error) {
-
-            console.error(
-                "Error loading user state:",
-                error
-            );
-
-        }
-
-    } else {
-
-        if (window.handlePostLogoutUI) {
-
-            window.handlePostLogoutUI();
 
         }
 
     }
-
-});
+);
