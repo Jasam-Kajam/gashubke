@@ -6,7 +6,7 @@ import {
     signOut,
     onAuthStateChanged,
     sendPasswordResetEmail,
-    updateProfile as firebaseUpdateProfile
+    updateProfile
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 import {
@@ -17,54 +17,35 @@ import {
 
 
 // ============================================================
-// GAS HUB KE - AUTHENTICATION
-// Login / Registration / Forgot Password / Update Profile
+// GASHUBKE AUTHENTICATION
 // ============================================================
 
-const authLink =
-    document.getElementById("authLink");
-
-const authModal =
-    document.getElementById("authModal");
-
-const closeModal =
-    document.getElementById("closeModal");
-
-const authForm =
-    document.getElementById("authForm");
-
-const authModalTitle =
-    document.getElementById("authModalTitle");
-
-const authSubmitBtn =
-    document.getElementById("authSubmitBtn");
-
-const toggleAuthMode =
-    document.getElementById("toggleAuthMode");
-
-const vendorFields =
-    document.getElementById("vendorFields");
-
+const authLink = document.getElementById("authLink");
+const authModal = document.getElementById("authModal");
+const closeModal = document.getElementById("closeModal");
+const authForm = document.getElementById("authForm");
+const authModalTitle = document.getElementById("authModalTitle");
+const authSubmitBtn = document.getElementById("authSubmitBtn");
+const toggleAuthMode = document.getElementById("toggleAuthMode");
+const vendorFields = document.getElementById("vendorFields");
 
 let isRegistering = false;
 
 
 // ============================================================
-// SAFE ELEMENT VALUE
+// HELPER: GET FIELD VALUE
 // ============================================================
 
-function getValue(...ids) {
-
+function getFieldValue(...ids) {
     for (const id of ids) {
+        const element = document.getElementById(id);
 
-        const element =
-            document.getElementById(id);
+        if (element && element.value) {
+            const value = element.value.trim();
 
-        if (element) {
-
-            return String(
-                element.value || ""
-            ).trim();
+            if (value) {
+                return value;
+            }
         }
     }
 
@@ -73,48 +54,45 @@ function getValue(...ids) {
 
 
 // ============================================================
-// GET CURRENT USER PROFILE
+// BUILD SUPPLIER LOCATION
+// FORMAT:
+// Ruiru, Kiambu
+// Westlands, Nairobi
+// Kitale, Trans Nzoia
+// Nanyuki, Laikipia
 // ============================================================
 
-async function getCurrentUserProfile() {
+function getSupplierLocation() {
 
-    if (!auth.currentUser) {
-        return null;
-    }
+    // IMPORTANT:
+    // Do NOT use "city" here.
+    // We want the actual town/area selected by the supplier.
 
-    try {
+    const town = getFieldValue(
+        "supplierTown",
+        "town",
+        "businessTown",
+        "registeredTown",
+        "area",
+        "supplierArea"
+    );
 
-        const userRef =
-            doc(
-                db,
-                "users",
-                auth.currentUser.uid
-            );
+    const county = getFieldValue(
+        "supplierCounty",
+        "county",
+        "businessCounty",
+        "registeredCounty"
+    );
 
-        const snapshot =
-            await getDoc(userRef);
+    const location = [town, county]
+        .filter(Boolean)
+        .join(", ");
 
-        if (snapshot.exists()) {
-
-            return {
-                uid: auth.currentUser.uid,
-                ...snapshot.data()
-            };
-        }
-
-        return {
-            uid: auth.currentUser.uid
-        };
-
-    } catch (error) {
-
-        console.error(
-            "Error loading user profile:",
-            error
-        );
-
-        return null;
-    }
+    return {
+        town,
+        county,
+        location
+    };
 }
 
 
@@ -124,46 +102,37 @@ async function getCurrentUserProfile() {
 
 if (authLink) {
 
-    authLink.addEventListener(
-        "click",
-        (e) => {
+    authLink.addEventListener("click", async (e) => {
 
-            e.preventDefault();
+        e.preventDefault();
 
-            if (auth.currentUser) {
+        if (auth.currentUser) {
 
-                signOut(auth)
-                    .then(() => {
+            try {
 
-                        if (
-                            window.handlePostLogoutUI
-                        ) {
+                await signOut(auth);
 
-                            window.handlePostLogoutUI();
-                        }
-
-                    })
-                    .catch(error => {
-
-                        console.error(
-                            "Logout error:",
-                            error
-                        );
-
-                        alert(
-                            "Unable to sign out. Please try again."
-                        );
-                    });
-
-            } else {
-
-                if (authModal) {
-                    authModal.style.display =
-                        "flex";
+                if (window.handlePostLogoutUI) {
+                    window.handlePostLogoutUI();
                 }
+
+            } catch (error) {
+
+                console.error("Logout error:", error);
+                alert("Unable to sign out. Please try again.");
+
             }
+
+        } else {
+
+            if (authModal) {
+                authModal.style.display = "flex";
+            }
+
         }
-    );
+
+    });
+
 }
 
 
@@ -173,410 +142,247 @@ if (authLink) {
 
 if (closeModal) {
 
-    closeModal.addEventListener(
-        "click",
-        () => {
+    closeModal.addEventListener("click", () => {
 
-            if (authModal) {
-                authModal.style.display =
-                    "none";
-            }
+        if (authModal) {
+            authModal.style.display = "none";
         }
-    );
+
+    });
+
 }
 
 
 // ============================================================
-// SWITCH LOGIN / REGISTER
+// TOGGLE LOGIN / REGISTRATION
 // ============================================================
 
 if (toggleAuthMode) {
 
-    toggleAuthMode.addEventListener(
-        "click",
-        () => {
+    toggleAuthMode.addEventListener("click", () => {
 
-            isRegistering =
-                !isRegistering;
+        isRegistering = !isRegistering;
 
-            if (isRegistering) {
+        if (isRegistering) {
 
-                if (authModalTitle) {
-                    authModalTitle.innerText =
-                        "Register Platform Account";
-                }
-
-                if (authSubmitBtn) {
-                    authSubmitBtn.innerText =
-                        "Sign Up";
-                }
-
-                toggleAuthMode.innerText =
-                    "Already have an account? Sign In";
-
-                if (vendorFields) {
-                    vendorFields.style.display =
-                        "block";
-                }
-
-            } else {
-
-                if (authModalTitle) {
-                    authModalTitle.innerText =
-                        "Sign In";
-                }
-
-                if (authSubmitBtn) {
-                    authSubmitBtn.innerText =
-                        "Sign In";
-                }
-
-                toggleAuthMode.innerText =
-                    "Need an account? Register";
-
-                if (vendorFields) {
-                    vendorFields.style.display =
-                        "none";
-                }
+            if (authModalTitle) {
+                authModalTitle.innerText = "Register Platform Account";
             }
+
+            if (authSubmitBtn) {
+                authSubmitBtn.innerText = "Sign Up";
+            }
+
+            toggleAuthMode.innerText =
+                "Already have an account? Sign In";
+
+            if (vendorFields) {
+                vendorFields.style.display = "block";
+            }
+
+        } else {
+
+            if (authModalTitle) {
+                authModalTitle.innerText = "Sign In";
+            }
+
+            if (authSubmitBtn) {
+                authSubmitBtn.innerText = "Sign In";
+            }
+
+            toggleAuthMode.innerText =
+                "Need an account? Register";
+
+            if (vendorFields) {
+                vendorFields.style.display = "none";
+            }
+
         }
-    );
+
+    });
+
 }
 
 
 // ============================================================
-// REGISTRATION
+// AUTH FORM SUBMIT
 // ============================================================
 
 if (authForm) {
 
-    authForm.addEventListener(
-        "submit",
-        async (e) => {
+    authForm.addEventListener("submit", async (e) => {
 
-            e.preventDefault();
+        e.preventDefault();
 
-            const email =
-                getValue("authEmail");
+        const email =
+            document.getElementById("authEmail")?.value.trim() || "";
 
-            const password =
-                document.getElementById(
-                    "authPassword"
-                )?.value || "";
+        const password =
+            document.getElementById("authPassword")?.value || "";
 
-            try {
+        if (!email || !password) {
 
-                // ==================================================
-                // REGISTER
-                // ==================================================
+            alert("Please enter your email and password.");
+            return;
 
-                if (isRegistering) {
+        }
 
-                    const role =
-                        getValue(
-                            "userRole"
-                        ) || "customer";
+        try {
 
-                    const businessName =
-                        getValue(
-                            "businessName",
-                            "supplierBusinessName",
-                            "business_name"
-                        );
+            // ==================================================
+            // REGISTRATION
+            // ==================================================
 
-                    // ----------------------------------------------
-                    // LOCATION
-                    // ----------------------------------------------
+            if (isRegistering) {
 
-                    const county =
-                        getValue(
-                            "county",
-                            "supplierCounty",
-                            "businessCounty",
-                            "registeredCounty"
-                        );
+                const role =
+                    getFieldValue("userRole") || "customer";
 
-                    const town =
-                        getValue(
-                            "town",
-                            "supplierTown",
-                            "businessTown",
-                            "registeredTown",
-                            "city"
-                        );
+                const businessName =
+                    getFieldValue("businessName") ||
+                    "Independent Supplier";
 
-                    let location =
-                        getValue(
-                            "location",
-                            "supplierLocation",
-                            "businessLocation",
-                            "registeredLocation",
-                            "address"
-                        );
+                // Get supplier location ONLY during registration.
+                const {
+                    town,
+                    county,
+                    location
+                } = getSupplierLocation();
 
 
-                    // ----------------------------------------------
-                    // PHONE
-                    // ----------------------------------------------
+                // ----------------------------------------------
+                // Validate supplier location
+                // ----------------------------------------------
 
-                    const phone =
-                        getValue(
-                            "phone",
-                            "supplierPhone",
-                            "businessPhone",
-                            "phoneNumber",
-                            "authPhone"
-                        );
+                if (role === "supplier") {
 
-
-                    // ----------------------------------------------
-                    // BUILD LOCATION
-                    // ----------------------------------------------
-
-                    if (!location) {
-
-                        if (
-                            town &&
-                            county
-                        ) {
-
-                            location =
-                                `${town}, ${county}`;
-
-                        } else {
-
-                            location =
-                                town ||
-                                county ||
-                                "";
-                        }
-                    }
-
-
-                    // ----------------------------------------------
-                    // SUPPLIER VALIDATION
-                    // ----------------------------------------------
-
-                    if (
-                        role === "supplier"
-                    ) {
-
-                        if (!businessName) {
-
-                            alert(
-                                "Please enter your business name."
-                            );
-
-                            return;
-                        }
-
-                        if (!county) {
-
-                            alert(
-                                "Please select your county."
-                            );
-
-                            return;
-                        }
-
-                        if (!town) {
-
-                            alert(
-                                "Please select your town."
-                            );
-
-                            return;
-                        }
-                    }
-
-
-                    if (!email) {
+                    if (!town) {
 
                         alert(
-                            "Please enter your email address."
+                            "Please select or enter your town/area."
                         );
 
                         return;
                     }
 
-
-                    if (!password) {
+                    if (!county) {
 
                         alert(
-                            "Please enter a password."
+                            "Please select your county."
                         );
 
                         return;
                     }
 
-
-                    if (password.length < 6) {
-
-                        alert(
-                            "Password must contain at least 6 characters."
-                        );
-
-                        return;
-                    }
-
-
-                    // ----------------------------------------------
-                    // CREATE FIREBASE ACCOUNT
-                    // ----------------------------------------------
-
-                    const userCredential =
-                        await createUserWithEmailAndPassword(
-                            auth,
-                            email,
-                            password
-                        );
-
-
-                    const user =
-                        userCredential.user;
-
-
-                    // ----------------------------------------------
-                    // UPDATE FIREBASE AUTH PROFILE
-                    // ----------------------------------------------
-
-                    const displayName =
-                        businessName ||
-                        email.split("@")[0];
-
-
-                    try {
-
-                        await firebaseUpdateProfile(
-                            user,
-                            {
-                                displayName
-                            }
-                        );
-
-                    } catch (profileError) {
-
-                        console.warn(
-                            "Auth profile update failed:",
-                            profileError
-                        );
-                    }
-
-
-                    // ----------------------------------------------
-                    // SAVE FIRESTORE USER PROFILE
-                    // ----------------------------------------------
-
-                    await setDoc(
-                        doc(
-                            db,
-                            "users",
-                            user.uid
-                        ),
-                        {
-
-                            uid:
-                                user.uid,
-
-                            email:
-                                email,
-
-                            role:
-                                role,
-
-                            businessName:
-                                businessName ||
-                                "Independent Supplier",
-
-                            phone:
-                                phone,
-
-                            county:
-                                county,
-
-                            town:
-                                town,
-
-                            location:
-                                location,
-
-                            // ----------------------------------
-                            // STRUCTURED SUPPLIER LOCATION
-                            // ----------------------------------
-
-                            supplierLocation: {
-
-                                town:
-                                    town,
-
-                                county:
-                                    county,
-
-                                display:
-                                    location
-                            },
-
-                            createdAt:
-                                new Date().toISOString(),
-
-                            updatedAt:
-                                new Date().toISOString()
-                        },
-
-                        {
-                            merge: true
-                        }
-                    );
-
-
-                    alert(
-                        "Registration successful!"
-                    );
-
-
-                    if (authModal) {
-                        authModal.style.display =
-                            "none";
-                    }
-
-
-                    if (
-                        window.handlePostLoginUI
-                    ) {
-
-                        window.handlePostLoginUI(
-                            role
-                        );
-                    }
-
-
-                    return;
                 }
 
+
+                // ----------------------------------------------
+                // Create Firebase Auth account
+                // ----------------------------------------------
+
+                const userCredential =
+                    await createUserWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+                const user = userCredential.user;
+
+
+                // ----------------------------------------------
+                // Update Firebase Auth profile
+                // ----------------------------------------------
+
+                try {
+
+                    await updateProfile(user, {
+                        displayName: businessName
+                    });
+
+                } catch (profileError) {
+
+                    console.warn(
+                        "Could not update Auth profile:",
+                        profileError
+                    );
+
+                }
+
+
+                // ----------------------------------------------
+                // Firestore user data
+                // ----------------------------------------------
+
+                const userData = {
+
+                    email: user.email,
+
+                    role,
+
+                    businessName,
+
+                    createdAt: new Date().toISOString()
+
+                };
+
+
+                // ----------------------------------------------
+                // Supplier location
+                // ----------------------------------------------
+
+                if (role === "supplier") {
+
+                    userData.town = town;
+
+                    userData.county = county;
+
+                    userData.location = location;
+
+                    userData.supplierLocation = {
+
+                        town: town,
+
+                        county: county,
+
+                        display: location
+
+                    };
+
+                }
+
+
+                // ----------------------------------------------
+                // Save user profile
+                // ----------------------------------------------
+
+                await setDoc(
+                    doc(db, "users", user.uid),
+                    userData
+                );
+
+
+                alert("Registration successful!");
+
+
+                if (authModal) {
+                    authModal.style.display = "none";
+                }
+
+
+                if (window.handlePostLoginUI) {
+
+                    window.handlePostLoginUI(role);
+
+                }
+
+
+            } else {
 
                 // ==================================================
                 // LOGIN
                 // ==================================================
-
-                if (!email) {
-
-                    alert(
-                        "Please enter your email address."
-                    );
-
-                    return;
-                }
-
-
-                if (!password) {
-
-                    alert(
-                        "Please enter your password."
-                    );
-
-                    return;
-                }
-
 
                 const userCredential =
                     await signInWithEmailAndPassword(
@@ -585,72 +391,106 @@ if (authForm) {
                         password
                     );
 
-
-                const user =
-                    userCredential.user;
-
+                const user = userCredential.user;
 
                 const userDoc =
                     await getDoc(
-                        doc(
-                            db,
-                            "users",
-                            user.uid
-                        )
+                        doc(db, "users", user.uid)
                     );
 
+                let role = "customer";
 
-                let role =
-                    "customer";
-
-
-                if (
-                    userDoc.exists()
-                ) {
+                if (userDoc.exists()) {
 
                     role =
                         userDoc.data().role ||
                         "customer";
+
                 }
 
 
-                alert(
-                    "Signed in successfully!"
-                );
+                alert("Signed in successfully!");
 
 
                 if (authModal) {
-                    authModal.style.display =
-                        "none";
+                    authModal.style.display = "none";
                 }
 
 
-                if (
-                    window.handlePostLoginUI
-                ) {
+                if (window.handlePostLoginUI) {
 
-                    window.handlePostLoginUI(
-                        role
-                    );
+                    window.handlePostLoginUI(role);
+
                 }
 
-
-            } catch (error) {
-
-                console.error(
-                    "Authentication Error:",
-                    error
-                );
-
-
-                alert(
-                    getAuthErrorMessage(
-                        error
-                    )
-                );
             }
+
+        } catch (error) {
+
+            console.error(
+                "Authentication error:",
+                error
+            );
+
+            let message =
+                error.message ||
+                "Authentication failed.";
+
+            switch (error.code) {
+
+                case "auth/email-already-in-use":
+                    message =
+                        "An account with this email already exists.";
+                    break;
+
+                case "auth/invalid-email":
+                    message =
+                        "Please enter a valid email address.";
+                    break;
+
+                case "auth/weak-password":
+                    message =
+                        "Password is too weak. Please use a stronger password.";
+                    break;
+
+                case "auth/invalid-credential":
+                    message =
+                        "Incorrect email or password.";
+                    break;
+
+                case "auth/user-not-found":
+                    message =
+                        "No account exists with this email.";
+                    break;
+
+                case "auth/wrong-password":
+                    message =
+                        "Incorrect password.";
+                    break;
+
+                case "auth/network-request-failed":
+                    message =
+                        "Network error. Check your internet connection and try again.";
+                    break;
+
+                case "auth/too-many-requests":
+                    message =
+                        "Too many attempts. Please try again later.";
+                    break;
+
+                case "auth/operation-not-allowed":
+                    message =
+                        "This sign-in method is not enabled in Firebase.";
+                    break;
+
+            }
+
+            alert("Authentication Error: " + message);
+
         }
-    );
+
+    });
+
 }
 
 
@@ -658,323 +498,77 @@ if (authForm) {
 // FORGOT PASSWORD
 // ============================================================
 
-window.forgotPassword =
-async function () {
+const forgotPassword =
+    document.getElementById("forgotPassword");
 
-    const email =
-        getValue("authEmail");
+if (forgotPassword) {
 
+    forgotPassword.addEventListener("click", async (e) => {
 
-    if (!email) {
+        e.preventDefault();
 
-        alert(
-            "Enter your email address first."
-        );
+        const email =
+            document.getElementById("authEmail")?.value.trim() || "";
 
-        document
-            .getElementById("authEmail")
-            ?.focus();
+        if (!email) {
 
-        return;
-    }
+            alert(
+                "Enter your email address first."
+            );
 
+            return;
 
-    try {
+        }
 
-        await sendPasswordResetEmail(
-            auth,
-            email
-        );
+        try {
 
+            await sendPasswordResetEmail(
+                auth,
+                email
+            );
 
-        alert(
-            "Password reset email sent. Please check your email inbox and spam folder."
-        );
+            alert(
+                "Password reset email sent. Please check your inbox and spam folder."
+            );
 
+        } catch (error) {
 
-    } catch (error) {
-
-        console.error(
-            "Password reset error:",
-            error
-        );
-
-
-        alert(
-            getAuthErrorMessage(
+            console.error(
+                "Password reset error:",
                 error
-            )
-        );
-    }
-};
-
-
-// ============================================================
-// ALSO SUPPORT A FORGOT PASSWORD BUTTON/LINK
-// ============================================================
-
-const forgotPasswordBtn =
-    document.getElementById(
-        "forgotPassword"
-    ) ||
-    document.getElementById(
-        "forgotPasswordBtn"
-    );
-
-
-if (forgotPasswordBtn) {
-
-    forgotPasswordBtn.addEventListener(
-        "click",
-        (e) => {
-
-            e.preventDefault();
-
-            window.forgotPassword();
-        }
-    );
-}
-
-
-// ============================================================
-// UPDATE PROFILE
-// ============================================================
-
-window.updateSupplierProfile =
-async function () {
-
-    if (!auth.currentUser) {
-
-        alert(
-            "Please sign in first."
-        );
-
-        return;
-    }
-
-
-    try {
-
-        const user =
-            auth.currentUser;
-
-
-        // ======================================================
-        // READ PROFILE FIELDS
-        // ======================================================
-
-        const businessName =
-            getValue(
-                "profileBusinessName",
-                "businessName",
-                "supplierBusinessName",
-                "business_name"
             );
 
+            let message =
+                error.message ||
+                "Unable to send password reset email.";
 
-        const phone =
-            getValue(
-                "profilePhone",
-                "phone",
-                "supplierPhone",
-                "businessPhone",
-                "phoneNumber"
-            );
+            switch (error.code) {
 
+                case "auth/invalid-email":
+                    message =
+                        "Please enter a valid email address.";
+                    break;
 
-        const county =
-            getValue(
-                "profileCounty",
-                "county",
-                "supplierCounty",
-                "businessCounty"
-            );
+                case "auth/user-not-found":
+                    message =
+                        "No account exists with this email.";
+                    break;
 
+                case "auth/network-request-failed":
+                    message =
+                        "Network error. Check your internet connection.";
+                    break;
 
-        const town =
-            getValue(
-                "profileTown",
-                "town",
-                "supplierTown",
-                "businessTown",
-                "city"
-            );
-
-
-        let location =
-            getValue(
-                "profileLocation",
-                "location",
-                "supplierLocation",
-                "businessLocation",
-                "registeredLocation",
-                "address"
-            );
-
-
-        // ======================================================
-        // BUILD LOCATION
-        // ======================================================
-
-        if (!location) {
-
-            if (
-                town &&
-                county
-            ) {
-
-                location =
-                    `${town}, ${county}`;
-
-            } else {
-
-                location =
-                    town ||
-                    county ||
-                    "";
             }
-        }
 
-
-        // ======================================================
-        // UPDATE FIREBASE AUTH DISPLAY NAME
-        // ======================================================
-
-        const displayName =
-            businessName ||
-            user.displayName ||
-            user.email?.split("@")[0] ||
-            "GasHubKE User";
-
-
-        await firebaseUpdateProfile(
-            user,
-            {
-                displayName
-            }
-        );
-
-
-        // ======================================================
-        // UPDATE FIRESTORE PROFILE
-        // ======================================================
-
-        await setDoc(
-            doc(
-                db,
-                "users",
-                user.uid
-            ),
-            {
-
-                uid:
-                    user.uid,
-
-                email:
-                    user.email,
-
-                businessName:
-                    businessName ||
-                    "Independent Supplier",
-
-                phone:
-                    phone,
-
-                county:
-                    county,
-
-                town:
-                    town,
-
-                location:
-                    location,
-
-                supplierLocation: {
-
-                    town:
-                        town,
-
-                    county:
-                        county,
-
-                    display:
-                        location
-                },
-
-                updatedAt:
-                    new Date().toISOString()
-
-            },
-
-            {
-                merge: true
-            }
-        );
-
-
-        alert(
-            "Profile updated successfully!"
-        );
-
-
-        // Refresh page UI if available
-        if (
-            window.handlePostLoginUI
-        ) {
-
-            const profile =
-                await getCurrentUserProfile();
-
-            const role =
-                profile?.role ||
-                "customer";
-
-            window.handlePostLoginUI(
-                role
+            alert(
+                "Password Reset Error: " + message
             );
+
         }
 
+    });
 
-    } catch (error) {
-
-        console.error(
-            "Profile update error:",
-            error
-        );
-
-
-        alert(
-            "Failed to update profile: " +
-            getAuthErrorMessage(error)
-        );
-    }
-};
-
-
-// ============================================================
-// UPDATE PROFILE BUTTON
-// ============================================================
-
-const updateProfileBtn =
-    document.getElementById(
-        "updateProfileBtn"
-    ) ||
-    document.getElementById(
-        "saveProfileBtn"
-    );
-
-
-if (updateProfileBtn) {
-
-    updateProfileBtn.addEventListener(
-        "click",
-        (e) => {
-
-            e.preventDefault();
-
-            window.updateSupplierProfile();
-        }
-    );
 }
 
 
@@ -982,117 +576,50 @@ if (updateProfileBtn) {
 // AUTH STATE
 // ============================================================
 
-onAuthStateChanged(
-    auth,
-    async user => {
+onAuthStateChanged(auth, async (user) => {
 
-        if (user) {
+    if (user) {
 
-            try {
+        try {
 
-                const userDoc =
-                    await getDoc(
-                        doc(
-                            db,
-                            "users",
-                            user.uid
-                        )
-                    );
+            const userDoc =
+                await getDoc(
+                    doc(db, "users", user.uid)
+                );
 
+            let role = "customer";
 
-                let role =
+            if (userDoc.exists()) {
+
+                role =
+                    userDoc.data().role ||
                     "customer";
 
-
-                if (
-                    userDoc.exists()
-                ) {
-
-                    role =
-                        userDoc.data().role ||
-                        "customer";
-                }
-
-
-                if (
-                    window.handlePostLoginUI
-                ) {
-
-                    window.handlePostLoginUI(
-                        role
-                    );
-                }
-
-
-            } catch (err) {
-
-                console.error(
-                    "Error loading user state:",
-                    err
-                );
             }
 
-        } else {
+            if (window.handlePostLoginUI) {
 
-            if (
-                window.handlePostLogoutUI
-            ) {
+                window.handlePostLoginUI(role);
 
-                window.handlePostLogoutUI();
             }
-        }
-    }
-);
 
+        } catch (error) {
 
-// ============================================================
-// FIREBASE ERROR MESSAGES
-// ============================================================
-
-function getAuthErrorMessage(error) {
-
-    switch (error?.code) {
-
-        case "auth/invalid-email":
-            return "Please enter a valid email address.";
-
-        case "auth/user-not-found":
-            return "No account exists with this email address.";
-
-        case "auth/wrong-password":
-            return "Incorrect email or password.";
-
-        case "auth/invalid-credential":
-            return "Incorrect email or password.";
-
-        case "auth/email-already-in-use":
-            return "An account with this email already exists.";
-
-        case "auth/weak-password":
-            return "Password is too weak. Use at least 6 characters.";
-
-        case "auth/user-disabled":
-            return "This account has been disabled.";
-
-        case "auth/too-many-requests":
-            return "Too many attempts. Please try again later.";
-
-        case "auth/network-request-failed":
-            return "Network error. Check your internet connection.";
-
-        case "auth/operation-not-allowed":
-            return "This authentication method is not enabled in Firebase.";
-
-        case "auth/requires-recent-login":
-            return "Please sign in again before updating your profile.";
-
-        case "auth/unauthorized-domain":
-            return "This website domain is not authorized in Firebase.";
-
-        default:
-            return (
-                error?.message ||
-                "An authentication error occurred."
+            console.error(
+                "Error loading user state:",
+                error
             );
+
+        }
+
+    } else {
+
+        if (window.handlePostLogoutUI) {
+
+            window.handlePostLogoutUI();
+
+        }
+
     }
-}
+
+});
