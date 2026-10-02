@@ -33,18 +33,22 @@ let isRegistering = false;
 
 
 // ============================================================
-// HELPER
+// HELPER - GET FIELD VALUE
 // ============================================================
 
 function getFieldValue(...ids) {
 
     for (const id of ids) {
 
-        const element = document.getElementById(id);
+        const element =
+            document.getElementById(id);
 
-        if (!element) continue;
+        if (!element) {
+            continue;
+        }
 
-        const value = String(element.value || "").trim();
+        const value =
+            String(element.value || "").trim();
 
         if (value) {
             return value;
@@ -56,7 +60,7 @@ function getFieldValue(...ids) {
 
 
 // ============================================================
-// SUPPLIER / VENDOR ROLE CHECK
+// NORMALIZE ROLE
 // ============================================================
 
 function isSupplierRole(role) {
@@ -67,8 +71,8 @@ function isSupplierRole(role) {
             .toLowerCase();
 
     return (
-        normalizedRole === "vendor" ||
-        normalizedRole === "supplier"
+        normalizedRole === "supplier" ||
+        normalizedRole === "vendor"
     );
 }
 
@@ -76,45 +80,106 @@ function isSupplierRole(role) {
 // ============================================================
 // SUPPLIER BUSINESS LOCATION
 //
-// FORMAT:
+// AUTHORITATIVE FORMAT:
+//
 // Town, County
 //
 // Examples:
+//
 // Ruiru, Kiambu
 // Kitale, Trans Nzoia
 // Nanyuki, Laikipia
 //
-// AREA IS NOT USED.
+// NO AREA.
 // ============================================================
 
 function getSupplierLocation() {
 
-    const town = getFieldValue(
-        "supplierTown",
-        "town",
-        "businessTown",
-        "registeredTown",
-        "supplierLocationTown",
-        "businessLocationTown"
-    );
+    let town =
+        getFieldValue(
+            "supplierTown",
+            "town",
+            "businessTown",
+            "registeredTown",
+            "supplierLocationTown",
+            "businessLocationTown"
+        );
 
-    const county = getFieldValue(
-        "supplierCounty",
-        "county",
-        "businessCounty",
-        "registeredCounty",
-        "supplierLocationCounty",
-        "businessLocationCounty"
-    );
+    let county =
+        getFieldValue(
+            "supplierCounty",
+            "county",
+            "businessCounty",
+            "registeredCounty",
+            "supplierLocationCounty",
+            "businessLocationCounty"
+        );
 
-    const location = [town, county]
-        .filter(Boolean)
-        .join(", ");
+
+    // --------------------------------------------------------
+    // DIRECT BUSINESS LOCATION FIELD
+    // --------------------------------------------------------
+
+    let businessLocation =
+        getFieldValue(
+            "businessLocation",
+            "supplierBusinessLocation",
+            "registeredBusinessLocation"
+        );
+
+
+    // --------------------------------------------------------
+    // IF TOWN/COUNTY ARE MISSING, TRY BUSINESS LOCATION
+    //
+    // Example:
+    // "Ruiru, Kiambu"
+    // --------------------------------------------------------
+
+    if (
+        businessLocation &&
+        (!town || !county)
+    ) {
+
+        const parts =
+            businessLocation
+                .split(",")
+                .map(value => value.trim())
+                .filter(Boolean);
+
+
+        if (!town && parts[0]) {
+            town = parts[0];
+        }
+
+
+        if (!county && parts[1]) {
+            county = parts[1];
+        }
+    }
+
+
+    // --------------------------------------------------------
+    // BUILD AUTHORITATIVE LOCATION
+    // --------------------------------------------------------
+
+    const location =
+        [town, county]
+            .filter(Boolean)
+            .join(", ");
+
 
     return {
-        town,
-        county,
-        location
+
+        town:
+            String(town || "").trim(),
+
+        county:
+            String(county || "").trim(),
+
+        location:
+            location ||
+            String(businessLocation || "").trim()
+
     };
 }
 
@@ -129,21 +194,33 @@ export async function updateUserProfile({
     county = ""
 } = {}) {
 
-    const user = auth.currentUser;
+    const user =
+        auth.currentUser;
+
 
     if (!user) {
+
         throw new Error(
             "You must be signed in to update your profile."
         );
+
     }
 
-    businessName = String(businessName).trim();
-    town = String(town).trim();
-    county = String(county).trim();
 
-    const location = [town, county]
-        .filter(Boolean)
-        .join(", ");
+    businessName =
+        String(businessName).trim();
+
+    town =
+        String(town).trim();
+
+    county =
+        String(county).trim();
+
+
+    const location =
+        [town, county]
+            .filter(Boolean)
+            .join(", ");
 
 
     // --------------------------------------------------------
@@ -152,35 +229,48 @@ export async function updateUserProfile({
 
     if (businessName) {
 
-        await updateProfile(user, {
-            displayName: businessName
-        });
+        await updateProfile(
+            user,
+            {
+                displayName:
+                    businessName
+            }
+        );
 
     }
 
 
     // --------------------------------------------------------
-    // FIRESTORE USER DOCUMENT
+    // GET EXISTING FIRESTORE PROFILE
     // --------------------------------------------------------
 
-    const userRef = doc(
-        db,
-        "users",
-        user.uid
-    );
+    const userRef =
+        doc(
+            db,
+            "users",
+            user.uid
+        );
 
-    const existingDoc = await getDoc(userRef);
 
-    const existingData = existingDoc.exists()
-        ? existingDoc.data()
-        : {};
+    const existingDoc =
+        await getDoc(
+            userRef
+        );
+
+
+    const existingData =
+        existingDoc.exists()
+            ? existingDoc.data()
+            : {};
+
 
     const role =
-        existingData.role || "customer";
+        existingData.role ||
+        "customer";
 
 
     // --------------------------------------------------------
-    // UPDATED PROFILE DATA
+    // BASE PROFILE
     // --------------------------------------------------------
 
     const updatedData = {
@@ -204,36 +294,54 @@ export async function updateUserProfile({
 
 
     // --------------------------------------------------------
-    // REGISTERED BUSINESS LOCATION
+    // BUSINESS LOCATION
     // --------------------------------------------------------
 
     if (town && county) {
 
-        updatedData.town = town;
+        // Basic fields
+        updatedData.town =
+            town;
 
-        updatedData.county = county;
+        updatedData.county =
+            county;
 
-        updatedData.supplierTown = town;
 
-        updatedData.supplierCounty = county;
+        // Compatibility fields
+        updatedData.supplierTown =
+            town;
 
-        updatedData.location = location;
+        updatedData.supplierCounty =
+            county;
 
-        // IMPORTANT:
-        // This is the field checked by supplier dashboard.
-        updatedData.businessLocation = location;
 
-        updatedData.registeredBusinessLocation = location;
+        // PRIMARY LOCATION FIELD
+        updatedData.businessLocation =
+            location;
 
+
+        // Other compatibility fields
+        updatedData.registeredBusinessLocation =
+            location;
+
+        updatedData.location =
+            location;
+
+
+        // Structured location
         updatedData.supplierLocation = {
 
-            town: town,
+            town:
+                town,
 
-            county: county,
+            county:
+                county,
 
-            label: location,
+            label:
+                location,
 
-            display: location
+            display:
+                location
 
         };
 
@@ -241,7 +349,7 @@ export async function updateUserProfile({
 
 
     // --------------------------------------------------------
-    // SAVE
+    // SAVE PROFILE
     // --------------------------------------------------------
 
     await setDoc(
@@ -253,9 +361,14 @@ export async function updateUserProfile({
     );
 
 
+    // --------------------------------------------------------
+    // RETURN PROFILE
+    // --------------------------------------------------------
+
     return {
 
-        uid: user.uid,
+        uid:
+            user.uid,
 
         businessName:
             updatedData.businessName,
@@ -282,49 +395,61 @@ export async function updateUserProfile({
 
         location:
             updatedData.businessLocation ||
-            updatedData.location ||
             existingData.businessLocation ||
+            updatedData.location ||
             existingData.location ||
+            existingData.registeredBusinessLocation ||
             existingData.supplierLocation?.label ||
             existingData.supplierLocation?.display ||
             ""
 
     };
-
 }
 
 
 // ============================================================
-// LOAD CURRENT PROFILE
+// LOAD CURRENT USER PROFILE
 // ============================================================
 
 export async function getCurrentUserProfile() {
 
-    const user = auth.currentUser;
+    const user =
+        auth.currentUser;
+
 
     if (!user) {
+
         throw new Error(
             "You must be signed in."
         );
+
     }
 
 
-    const userRef = doc(
-        db,
-        "users",
-        user.uid
-    );
+    const userRef =
+        doc(
+            db,
+            "users",
+            user.uid
+        );
 
-    const userDoc = await getDoc(userRef);
 
-    const data = userDoc.exists()
-        ? userDoc.data()
-        : {};
+    const userDoc =
+        await getDoc(
+            userRef
+        );
+
+
+    const data =
+        userDoc.exists()
+            ? userDoc.data()
+            : {};
 
 
     return {
 
-        uid: user.uid,
+        uid:
+            user.uid,
 
         email:
             user.email ||
@@ -357,6 +482,7 @@ export async function getCurrentUserProfile() {
             data.supplierLocation?.county ||
             "",
 
+        // businessLocation is checked FIRST
         location:
             data.businessLocation ||
             data.registeredBusinessLocation ||
@@ -366,39 +492,57 @@ export async function getCurrentUserProfile() {
             ""
 
     };
-
 }
 
 
 // ============================================================
-// CREATE FORGOT PASSWORD BUTTON IF MISSING
+// FORGOT PASSWORD BUTTON
 // ============================================================
 
 function ensureForgotPasswordButton() {
 
-    if (!authForm) return;
-
-    if (document.getElementById("forgotPassword")) {
+    if (!authForm) {
         return;
     }
 
-    const passwordInput =
-        document.getElementById("authPassword");
 
-    if (!passwordInput) return;
+    if (
+        document.getElementById(
+            "forgotPassword"
+        )
+    ) {
+        return;
+    }
+
+
+    const passwordInput =
+        document.getElementById(
+            "authPassword"
+        );
+
+
+    if (!passwordInput) {
+        return;
+    }
+
 
     const wrapper =
         document.createElement("div");
 
+
     wrapper.className =
         "text-end mt-2";
+
 
     const button =
         document.createElement("button");
 
-    button.type = "button";
 
-    button.id = "forgotPassword";
+    button.type =
+        "button";
+
+    button.id =
+        "forgotPassword";
 
     button.className =
         "btn btn-link p-0";
@@ -406,12 +550,15 @@ function ensureForgotPasswordButton() {
     button.textContent =
         "Forgot Password?";
 
-    wrapper.appendChild(button);
+
+    wrapper.appendChild(
+        button
+    );
+
 
     passwordInput.parentElement?.appendChild(
         wrapper
     );
-
 }
 
 
@@ -422,8 +569,10 @@ function ensureForgotPasswordButton() {
 async function handleForgotPassword() {
 
     const email =
-        document.getElementById("authEmail")
-            ?.value.trim() || "";
+        document.getElementById(
+            "authEmail"
+        )?.value.trim() || "";
+
 
     if (!email) {
 
@@ -431,8 +580,9 @@ async function handleForgotPassword() {
             "Enter your email address first."
         );
 
-        document.getElementById("authEmail")
-            ?.focus();
+        document.getElementById(
+            "authEmail"
+        )?.focus();
 
         return;
     }
@@ -445,9 +595,11 @@ async function handleForgotPassword() {
             email
         );
 
+
         alert(
             "Password reset email sent. Please check your inbox and spam folder."
         );
+
 
     } catch (error) {
 
@@ -456,8 +608,10 @@ async function handleForgotPassword() {
             error
         );
 
+
         let message =
             "Unable to send password reset email.";
+
 
         switch (error.code) {
 
@@ -468,6 +622,7 @@ async function handleForgotPassword() {
 
                 break;
 
+
             case "auth/user-not-found":
 
                 message =
@@ -475,12 +630,14 @@ async function handleForgotPassword() {
 
                 break;
 
+
             case "auth/network-request-failed":
 
                 message =
                     "Network error. Check your internet connection.";
 
                 break;
+
 
             case "auth/too-many-requests":
 
@@ -491,13 +648,12 @@ async function handleForgotPassword() {
 
         }
 
+
         alert(
             "Password Reset Error: " +
             message
         );
-
     }
-
 }
 
 
@@ -507,12 +663,18 @@ async function handleForgotPassword() {
 
 document.addEventListener(
     "click",
-    (event) => {
+    event => {
 
         const button =
-            event.target.closest("#forgotPassword");
+            event.target.closest(
+                "#forgotPassword"
+            );
 
-        if (!button) return;
+
+        if (!button) {
+            return;
+        }
+
 
         event.preventDefault();
 
@@ -520,6 +682,7 @@ document.addEventListener(
 
     }
 );
+
 
 ensureForgotPasswordButton();
 
@@ -532,19 +695,28 @@ if (authLink) {
 
     authLink.addEventListener(
         "click",
-        async (e) => {
+        async event => {
 
-            e.preventDefault();
+            event.preventDefault();
+
 
             if (auth.currentUser) {
 
                 try {
 
-                    await signOut(auth);
+                    await signOut(
+                        auth
+                    );
 
-                    if (window.handlePostLogoutUI) {
+
+                    if (
+                        window.handlePostLogoutUI
+                    ) {
+
                         window.handlePostLogoutUI();
+
                     }
+
 
                 } catch (error) {
 
@@ -553,28 +725,31 @@ if (authLink) {
                         error
                     );
 
+
                     alert(
                         "Unable to sign out. Please try again."
                     );
-
                 }
+
 
             } else {
 
                 if (authModal) {
-                    authModal.style.display = "flex";
+
+                    authModal.style.display =
+                        "flex";
+
                 }
 
             }
 
         }
     );
-
 }
 
 
 // ============================================================
-// CLOSE MODAL
+// CLOSE AUTH MODAL
 // ============================================================
 
 if (closeModal) {
@@ -584,17 +759,19 @@ if (closeModal) {
         () => {
 
             if (authModal) {
-                authModal.style.display = "none";
+
+                authModal.style.display =
+                    "none";
+
             }
 
         }
     );
-
 }
 
 
 // ============================================================
-// LOGIN / REGISTER TOGGLE
+// LOGIN / REGISTRATION TOGGLE
 // ============================================================
 
 if (toggleAuthMode) {
@@ -636,6 +813,7 @@ if (toggleAuthMode) {
 
                 }
 
+
             } else {
 
                 if (authModalTitle) {
@@ -669,7 +847,6 @@ if (toggleAuthMode) {
 
         }
     );
-
 }
 
 
@@ -681,9 +858,9 @@ if (authForm) {
 
     authForm.addEventListener(
         "submit",
-        async (e) => {
+        async event => {
 
-            e.preventDefault();
+            event.preventDefault();
 
 
             const email =
@@ -705,7 +882,6 @@ if (authForm) {
                 );
 
                 return;
-
             }
 
 
@@ -717,11 +893,25 @@ if (authForm) {
 
                 if (isRegistering) {
 
+                    // ------------------------------------------------
+                    // ROLE
+                    // ------------------------------------------------
+
                     const role =
                         getFieldValue(
                             "userRole"
                         ) || "customer";
 
+
+                    const supplierAccount =
+                        isSupplierRole(
+                            role
+                        );
+
+
+                    // ------------------------------------------------
+                    // BUSINESS NAME
+                    // ------------------------------------------------
 
                     const businessName =
                         getFieldValue(
@@ -729,6 +919,10 @@ if (authForm) {
                         ) ||
                         "Independent Supplier";
 
+
+                    // ------------------------------------------------
+                    // LOCATION
+                    // ------------------------------------------------
 
                     const {
                         town,
@@ -738,13 +932,20 @@ if (authForm) {
                         getSupplierLocation();
 
 
-                    // ------------------------------------------------
-                    // SUPPLIER / VENDOR LOCATION REQUIRED
-                    // ------------------------------------------------
+                    console.log(
+                        "Registration location:",
+                        {
+                            town,
+                            county,
+                            location,
+                            role
+                        }
+                    );
 
-                    const supplierAccount =
-                        isSupplierRole(role);
 
+                    // ------------------------------------------------
+                    // SUPPLIER LOCATION REQUIRED
+                    // ------------------------------------------------
 
                     if (supplierAccount) {
 
@@ -755,7 +956,6 @@ if (authForm) {
                             );
 
                             return;
-
                         }
 
 
@@ -766,7 +966,16 @@ if (authForm) {
                             );
 
                             return;
+                        }
 
+
+                        if (!location) {
+
+                            alert(
+                                "Business location could not be created. Please select your town and county again."
+                            );
+
+                            return;
                         }
 
                     }
@@ -802,42 +1011,50 @@ if (authForm) {
                             }
                         );
 
-                    } catch (error) {
+                    } catch (profileError) {
 
                         console.warn(
                             "Auth profile update failed:",
-                            error
+                            profileError
                         );
-
                     }
 
 
                     // ------------------------------------------------
-                    // FIRESTORE USER PROFILE
+                    // BASE FIRESTORE USER DATA
                     // ------------------------------------------------
 
                     const userData = {
 
+                        uid:
+                            user.uid,
+
                         email:
-                            user.email,
+                            user.email || email,
 
                         role,
 
                         businessName,
 
                         createdAt:
+                            new Date().toISOString(),
+
+                        updatedAt:
                             new Date().toISOString()
 
                     };
 
 
                     // ==================================================
-                    // SUPPLIER / VENDOR BUSINESS LOCATION
+                    // SUPPLIER / VENDOR LOCATION
                     // ==================================================
 
                     if (supplierAccount) {
 
-                        // Basic location
+                        // ------------------------------------------------
+                        // BASIC TOWN + COUNTY
+                        // ------------------------------------------------
+
                         userData.town =
                             town;
 
@@ -845,7 +1062,10 @@ if (authForm) {
                             county;
 
 
-                        // Compatibility fields
+                        // ------------------------------------------------
+                        // COMPATIBILITY FIELDS
+                        // ------------------------------------------------
+
                         userData.supplierTown =
                             town;
 
@@ -853,23 +1073,30 @@ if (authForm) {
                             county;
 
 
-                        // General location
-                        userData.location =
-                            location;
-
-
+                        // ------------------------------------------------
                         // IMPORTANT:
-                        // Supplier dashboard checks this field.
+                        // PRIMARY BUSINESS LOCATION
+                        // ------------------------------------------------
+
                         userData.businessLocation =
                             location;
 
 
-                        // Additional compatibility
+                        // ------------------------------------------------
+                        // OTHER LOCATION FIELDS
+                        // ------------------------------------------------
+
+                        userData.location =
+                            location;
+
                         userData.registeredBusinessLocation =
                             location;
 
 
-                        // Structured location
+                        // ------------------------------------------------
+                        // STRUCTURED LOCATION
+                        // ------------------------------------------------
+
                         userData.supplierLocation = {
 
                             town:
@@ -886,11 +1113,17 @@ if (authForm) {
 
                         };
 
+
+                        console.log(
+                            "Saving supplier location:",
+                            userData.supplierLocation
+                        );
+
                     }
 
 
                     // ------------------------------------------------
-                    // SAVE PROFILE
+                    // SAVE USER PROFILE
                     // ------------------------------------------------
 
                     await setDoc(
@@ -899,14 +1132,37 @@ if (authForm) {
                             "users",
                             user.uid
                         ),
-                        userData
+                        userData,
+                        {
+                            merge: true
+                        }
                     );
 
 
-                    console.log(
-                        "GasHubKE user profile saved:",
-                        userData
-                    );
+                    // ------------------------------------------------
+                    // VERIFY PROFILE WAS SAVED
+                    // ------------------------------------------------
+
+                    const savedProfile =
+                        await getDoc(
+                            doc(
+                                db,
+                                "users",
+                                user.uid
+                            )
+                        );
+
+
+                    if (
+                        savedProfile.exists()
+                    ) {
+
+                        console.log(
+                            "GasHubKE registered user:",
+                            savedProfile.data()
+                        );
+
+                    }
 
 
                     alert(
@@ -951,6 +1207,10 @@ if (authForm) {
                         userCredential.user;
 
 
+                    // ------------------------------------------------
+                    // LOAD PROFILE
+                    // ------------------------------------------------
+
                     const userDoc =
                         await getDoc(
                             doc(
@@ -965,7 +1225,9 @@ if (authForm) {
                         "customer";
 
 
-                    if (userDoc.exists()) {
+                    if (
+                        userDoc.exists()
+                    ) {
 
                         role =
                             userDoc.data().role ||
@@ -1086,6 +1348,14 @@ if (authForm) {
 
                         break;
 
+
+                    case "permission-denied":
+
+                        message =
+                            "Firebase denied access to your profile. Check your Firestore security rules.";
+
+                        break;
+
                 }
 
 
@@ -1093,12 +1363,10 @@ if (authForm) {
                     "Authentication Error: " +
                     message
                 );
-
             }
 
         }
     );
-
 }
 
 
@@ -1108,7 +1376,7 @@ if (authForm) {
 
 onAuthStateChanged(
     auth,
-    async (user) => {
+    async user => {
 
         if (user) {
 
@@ -1128,7 +1396,9 @@ onAuthStateChanged(
                     "customer";
 
 
-                if (userDoc.exists()) {
+                if (
+                    userDoc.exists()
+                ) {
 
                     role =
                         userDoc.data().role ||
@@ -1156,6 +1426,7 @@ onAuthStateChanged(
                 );
 
             }
+
 
         } else {
 
