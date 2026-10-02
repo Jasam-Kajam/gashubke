@@ -56,19 +56,35 @@ function getFieldValue(...ids) {
 
 
 // ============================================================
+// SUPPLIER / VENDOR ROLE CHECK
+// ============================================================
+
+function isSupplierRole(role) {
+
+    const normalizedRole =
+        String(role || "")
+            .trim()
+            .toLowerCase();
+
+    return (
+        normalizedRole === "vendor" ||
+        normalizedRole === "supplier"
+    );
+}
+
+
+// ============================================================
 // SUPPLIER BUSINESS LOCATION
 //
-// REQUIRED FORMAT:
-//
+// FORMAT:
 // Town, County
 //
 // Examples:
-//
 // Ruiru, Kiambu
 // Kitale, Trans Nzoia
 // Nanyuki, Laikipia
 //
-// NO AREA
+// AREA IS NOT USED.
 // ============================================================
 
 function getSupplierLocation() {
@@ -129,6 +145,11 @@ export async function updateUserProfile({
         .filter(Boolean)
         .join(", ");
 
+
+    // --------------------------------------------------------
+    // UPDATE FIREBASE AUTH PROFILE
+    // --------------------------------------------------------
+
     if (businessName) {
 
         await updateProfile(user, {
@@ -136,6 +157,11 @@ export async function updateUserProfile({
         });
 
     }
+
+
+    // --------------------------------------------------------
+    // FIRESTORE USER DOCUMENT
+    // --------------------------------------------------------
 
     const userRef = doc(
         db,
@@ -152,6 +178,10 @@ export async function updateUserProfile({
     const role =
         existingData.role || "customer";
 
+
+    // --------------------------------------------------------
+    // UPDATED PROFILE DATA
+    // --------------------------------------------------------
 
     const updatedData = {
 
@@ -173,21 +203,24 @@ export async function updateUserProfile({
     };
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // REGISTERED BUSINESS LOCATION
-    // ========================================================
+    // --------------------------------------------------------
 
     if (town && county) {
 
         updatedData.town = town;
+
         updatedData.county = county;
 
         updatedData.supplierTown = town;
+
         updatedData.supplierCounty = county;
 
         updatedData.location = location;
 
-        // Explicit field expected by the dashboard
+        // IMPORTANT:
+        // This is the field checked by supplier dashboard.
         updatedData.businessLocation = location;
 
         updatedData.registeredBusinessLocation = location;
@@ -195,14 +228,21 @@ export async function updateUserProfile({
         updatedData.supplierLocation = {
 
             town: town,
+
             county: county,
+
             label: location,
+
             display: location
 
         };
 
     }
 
+
+    // --------------------------------------------------------
+    // SAVE
+    // --------------------------------------------------------
 
     await setDoc(
         userRef,
@@ -268,6 +308,7 @@ export async function getCurrentUserProfile() {
         );
     }
 
+
     const userRef = doc(
         db,
         "users",
@@ -330,7 +371,7 @@ export async function getCurrentUserProfile() {
 
 
 // ============================================================
-// FORGOT PASSWORD BUTTON
+// CREATE FORGOT PASSWORD BUTTON IF MISSING
 // ============================================================
 
 function ensureForgotPasswordButton() {
@@ -356,9 +397,14 @@ function ensureForgotPasswordButton() {
         document.createElement("button");
 
     button.type = "button";
+
     button.id = "forgotPassword";
-    button.className = "btn btn-link p-0";
-    button.textContent = "Forgot Password?";
+
+    button.className =
+        "btn btn-link p-0";
+
+    button.textContent =
+        "Forgot Password?";
 
     wrapper.appendChild(button);
 
@@ -391,6 +437,7 @@ async function handleForgotPassword() {
         return;
     }
 
+
     try {
 
         await sendPasswordResetEmail(
@@ -415,31 +462,42 @@ async function handleForgotPassword() {
         switch (error.code) {
 
             case "auth/invalid-email":
+
                 message =
                     "Please enter a valid email address.";
+
                 break;
 
             case "auth/user-not-found":
+
                 message =
                     "No account exists with this email.";
+
                 break;
 
             case "auth/network-request-failed":
+
                 message =
                     "Network error. Check your internet connection.";
+
                 break;
 
             case "auth/too-many-requests":
+
                 message =
                     "Too many attempts. Please try again later.";
+
                 break;
+
         }
 
         alert(
             "Password Reset Error: " +
             message
         );
+
     }
+
 }
 
 
@@ -498,6 +556,7 @@ if (authLink) {
                     alert(
                         "Unable to sign out. Please try again."
                     );
+
                 }
 
             } else {
@@ -547,44 +606,63 @@ if (toggleAuthMode) {
             isRegistering =
                 !isRegistering;
 
+
             if (isRegistering) {
 
                 if (authModalTitle) {
+
                     authModalTitle.innerText =
                         "Register Platform Account";
+
                 }
 
+
                 if (authSubmitBtn) {
+
                     authSubmitBtn.innerText =
                         "Sign Up";
+
                 }
+
 
                 toggleAuthMode.innerText =
                     "Already have an account? Sign In";
 
+
                 if (vendorFields) {
+
                     vendorFields.style.display =
                         "block";
+
                 }
 
             } else {
 
                 if (authModalTitle) {
+
                     authModalTitle.innerText =
                         "Sign In";
+
                 }
 
+
                 if (authSubmitBtn) {
+
                     authSubmitBtn.innerText =
                         "Sign In";
+
                 }
+
 
                 toggleAuthMode.innerText =
                     "Need an account? Register";
 
+
                 if (vendorFields) {
+
                     vendorFields.style.display =
                         "none";
+
                 }
 
             }
@@ -607,10 +685,12 @@ if (authForm) {
 
             e.preventDefault();
 
+
             const email =
                 document.getElementById(
                     "authEmail"
                 )?.value.trim() || "";
+
 
             const password =
                 document.getElementById(
@@ -625,6 +705,7 @@ if (authForm) {
                 );
 
                 return;
+
             }
 
 
@@ -658,10 +739,14 @@ if (authForm) {
 
 
                     // ------------------------------------------------
-                    // SUPPLIER LOCATION REQUIRED
+                    // SUPPLIER / VENDOR LOCATION REQUIRED
                     // ------------------------------------------------
 
-                    if (role === "supplier") {
+                    const supplierAccount =
+                        isSupplierRole(role);
+
+
+                    if (supplierAccount) {
 
                         if (!town) {
 
@@ -670,7 +755,9 @@ if (authForm) {
                             );
 
                             return;
+
                         }
+
 
                         if (!county) {
 
@@ -679,6 +766,7 @@ if (authForm) {
                             );
 
                             return;
+
                         }
 
                     }
@@ -694,6 +782,7 @@ if (authForm) {
                             email,
                             password
                         );
+
 
                     const user =
                         userCredential.user;
@@ -743,36 +832,44 @@ if (authForm) {
 
 
                     // ==================================================
-                    // SUPPLIER BUSINESS LOCATION
+                    // SUPPLIER / VENDOR BUSINESS LOCATION
                     // ==================================================
 
-                    if (role === "supplier") {
+                    if (supplierAccount) {
 
+                        // Basic location
                         userData.town =
                             town;
 
                         userData.county =
                             county;
 
+
+                        // Compatibility fields
                         userData.supplierTown =
                             town;
 
                         userData.supplierCounty =
                             county;
 
+
+                        // General location
                         userData.location =
                             location;
 
 
-                        // Explicit registered business location
+                        // IMPORTANT:
+                        // Supplier dashboard checks this field.
                         userData.businessLocation =
                             location;
 
+
+                        // Additional compatibility
                         userData.registeredBusinessLocation =
                             location;
 
 
-                        // Structured supplier location
+                        // Structured location
                         userData.supplierLocation = {
 
                             town:
@@ -807,7 +904,7 @@ if (authForm) {
 
 
                     console.log(
-                        "GasHubKE supplier profile saved:",
+                        "GasHubKE user profile saved:",
                         userData
                     );
 
@@ -818,8 +915,10 @@ if (authForm) {
 
 
                     if (authModal) {
+
                         authModal.style.display =
                             "none";
+
                     }
 
 
@@ -846,6 +945,7 @@ if (authForm) {
                             email,
                             password
                         );
+
 
                     const user =
                         userCredential.user;
@@ -880,8 +980,10 @@ if (authForm) {
 
 
                     if (authModal) {
+
                         authModal.style.display =
                             "none";
+
                     }
 
 
@@ -914,49 +1016,76 @@ if (authForm) {
                 switch (error.code) {
 
                     case "auth/email-already-in-use":
+
                         message =
                             "An account with this email already exists.";
+
                         break;
+
 
                     case "auth/invalid-email":
+
                         message =
                             "Please enter a valid email address.";
+
                         break;
+
 
                     case "auth/weak-password":
+
                         message =
                             "Password is too weak. Please use a stronger password.";
+
                         break;
+
 
                     case "auth/invalid-credential":
+
                         message =
                             "Incorrect email or password.";
+
                         break;
+
 
                     case "auth/user-not-found":
+
                         message =
                             "No account exists with this email.";
+
                         break;
+
 
                     case "auth/wrong-password":
+
                         message =
                             "Incorrect password.";
+
                         break;
+
 
                     case "auth/network-request-failed":
+
                         message =
                             "Network error. Check your internet connection and try again.";
+
                         break;
+
 
                     case "auth/too-many-requests":
+
                         message =
                             "Too many attempts. Please try again later.";
+
                         break;
 
+
                     case "auth/operation-not-allowed":
+
                         message =
                             "This sign-in method is not enabled in Firebase.";
+
                         break;
+
                 }
 
 
@@ -1017,6 +1146,7 @@ onAuthStateChanged(
                     );
 
                 }
+
 
             } catch (error) {
 
