@@ -15,10 +15,15 @@ import {
     setDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+import {
+    kenyaCounties,
+    getTowns
+} from "./counties.js";
 
-// ============================================================
-// GASHUBKE AUTHENTICATION
-// ============================================================
+
+/* =========================================================
+   AUTH UI ELEMENTS
+========================================================= */
 
 const authLink = document.getElementById("authLink");
 const authModal = document.getElementById("authModal");
@@ -31,44 +36,36 @@ const vendorFields = document.getElementById("vendorFields");
 
 let isRegistering = false;
 
+/*
+   Prevent onAuthStateChanged() from immediately changing
+   the UI while the supplier profile completion form is open.
+*/
+let profileCompletionOpen = false;
 
-// ============================================================
-// HELPER - GET FIELD VALUE
-// ============================================================
+
+/* =========================================================
+   GENERAL HELPERS
+========================================================= */
 
 function getFieldValue(...ids) {
-
     for (const id of ids) {
+        const element = document.getElementById(id);
 
-        const element =
-            document.getElementById(id);
+        if (!element) continue;
 
-        if (!element) {
-            continue;
-        }
+        const value = String(element.value || "").trim();
 
-        const value =
-            String(element.value || "").trim();
-
-        if (value) {
-            return value;
-        }
+        if (value) return value;
     }
 
     return "";
 }
 
 
-// ============================================================
-// NORMALIZE ROLE
-// ============================================================
-
 function isSupplierRole(role) {
-
-    const normalizedRole =
-        String(role || "")
-            .trim()
-            .toLowerCase();
+    const normalizedRole = String(role || "")
+        .trim()
+        .toLowerCase();
 
     return (
         normalizedRole === "supplier" ||
@@ -77,63 +74,54 @@ function isSupplierRole(role) {
 }
 
 
-// ============================================================
-// SUPPLIER BUSINESS LOCATION
-//
-// AUTHORITATIVE FORMAT:
-//
-// Town, County
-//
-// Example:
-// Ruiru, Kiambu
-//
-// NO AREA.
-// ============================================================
+function buildLocation(town = "", county = "") {
+    town = String(town || "").trim();
+    county = String(county || "").trim();
+
+    return [town, county]
+        .filter(Boolean)
+        .join(", ");
+}
+
+
+/* =========================================================
+   SUPPLIER LOCATION
+========================================================= */
 
 function getSupplierLocation() {
+    let town = getFieldValue(
+        "supplierTown",
+        "town",
+        "businessTown",
+        "registeredTown",
+        "supplierLocationTown",
+        "businessLocationTown"
+    );
 
-    let town =
-        getFieldValue(
-            "supplierTown",
-            "town",
-            "businessTown",
-            "registeredTown",
-            "supplierLocationTown",
-            "businessLocationTown"
-        );
+    let county = getFieldValue(
+        "supplierCounty",
+        "county",
+        "businessCounty",
+        "registeredCounty",
+        "supplierLocationCounty",
+        "businessLocationCounty"
+    );
 
-    let county =
-        getFieldValue(
-            "supplierCounty",
-            "county",
-            "businessCounty",
-            "registeredCounty",
-            "supplierLocationCounty",
-            "businessLocationCounty"
-        );
+    let businessLocation = getFieldValue(
+        "businessLocation",
+        "supplierBusinessLocation",
+        "registeredBusinessLocation"
+    );
 
-    let businessLocation =
-        getFieldValue(
-            "businessLocation",
-            "supplierBusinessLocation",
-            "registeredBusinessLocation"
-        );
-
-
-    // --------------------------------------------------------
-    // TRY TO EXTRACT TOWN + COUNTY FROM LOCATION
-    // --------------------------------------------------------
-
-    if (
-        businessLocation &&
-        (!town || !county)
-    ) {
-
-        const parts =
-            businessLocation
-                .split(",")
-                .map(value => value.trim())
-                .filter(Boolean);
+    /*
+       Compatibility with older forms that may have a single
+       "Town, County" field.
+    */
+    if (businessLocation && (!town || !county)) {
+        const parts = businessLocation
+            .split(",")
+            .map(value => value.trim())
+            .filter(Boolean);
 
         if (!town && parts[0]) {
             town = parts[0];
@@ -144,36 +132,102 @@ function getSupplierLocation() {
         }
     }
 
-
-    // --------------------------------------------------------
-    // BUILD LOCATION
-    // --------------------------------------------------------
-
-    const location =
-        town && county
-            ? `${town}, ${county}`
-            : "";
-
+    const location = buildLocation(town, county);
 
     return {
-
-        town:
-            String(town || "").trim(),
-
-        county:
-            String(county || "").trim(),
-
-        location:
-            location ||
-            String(businessLocation || "").trim()
-
+        town,
+        county,
+        location: location || businessLocation
     };
 }
 
 
-// ============================================================
-// UPDATE USER PROFILE
-// ============================================================
+/* =========================================================
+   COUNTIES.JS HELPERS
+========================================================= */
+
+function populateProfileCounties(countySelect, selectedCounty = "") {
+    if (!countySelect) return;
+
+    countySelect.innerHTML =
+        `<option value="">Select County</option>`;
+
+    if (!Array.isArray(kenyaCounties)) {
+        console.error(
+            "kenyaCounties was not loaded correctly from counties.js"
+        );
+        return;
+    }
+
+    kenyaCounties.forEach(county => {
+        const option = document.createElement("option");
+
+        option.value = county;
+        option.textContent = county;
+
+        if (
+            String(county).trim().toLowerCase() ===
+            String(selectedCounty).trim().toLowerCase()
+        ) {
+            option.selected = true;
+        }
+
+        countySelect.appendChild(option);
+    });
+}
+
+
+function populateProfileTowns(
+    townSelect,
+    county,
+    selectedTown = ""
+) {
+    if (!townSelect) return;
+
+    townSelect.innerHTML =
+        `<option value="">Select Town</option>`;
+
+    townSelect.disabled = true;
+
+    if (!county) return;
+
+    let towns = [];
+
+    try {
+        towns = getTowns(county) || [];
+    } catch (error) {
+        console.error(
+            "Unable to load towns for county:",
+            county,
+            error
+        );
+
+        return;
+    }
+
+    towns.forEach(town => {
+        const option = document.createElement("option");
+
+        option.value = town;
+        option.textContent = town;
+
+        if (
+            String(town).trim().toLowerCase() ===
+            String(selectedTown).trim().toLowerCase()
+        ) {
+            option.selected = true;
+        }
+
+        townSelect.appendChild(option);
+    });
+
+    townSelect.disabled = false;
+}
+
+
+/* =========================================================
+   UPDATE USER PROFILE
+========================================================= */
 
 export async function updateUserProfile({
     businessName = "",
@@ -181,112 +235,69 @@ export async function updateUserProfile({
     county = ""
 } = {}) {
 
-    const user =
-        auth.currentUser;
-
+    const user = auth.currentUser;
 
     if (!user) {
-
         throw new Error(
             "You must be signed in to update your profile."
         );
-
     }
 
+    businessName = String(businessName).trim();
+    town = String(town).trim();
+    county = String(county).trim();
 
-    businessName =
-        String(businessName).trim();
-
-    town =
-        String(town).trim();
-
-    county =
-        String(county).trim();
-
-
-    // --------------------------------------------------------
-    // LOCATION
-    // --------------------------------------------------------
-
-    const location =
-        town && county
-            ? `${town}, ${county}`
-            : "";
-
-
-    if (!town || !county) {
-
+    if (!businessName) {
         throw new Error(
-            "Both Town and County are required."
+            "Please enter your business name."
         );
-
     }
 
-
-    // --------------------------------------------------------
-    // UPDATE FIREBASE AUTH PROFILE
-    // --------------------------------------------------------
-
-    if (businessName) {
-
-        await updateProfile(
-            user,
-            {
-                displayName:
-                    businessName
-            }
+    if (!town) {
+        throw new Error(
+            "Please select your town."
         );
-
     }
 
-
-    // --------------------------------------------------------
-    // FIRESTORE USER REFERENCE
-    // --------------------------------------------------------
-
-    const userRef =
-        doc(
-            db,
-            "users",
-            user.uid
+    if (!county) {
+        throw new Error(
+            "Please select your county."
         );
+    }
 
+    const location = buildLocation(town, county);
 
-    // --------------------------------------------------------
-    // GET EXISTING PROFILE
-    // --------------------------------------------------------
+    const userRef = doc(db, "users", user.uid);
 
-    const existingDoc =
-        await getDoc(
-            userRef
-        );
-
+    const existingDoc = await getDoc(userRef);
 
     const existingData =
         existingDoc.exists()
             ? existingDoc.data()
             : {};
 
-
     const role =
-        existingData.role ||
-        "supplier";
+        existingData.role || "supplier";
 
 
-    // --------------------------------------------------------
-    // UPDATED PROFILE
-    // --------------------------------------------------------
+    /* Update Firebase Authentication display name */
+
+    try {
+        await updateProfile(user, {
+            displayName: businessName
+        });
+    } catch (error) {
+        console.warn(
+            "Firebase Auth profile update failed:",
+            error
+        );
+    }
+
+
+    /* Save complete supplier profile */
 
     const updatedData = {
-
-        uid:
-            user.uid,
-
-        businessName:
-            businessName ||
-            existingData.businessName ||
-            user.displayName ||
-            "Independent Supplier",
+        uid: user.uid,
 
         email:
             user.email ||
@@ -295,155 +306,83 @@ export async function updateUserProfile({
 
         role,
 
-        // Main location
+        businessName,
+
         town,
         county,
 
-        // Compatibility fields
-        supplierTown:
-            town,
+        supplierTown: town,
+        supplierCounty: county,
 
-        supplierCounty:
-            county,
+        businessLocation: location,
+        registeredBusinessLocation: location,
+        location,
 
-        businessLocation:
-            location,
-
-        location:
-            location,
-
-        registeredBusinessLocation:
-            location,
-
-        // Structured location
         supplierLocation: {
-
             town,
-
             county,
-
-            label:
-                location,
-
-            display:
-                location
-
+            label: location,
+            display: location
         },
 
-        updatedAt:
-            new Date().toISOString()
-
+        updatedAt: new Date().toISOString()
     };
 
-
-    // --------------------------------------------------------
-    // SAVE
-    // --------------------------------------------------------
 
     await setDoc(
         userRef,
         updatedData,
-        {
-            merge: true
-        }
+        { merge: true }
     );
 
 
-    // --------------------------------------------------------
-    // VERIFY
-    // --------------------------------------------------------
-
-    const verifiedDoc =
-        await getDoc(
-            userRef
-        );
-
-
-    if (!verifiedDoc.exists()) {
-
-        throw new Error(
-            "Profile was not saved. Please try again."
-        );
-
-    }
-
-
-    const verifiedData =
-        verifiedDoc.data();
-
-
-    if (
-        !verifiedData.businessLocation ||
-        !verifiedData.supplierLocation?.town ||
-        !verifiedData.supplierLocation?.county
-    ) {
-
-        throw new Error(
-            "Business Location could not be verified."
-        );
-
-    }
-
-
     return {
+        uid: user.uid,
 
-        uid:
-            user.uid,
-
-        businessName:
-            verifiedData.businessName,
+        businessName,
 
         email:
-            verifiedData.email,
+            user.email ||
+            existingData.email ||
+            "",
 
-        role:
-            verifiedData.role,
+        role,
 
-        town:
-            verifiedData.supplierLocation.town,
+        town,
+        county,
 
-        county:
-            verifiedData.supplierLocation.county,
+        location,
 
-        location:
-            verifiedData.businessLocation
-
+        supplierLocation: {
+            town,
+            county,
+            label: location
+        }
     };
 }
 
 
-// ============================================================
-// LOAD CURRENT USER PROFILE
-// ============================================================
+/* =========================================================
+   GET CURRENT USER PROFILE
+========================================================= */
 
 export async function getCurrentUserProfile() {
 
-    const user =
-        auth.currentUser;
-
+    const user = auth.currentUser;
 
     if (!user) {
-
         throw new Error(
             "You must be signed in."
         );
-
     }
 
+    const userRef = doc(
+        db,
+        "users",
+        user.uid
+    );
 
-    const userRef =
-        doc(
-            db,
-            "users",
-            user.uid
-        );
-
-
-    const userDoc =
-        await getDoc(
-            userRef
-        );
-
+    const userDoc = await getDoc(userRef);
 
     const data =
         userDoc.exists()
@@ -451,10 +390,12 @@ export async function getCurrentUserProfile() {
             : {};
 
 
-    return {
+    const supplierLocation =
+        data.supplierLocation || {};
 
-        uid:
-            user.uid,
+
+    return {
+        uid: user.uid,
 
         email:
             user.email ||
@@ -478,45 +419,58 @@ export async function getCurrentUserProfile() {
         town:
             data.town ||
             data.supplierTown ||
-            data.supplierLocation?.town ||
+            supplierLocation.town ||
             "",
 
         county:
             data.county ||
             data.supplierCounty ||
-            data.supplierLocation?.county ||
+            supplierLocation.county ||
             "",
 
         location:
             data.businessLocation ||
             data.registeredBusinessLocation ||
             data.location ||
-            data.supplierLocation?.label ||
-            data.supplierLocation?.display ||
+            supplierLocation.label ||
+            supplierLocation.display ||
             ""
-
     };
 }
 
 
-// ============================================================
-// SUPPLIER PROFILE COMPLETION FORM
-//
-// THIS FORM IS CREATED DIRECTLY BY AUTH.JS.
-// NO SETTINGS PAGE IS REQUIRED.
-// ============================================================
+/* =========================================================
+   SUPPLIER PROFILE COMPLETION FORM
+========================================================= */
 
-function showSupplierProfileForm(user) {
+export async function showSupplierProfileForm(user) {
 
-    const existingOverlay =
+    if (!user) {
+        alert(
+            "Your account could not be loaded. Please sign in again."
+        );
+
+        return;
+    }
+
+    profileCompletionOpen = true;
+
+
+    /* Remove an old form if one exists */
+
+    const oldOverlay =
         document.getElementById(
             "gasHubSupplierProfileOverlay"
         );
 
-    if (existingOverlay) {
-        existingOverlay.remove();
+    if (oldOverlay) {
+        oldOverlay.remove();
     }
 
+
+    /* ---------------------------------------------------------
+       CREATE OVERLAY
+    --------------------------------------------------------- */
 
     const overlay =
         document.createElement("div");
@@ -524,106 +478,100 @@ function showSupplierProfileForm(user) {
     overlay.id =
         "gasHubSupplierProfileOverlay";
 
-
     overlay.innerHTML = `
-
-        <div class="gasHubSupplierProfileBox">
+        <div class="gasHubSupplierProfileCard">
 
             <div class="gasHubSupplierProfileHeader">
-
-                <div class="gasHubSupplierProfileIcon">
-                    G
-                </div>
-
                 <div>
-                    <h2>Complete Business Profile</h2>
-
+                    <h2>Complete Supplier Profile</h2>
                     <p>
-                        Your account has been created.
-                        Please complete your business details
-                        before continuing.
+                        Add your business name and registered
+                        supplier location.
                     </p>
                 </div>
-
             </div>
-
 
             <form id="gasHubSupplierProfileForm">
 
-                <div class="gasHubProfileGroup">
-
-                    <label for="gasHubProfileBusinessName">
+                <div class="gasHubProfileField">
+                    <label for="profileBusinessName">
                         Business Name
                     </label>
 
                     <input
                         type="text"
-                        id="gasHubProfileBusinessName"
+                        id="profileBusinessName"
+                        class="form-control"
                         placeholder="Enter business name"
-                        autocomplete="organization"
                         required
                     >
-
                 </div>
 
 
-                <div class="gasHubProfileGroup">
-
-                    <label for="gasHubProfileTown">
-                        Town
-                    </label>
-
-                    <input
-                        type="text"
-                        id="gasHubProfileTown"
-                        placeholder="e.g. Ruiru"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="gasHubProfileGroup">
-
-                    <label for="gasHubProfileCounty">
+                <div class="gasHubProfileField">
+                    <label for="profileCounty">
                         County
                     </label>
 
-                    <input
-                        type="text"
-                        id="gasHubProfileCounty"
-                        placeholder="e.g. Kiambu"
+                    <select
+                        id="profileCounty"
+                        class="form-select"
                         required
                     >
-
+                        <option value="">
+                            Select County
+                        </option>
+                    </select>
                 </div>
 
 
-                <div class="gasHubProfileLocation">
+                <div class="gasHubProfileField">
+                    <label for="profileTown">
+                        Town
+                    </label>
 
-                    <span>
-                        Business Location
-                    </span>
+                    <select
+                        id="profileTown"
+                        class="form-select"
+                        required
+                        disabled
+                    >
+                        <option value="">
+                            Select Town
+                        </option>
+                    </select>
 
-                    <strong id="gasHubProfileLocationPreview">
-                        Enter Town and County
+                    <small>
+                        Select a county first to load its towns.
+                    </small>
+                </div>
+
+
+                <div
+                    id="profileLocationPreview"
+                    class="gasHubLocationPreview"
+                >
+                    Location:
+                    <strong>
+                        Select Town, County
                     </strong>
-
                 </div>
+
+
+                <div
+                    id="gasHubSupplierProfileError"
+                    class="gasHubProfileError"
+                    style="display:none;"
+                ></div>
 
 
                 <button
                     type="submit"
-                    id="gasHubSaveSupplierProfile"
+                    id="saveSupplierProfileBtn"
+                    class="btn btn-primary w-100"
                 >
-                    Save Business Profile
+                    Save Profile
                 </button>
-
-
-                <div
-                    id="gasHubSupplierProfileMessage"
-                    class="gasHubSupplierProfileMessage"
-                ></div>
 
             </form>
 
@@ -631,497 +579,493 @@ function showSupplierProfileForm(user) {
     `;
 
 
-    document.body.appendChild(
-        overlay
-    );
+    /* ---------------------------------------------------------
+       PROFILE FORM STYLES
+    --------------------------------------------------------- */
 
+    const style =
+        document.createElement("style");
 
-    // ========================================================
-    // PROFILE FORM CSS
-    // ========================================================
+    style.id =
+        "gasHubSupplierProfileStyles";
 
-    if (
-        !document.getElementById(
-            "gasHubSupplierProfileStyles"
-        )
-    ) {
+    style.textContent = `
+        #gasHubSupplierProfileOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(15, 23, 42, 0.72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
 
-        const style =
-            document.createElement("style");
+        .gasHubSupplierProfileCard {
+            width: min(500px, 100%);
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
 
-        style.id =
-            "gasHubSupplierProfileStyles";
+        .gasHubSupplierProfileHeader h2 {
+            margin: 0 0 6px;
+            color: #1e293b;
+            font-size: 24px;
+            font-weight: 700;
+        }
 
+        .gasHubSupplierProfileHeader p {
+            margin: 0 0 24px;
+            color: #64748b;
+            font-size: 14px;
+        }
 
-        style.textContent = `
+        .gasHubProfileField {
+            margin-bottom: 18px;
+        }
 
+        .gasHubProfileField label {
+            display: block;
+            margin-bottom: 7px;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .gasHubProfileField select,
+        .gasHubProfileField input {
+            min-height: 46px;
+            border-radius: 10px;
+        }
+
+        .gasHubProfileField small {
+            display: block;
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .gasHubLocationPreview {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 14px;
+        }
+
+        .gasHubProfileError {
+            margin-bottom: 16px;
+            padding: 11px 13px;
+            border-radius: 8px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            font-size: 14px;
+        }
+
+        #saveSupplierProfileBtn {
+            min-height: 48px;
+            border: 0;
+            background: #f97316;
+            border-color: #f97316;
+            font-weight: 600;
+        }
+
+        #saveSupplierProfileBtn:hover {
+            background: #ea580c;
+            border-color: #ea580c;
+        }
+
+        #saveSupplierProfileBtn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 576px) {
             #gasHubSupplierProfileOverlay {
-                position: fixed;
-                inset: 0;
-                z-index: 999999;
-                background: rgba(15, 23, 42, .80);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
-                overflow-y: auto;
+                padding: 12px;
             }
 
-            .gasHubSupplierProfileBox {
-                width: 100%;
-                max-width: 500px;
-                background: #ffffff;
-                border-radius: 18px;
-                padding: 28px;
-                box-shadow:
-                    0 25px 70px rgba(0,0,0,.28);
-            }
-
-            .gasHubSupplierProfileHeader {
-                display: flex;
-                gap: 14px;
-                align-items: flex-start;
-                margin-bottom: 24px;
-            }
-
-            .gasHubSupplierProfileIcon {
-                width: 48px;
-                height: 48px;
-                min-width: 48px;
-                border-radius: 50%;
-                background: #f97316;
-                color: #ffffff;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 21px;
-                font-weight: 800;
+            .gasHubSupplierProfileCard {
+                padding: 22px 18px;
+                border-radius: 14px;
             }
 
             .gasHubSupplierProfileHeader h2 {
-                margin: 0;
-                color: #1e293b;
                 font-size: 21px;
             }
-
-            .gasHubSupplierProfileHeader p {
-                margin: 6px 0 0;
-                color: #64748b;
-                font-size: 14px;
-                line-height: 1.5;
-            }
-
-            .gasHubProfileGroup {
-                margin-bottom: 17px;
-            }
-
-            .gasHubProfileGroup label {
-                display: block;
-                margin-bottom: 7px;
-                color: #334155;
-                font-size: 14px;
-                font-weight: 600;
-            }
-
-            .gasHubProfileGroup input {
-                width: 100%;
-                box-sizing: border-box;
-                padding: 13px 14px;
-                border: 1px solid #cbd5e1;
-                border-radius: 10px;
-                outline: none;
-                font-size: 15px;
-                background: #ffffff;
-            }
-
-            .gasHubProfileGroup input:focus {
-                border-color: #f97316;
-                box-shadow:
-                    0 0 0 3px rgba(249,115,22,.12);
-            }
-
-            .gasHubProfileLocation {
-                margin-top: 5px;
-                padding: 13px;
-                border: 1px solid #fed7aa;
-                background: #fff7ed;
-                border-radius: 10px;
-                color: #9a3412;
-                font-size: 13px;
-            }
-
-            .gasHubProfileLocation span {
-                display: block;
-                margin-bottom: 4px;
-            }
-
-            .gasHubProfileLocation strong {
-                display: block;
-                font-size: 15px;
-            }
-
-            #gasHubSaveSupplierProfile {
-                width: 100%;
-                margin-top: 20px;
-                padding: 14px;
-                border: none;
-                border-radius: 10px;
-                background: #f97316;
-                color: #ffffff;
-                font-size: 15px;
-                font-weight: 700;
-                cursor: pointer;
-            }
-
-            #gasHubSaveSupplierProfile:hover {
-                background: #ea580c;
-            }
-
-            #gasHubSaveSupplierProfile:disabled {
-                opacity: .65;
-                cursor: not-allowed;
-            }
-
-            .gasHubSupplierProfileMessage {
-                margin-top: 12px;
-                text-align: center;
-                font-size: 14px;
-                line-height: 1.4;
-            }
-
-            @media (max-width: 500px) {
-
-                #gasHubSupplierProfileOverlay {
-                    padding: 14px;
-                }
-
-                .gasHubSupplierProfileBox {
-                    padding: 22px;
-                    border-radius: 15px;
-                }
-
-                .gasHubSupplierProfileHeader h2 {
-                    font-size: 18px;
-                }
-
-            }
-
-        `;
+        }
+    `;
 
 
-        document.head.appendChild(
-            style
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+
+
+    /* ---------------------------------------------------------
+       ELEMENTS
+    --------------------------------------------------------- */
+
+    const form =
+        document.getElementById(
+            "gasHubSupplierProfileForm"
         );
-    }
-
-
-    // ========================================================
-    // FORM ELEMENTS
-    // ========================================================
 
     const businessNameInput =
         document.getElementById(
-            "gasHubProfileBusinessName"
+            "profileBusinessName"
         );
 
-    const townInput =
+    const countySelect =
         document.getElementById(
-            "gasHubProfileTown"
+            "profileCounty"
         );
 
-    const countyInput =
+    const townSelect =
         document.getElementById(
-            "gasHubProfileCounty"
+            "profileTown"
         );
 
-    const locationPreview =
+    const preview =
         document.getElementById(
-            "gasHubProfileLocationPreview"
+            "profileLocationPreview"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "gasHubSupplierProfileError"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveSupplierProfileBtn"
         );
 
 
-    // ========================================================
-    // LOAD EXISTING PROFILE
-    // ========================================================
+    /* ---------------------------------------------------------
+       LOAD EXISTING PROFILE
+    --------------------------------------------------------- */
 
-    getDoc(
-        doc(
-            db,
-            "users",
-            user.uid
-        )
-    )
-    .then(snapshot => {
+    let existingData = {};
 
-        if (!snapshot.exists()) {
-            return;
+    try {
+
+        const profileRef =
+            doc(db, "users", user.uid);
+
+        const profileDoc =
+            await getDoc(profileRef);
+
+        if (profileDoc.exists()) {
+            existingData =
+                profileDoc.data();
         }
 
+    } catch (error) {
 
-        const data =
-            snapshot.data();
-
-
-        businessNameInput.value =
-            data.businessName ||
-            user.displayName ||
-            "";
-
-
-        townInput.value =
-            data.town ||
-            data.supplierTown ||
-            data.supplierLocation?.town ||
-            "";
-
-
-        countyInput.value =
-            data.county ||
-            data.supplierCounty ||
-            data.supplierLocation?.county ||
-            "";
-
-
-        updateProfileLocationPreview();
-
-    })
-    .catch(error => {
-
-        console.error(
-            "Unable to load existing profile:",
+        console.warn(
+            "Could not load existing supplier profile:",
             error
         );
-
-    });
-
-
-    // ========================================================
-    // LOCATION PREVIEW
-    // ========================================================
-
-    function updateProfileLocationPreview() {
-
-        const town =
-            townInput.value.trim();
-
-        const county =
-            countyInput.value.trim();
+    }
 
 
-        if (town && county) {
+    const existingSupplierLocation =
+        existingData.supplierLocation || {};
 
-            locationPreview.textContent =
-                `${town}, ${county}`;
 
-        } else {
+    const existingBusinessName =
+        existingData.businessName ||
+        user.displayName ||
+        "";
 
-            locationPreview.textContent =
-                "Enter Town and County";
 
-        }
+    const existingCounty =
+        existingData.county ||
+        existingData.supplierCounty ||
+        existingSupplierLocation.county ||
+        "";
+
+
+    const existingTown =
+        existingData.town ||
+        existingData.supplierTown ||
+        existingSupplierLocation.town ||
+        "";
+
+
+    businessNameInput.value =
+        existingBusinessName;
+
+
+    /* ---------------------------------------------------------
+       LOAD COUNTIES
+    --------------------------------------------------------- */
+
+    populateProfileCounties(
+        countySelect,
+        existingCounty
+    );
+
+
+    /* ---------------------------------------------------------
+       LOAD TOWNS FOR EXISTING COUNTY
+    --------------------------------------------------------- */
+
+    if (existingCounty) {
+
+        populateProfileTowns(
+            townSelect,
+            existingCounty,
+            existingTown
+        );
+
+    } else {
+
+        townSelect.disabled = true;
 
     }
 
 
-    townInput.addEventListener(
-        "input",
-        updateProfileLocationPreview
+    /* ---------------------------------------------------------
+       LOCATION PREVIEW
+    --------------------------------------------------------- */
+
+    function updateLocationPreview() {
+
+        const town =
+            townSelect.value.trim();
+
+        const county =
+            countySelect.value.trim();
+
+        const location =
+            buildLocation(town, county);
+
+
+        preview.innerHTML = `
+            Location:
+            <strong>
+                ${
+                    location ||
+                    "Select Town, County"
+                }
+            </strong>
+        `;
+    }
+
+
+    updateLocationPreview();
+
+
+    /* ---------------------------------------------------------
+       COUNTY CHANGE
+    --------------------------------------------------------- */
+
+    countySelect.addEventListener(
+        "change",
+        () => {
+
+            const county =
+                countySelect.value;
+
+            populateProfileTowns(
+                townSelect,
+                county
+            );
+
+            updateLocationPreview();
+        }
     );
 
-    countyInput.addEventListener(
-        "input",
-        updateProfileLocationPreview
+
+    /* ---------------------------------------------------------
+       TOWN CHANGE
+    --------------------------------------------------------- */
+
+    townSelect.addEventListener(
+        "change",
+        updateLocationPreview
     );
 
 
-    // ========================================================
-    // SAVE PROFILE
-    // ========================================================
+    /* ---------------------------------------------------------
+       FORM SUBMISSION
+    --------------------------------------------------------- */
 
-    document
-        .getElementById(
-            "gasHubSupplierProfileForm"
-        )
-        .addEventListener(
-            "submit",
-            async event => {
+    form.addEventListener(
+        "submit",
+        async event => {
 
-                event.preventDefault();
+            event.preventDefault();
 
+            errorBox.style.display = "none";
+            errorBox.textContent = "";
 
-                const businessName =
-                    businessNameInput.value.trim();
+            const businessName =
+                businessNameInput.value.trim();
 
-                const town =
-                    townInput.value.trim();
+            const county =
+                countySelect.value.trim();
 
-                const county =
-                    countyInput.value.trim();
+            const town =
+                townSelect.value.trim();
 
 
-                const message =
+            if (!businessName) {
+
+                errorBox.textContent =
+                    "Please enter your business name.";
+
+                errorBox.style.display = "block";
+
+                businessNameInput.focus();
+
+                return;
+            }
+
+
+            if (!county) {
+
+                errorBox.textContent =
+                    "Please select your county.";
+
+                errorBox.style.display = "block";
+
+                countySelect.focus();
+
+                return;
+            }
+
+
+            if (!town) {
+
+                errorBox.textContent =
+                    "Please select your town.";
+
+                errorBox.style.display = "block";
+
+                townSelect.focus();
+
+                return;
+            }
+
+
+            const location =
+                buildLocation(town, county);
+
+
+            saveButton.disabled = true;
+            saveButton.textContent =
+                "Saving Profile...";
+
+
+            try {
+
+                await updateUserProfile({
+                    businessName,
+                    town,
+                    county
+                });
+
+
+                profileCompletionOpen = false;
+
+
+                overlay.remove();
+
+
+                const styles =
                     document.getElementById(
-                        "gasHubSupplierProfileMessage"
+                        "gasHubSupplierProfileStyles"
                     );
 
+                if (styles) {
+                    styles.remove();
+                }
 
-                const saveButton =
-                    document.getElementById(
-                        "gasHubSaveSupplierProfile"
+
+                alert(
+                    "Supplier profile updated successfully!"
+                );
+
+
+                /*
+                   The supplier dashboard is controlled by
+                   supplier-dashboard.js.
+                */
+
+                if (
+                    typeof window.handlePostLoginUI ===
+                    "function"
+                ) {
+
+                    window.handlePostLoginUI(
+                        "supplier"
                     );
 
+                } else {
 
-                // ------------------------------------------------
-                // VALIDATION
-                // ------------------------------------------------
-
-                if (!businessName) {
-
-                    message.textContent =
-                        "Please enter your business name.";
-
-                    businessNameInput.focus();
-
-                    return;
+                    console.warn(
+                        "handlePostLoginUI is not available."
+                    );
                 }
 
 
-                if (!town) {
+            } catch (error) {
 
-                    message.textContent =
-                        "Please enter your town.";
+                console.error(
+                    "Supplier profile update error:",
+                    error
+                );
 
-                    townInput.focus();
+                errorBox.textContent =
+                    error.message ||
+                    "Unable to save your supplier profile.";
 
-                    return;
-                }
-
-
-                if (!county) {
-
-                    message.textContent =
-                        "Please enter your county.";
-
-                    countyInput.focus();
-
-                    return;
-                }
-
-
-                // ------------------------------------------------
-                // SAVE
-                // ------------------------------------------------
+                errorBox.style.display =
+                    "block";
 
                 saveButton.disabled =
-                    true;
+                    false;
 
                 saveButton.textContent =
-                    "Saving...";
-
-                message.textContent =
-                    "";
-
-
-                try {
-
-                    const profile =
-                        await updateUserProfile({
-
-                            businessName,
-
-                            town,
-
-                            county
-
-                        });
-
-
-                    console.log(
-                        "Supplier profile completed:",
-                        profile
-                    );
-
-
-                    message.textContent =
-                        "Business profile saved successfully.";
-
-
-                    saveButton.textContent =
-                        "Saved";
-
-
-                    // ------------------------------------------------
-                    // GO TO SUPPLIER DASHBOARD
-                    // ------------------------------------------------
-
-                    setTimeout(() => {
-
-                        window.location.href =
-                            "/supplier-dashboard/";
-
-                    }, 700);
-
-
-                } catch (error) {
-
-                    console.error(
-                        "Supplier profile save error:",
-                        error
-                    );
-
-
-                    message.textContent =
-                        error.message ||
-                        "Unable to save your profile.";
-
-                    saveButton.disabled =
-                        false;
-
-                    saveButton.textContent =
-                        "Save Business Profile";
-
-                }
-
+                    "Save Profile";
             }
-        );
+        }
+    );
 }
 
 
-// ============================================================
-// SHOW PROFILE AFTER ERROR
-//
-// IMPORTANT:
-// alert() pauses JavaScript until the user presses OK.
-// ============================================================
+/* =========================================================
+   PROFILE FORM AFTER REGISTRATION ERROR / MISSING DATA
+========================================================= */
 
-function showProfileAfterRegistrationError(
+export async function showProfileAfterRegistrationError(
     user,
     errorMessage = ""
 ) {
 
-    alert(
-        errorMessage ||
-        "Your account was created, but your Business Profile needs to be completed.\n\n" +
-        "Press OK to enter your Business Name, Town and County."
-    );
+    if (errorMessage) {
+        alert(errorMessage);
+    }
 
-
-    showSupplierProfileForm(
-        user
-    );
+    await showSupplierProfileForm(user);
 }
 
 
-// ============================================================
-// FORGOT PASSWORD BUTTON
-// ============================================================
+/* =========================================================
+   FORGOT PASSWORD
+========================================================= */
 
 function ensureForgotPasswordButton() {
 
-    if (!authForm) {
-        return;
-    }
-
+    if (!authForm) return;
 
     if (
         document.getElementById(
@@ -1131,16 +1075,12 @@ function ensureForgotPasswordButton() {
         return;
     }
 
-
     const passwordInput =
         document.getElementById(
             "authPassword"
         );
 
-
-    if (!passwordInput) {
-        return;
-    }
+    if (!passwordInput) return;
 
 
     const wrapper =
@@ -1153,8 +1093,7 @@ function ensureForgotPasswordButton() {
     const button =
         document.createElement("button");
 
-    button.type =
-        "button";
+    button.type = "button";
 
     button.id =
         "forgotPassword";
@@ -1166,20 +1105,13 @@ function ensureForgotPasswordButton() {
         "Forgot Password?";
 
 
-    wrapper.appendChild(
-        button
-    );
-
+    wrapper.appendChild(button);
 
     passwordInput.parentElement?.appendChild(
         wrapper
     );
 }
 
-
-// ============================================================
-// FORGOT PASSWORD
-// ============================================================
 
 async function handleForgotPassword() {
 
@@ -1210,11 +1142,9 @@ async function handleForgotPassword() {
             email
         );
 
-
         alert(
             "Password reset email sent. Please check your inbox and spam folder."
         );
-
 
     } catch (error) {
 
@@ -1231,36 +1161,24 @@ async function handleForgotPassword() {
         switch (error.code) {
 
             case "auth/invalid-email":
-
                 message =
                     "Please enter a valid email address.";
-
                 break;
-
 
             case "auth/user-not-found":
-
                 message =
                     "No account exists with this email.";
-
                 break;
-
 
             case "auth/network-request-failed":
-
                 message =
                     "Network error. Check your internet connection.";
-
                 break;
-
 
             case "auth/too-many-requests":
-
                 message =
                     "Too many attempts. Please try again later.";
-
                 break;
-
         }
 
 
@@ -1268,14 +1186,9 @@ async function handleForgotPassword() {
             "Password Reset Error: " +
             message
         );
-
     }
 }
 
-
-// ============================================================
-// FORGOT PASSWORD EVENT
-// ============================================================
 
 document.addEventListener(
     "click",
@@ -1286,16 +1199,11 @@ document.addEventListener(
                 "#forgotPassword"
             );
 
-
-        if (!button) {
-            return;
-        }
-
+        if (!button) return;
 
         event.preventDefault();
 
         handleForgotPassword();
-
     }
 );
 
@@ -1303,9 +1211,9 @@ document.addEventListener(
 ensureForgotPasswordButton();
 
 
-// ============================================================
-// AUTH LINK
-// ============================================================
+/* =========================================================
+   AUTH LINK
+========================================================= */
 
 if (authLink) {
 
@@ -1320,19 +1228,14 @@ if (authLink) {
 
                 try {
 
-                    await signOut(
-                        auth
-                    );
-
+                    await signOut(auth);
 
                     if (
-                        window.handlePostLogoutUI
+                        typeof window.handlePostLogoutUI ===
+                        "function"
                     ) {
-
                         window.handlePostLogoutUI();
-
                     }
-
 
                 } catch (error) {
 
@@ -1341,33 +1244,26 @@ if (authLink) {
                         error
                     );
 
-
                     alert(
                         "Unable to sign out. Please try again."
                     );
-
                 }
-
 
             } else {
 
                 if (authModal) {
-
                     authModal.style.display =
                         "flex";
-
                 }
-
             }
-
         }
     );
 }
 
 
-// ============================================================
-// CLOSE AUTH MODAL
-// ============================================================
+/* =========================================================
+   CLOSE AUTH MODAL
+========================================================= */
 
 if (closeModal) {
 
@@ -1376,20 +1272,17 @@ if (closeModal) {
         () => {
 
             if (authModal) {
-
                 authModal.style.display =
                     "none";
-
             }
-
         }
     );
 }
 
 
-// ============================================================
-// LOGIN / REGISTRATION TOGGLE
-// ============================================================
+/* =========================================================
+   LOGIN / REGISTER TOGGLE
+========================================================= */
 
 if (toggleAuthMode) {
 
@@ -1404,72 +1297,53 @@ if (toggleAuthMode) {
             if (isRegistering) {
 
                 if (authModalTitle) {
-
                     authModalTitle.innerText =
                         "Register Platform Account";
-
                 }
-
 
                 if (authSubmitBtn) {
-
                     authSubmitBtn.innerText =
                         "Sign Up";
-
                 }
-
 
                 toggleAuthMode.innerText =
                     "Already have an account? Sign In";
 
 
                 if (vendorFields) {
-
                     vendorFields.style.display =
                         "block";
-
                 }
-
 
             } else {
 
                 if (authModalTitle) {
-
                     authModalTitle.innerText =
                         "Sign In";
-
                 }
-
 
                 if (authSubmitBtn) {
-
                     authSubmitBtn.innerText =
                         "Sign In";
-
                 }
-
 
                 toggleAuthMode.innerText =
                     "Need an account? Register";
 
 
                 if (vendorFields) {
-
                     vendorFields.style.display =
                         "none";
-
                 }
-
             }
-
         }
     );
 }
 
 
-// ============================================================
-// LOGIN / REGISTRATION
-// ============================================================
+/* =========================================================
+   AUTH FORM
+========================================================= */
 
 if (authForm) {
 
@@ -1502,60 +1376,63 @@ if (authForm) {
             }
 
 
-            // ==================================================
-            // REGISTRATION
-            // ==================================================
+            try {
 
-            if (isRegistering) {
+                /* =================================================
+                   REGISTRATION
+                ================================================= */
 
-                let role =
-                    getFieldValue(
-                        "userRole"
-                    ) || "customer";
+                if (isRegistering) {
 
-
-                const supplierAccount =
-                    isSupplierRole(
-                        role
-                    );
+                    const role =
+                        getFieldValue(
+                            "userRole"
+                        ) || "customer";
 
 
-                const businessName =
-                    getFieldValue(
-                        "businessName"
-                    ) ||
-                    "Independent Supplier";
+                    const supplierAccount =
+                        isSupplierRole(role);
 
 
-                const {
-                    town,
-                    county,
-                    location
-                } =
-                    getSupplierLocation();
+                    const businessName =
+                        getFieldValue(
+                            "businessName"
+                        ) ||
+                        "Independent Supplier";
 
 
-                console.log(
-                    "GasHubKE registration:",
-                    {
-                        email,
-                        role,
-                        businessName,
+                    /*
+                       We attempt to read location from the
+                       registration form.
+
+                       Location is NOT required here because
+                       the supplier can complete it through
+                       the dynamic profile form after account
+                       creation.
+                    */
+
+                    const {
                         town,
                         county,
                         location
-                    }
-                );
+                    } =
+                        getSupplierLocation();
 
 
-                let user = null;
+                    console.log(
+                        "Registration location:",
+                        {
+                            town,
+                            county,
+                            location,
+                            role
+                        }
+                    );
 
 
-                try {
-
-                    // ==========================================
-                    // CREATE FIREBASE AUTH ACCOUNT
-                    // ==========================================
+                    /* ---------------------------------------------
+                       CREATE FIREBASE ACCOUNT
+                    --------------------------------------------- */
 
                     const userCredential =
                         await createUserWithEmailAndPassword(
@@ -1565,13 +1442,13 @@ if (authForm) {
                         );
 
 
-                    user =
+                    const user =
                         userCredential.user;
 
 
-                    // ==========================================
-                    // UPDATE AUTH DISPLAY NAME
-                    // ==========================================
+                    /* ---------------------------------------------
+                       UPDATE AUTH DISPLAY NAME
+                    --------------------------------------------- */
 
                     try {
 
@@ -1589,13 +1466,12 @@ if (authForm) {
                             "Auth profile update failed:",
                             profileError
                         );
-
                     }
 
 
-                    // ==========================================
-                    // BASE FIRESTORE DATA
-                    // ==========================================
+                    /* ---------------------------------------------
+                       BASE USER DATA
+                    --------------------------------------------- */
 
                     const userData = {
 
@@ -1611,99 +1487,237 @@ if (authForm) {
                         businessName,
 
                         createdAt:
-                            new Date().toISOString(),
+                            new Date()
+                                .toISOString(),
 
                         updatedAt:
-                            new Date().toISOString()
-
+                            new Date()
+                                .toISOString()
                     };
 
 
-                    // ==========================================
-                    // SUPPLIER DATA
-                    //
-                    // LOCATION IS OPTIONAL AT THIS STAGE.
-                    // ==========================================
+                    /* ---------------------------------------------
+                       SUPPLIER LOCATION
+                    --------------------------------------------- */
 
-                    if (supplierAccount) {
+                    if (
+                        supplierAccount &&
+                        town &&
+                        county
+                    ) {
 
-                        if (town) {
-
-                            userData.town =
-                                town;
-
-                            userData.supplierTown =
-                                town;
-
-                        }
-
-
-                        if (county) {
-
-                            userData.county =
-                                county;
-
-                            userData.supplierCounty =
-                                county;
-
-                        }
-
-
-                        if (
-                            town &&
-                            county
-                        ) {
-
-                            userData.businessLocation =
-                                `${town}, ${county}`;
-
-                            userData.location =
-                                `${town}, ${county}`;
-
-                            userData.registeredBusinessLocation =
-                                `${town}, ${county}`;
-
-                            userData.supplierLocation = {
-
+                        const supplierLocation =
+                            buildLocation(
                                 town,
+                                county
+                            );
 
-                                county,
 
-                                label:
-                                    `${town}, ${county}`,
+                        userData.town =
+                            town;
 
-                                display:
-                                    `${town}, ${county}`
+                        userData.county =
+                            county;
 
-                            };
+                        userData.supplierTown =
+                            town;
 
-                        }
+                        userData.supplierCounty =
+                            county;
 
+                        userData.businessLocation =
+                            supplierLocation;
+
+                        userData.location =
+                            supplierLocation;
+
+                        userData.registeredBusinessLocation =
+                            supplierLocation;
+
+                        userData.supplierLocation = {
+
+                            town,
+
+                            county,
+
+                            label:
+                                supplierLocation,
+
+                            display:
+                                supplierLocation
+                        };
+
+
+                        console.log(
+                            "Saving supplier location:",
+                            userData.supplierLocation
+                        );
                     }
 
 
-                    // ==========================================
-                    // SAVE FIRESTORE PROFILE
-                    // ==========================================
+                    /* ---------------------------------------------
+                       SAVE USER PROFILE
+                    --------------------------------------------- */
 
-                    await setDoc(
-                        doc(
-                            db,
-                            "users",
-                            user.uid
-                        ),
-                        userData,
-                        {
-                            merge: true
+                    try {
+
+                        await setDoc(
+                            doc(
+                                db,
+                                "users",
+                                user.uid
+                            ),
+                            userData,
+                            {
+                                merge: true
+                            }
+                        );
+
+                    } catch (profileSaveError) {
+
+                        console.error(
+                            "Initial profile save failed:",
+                            profileSaveError
+                        );
+
+
+                        /*
+                           Account exists in Firebase Auth even if
+                           Firestore profile saving failed.
+
+                           Give supplier a chance to complete the
+                           profile instead of creating another
+                           Firebase account.
+                        */
+
+                        if (supplierAccount) {
+
+                            if (authModal) {
+                                authModal.style.display =
+                                    "none";
+                            }
+
+
+                            await showProfileAfterRegistrationError(
+                                user,
+                                "Your account was created, but your supplier profile could not be completed automatically. Please select your County and Town."
+                            );
+
+                            return;
                         }
+
+
+                        throw profileSaveError;
+                    }
+
+
+                    /* ---------------------------------------------
+                       VERIFY SUPPLIER PROFILE
+                    --------------------------------------------- */
+
+                    if (supplierAccount) {
+
+                        const savedProfile =
+                            await getDoc(
+                                doc(
+                                    db,
+                                    "users",
+                                    user.uid
+                                )
+                            );
+
+
+                        const savedData =
+                            savedProfile.exists()
+                                ? savedProfile.data()
+                                : {};
+
+
+                        const savedTown =
+                            savedData.town ||
+                            savedData.supplierTown ||
+                            savedData.supplierLocation?.town ||
+                            "";
+
+
+                        const savedCounty =
+                            savedData.county ||
+                            savedData.supplierCounty ||
+                            savedData.supplierLocation?.county ||
+                            "";
+
+
+                        /*
+                           If registration did not contain both
+                           Town and County, open the dynamic profile
+                           form.
+                        */
+
+                        if (
+                            !savedTown ||
+                            !savedCounty
+                        ) {
+
+                            if (authModal) {
+                                authModal.style.display =
+                                    "none";
+                            }
+
+
+                            await showSupplierProfileForm(
+                                user
+                            );
+
+                            return;
+                        }
+                    }
+
+
+                    /* ---------------------------------------------
+                       REGISTRATION SUCCESS
+                    --------------------------------------------- */
+
+                    alert(
+                        "Registration successful!"
                     );
 
 
-                    // ==========================================
-                    // VERIFY PROFILE
-                    // ==========================================
+                    if (authModal) {
+                        authModal.style.display =
+                            "none";
+                    }
 
-                    const savedProfile =
+
+                    if (
+                        typeof window.handlePostLoginUI ===
+                        "function"
+                    ) {
+
+                        window.handlePostLoginUI(
+                            role
+                        );
+                    }
+
+
+                } else {
+
+                    /* =================================================
+                       LOGIN
+                    ================================================= */
+
+                    const userCredential =
+                        await signInWithEmailAndPassword(
+                            auth,
+                            email,
+                            password
+                        );
+
+
+                    const user =
+                        userCredential.user;
+
+
+                    const userDoc =
                         await getDoc(
                             doc(
                                 db,
@@ -1713,367 +1727,45 @@ if (authForm) {
                         );
 
 
-                    const savedData =
-                        savedProfile.exists()
-                            ? savedProfile.data()
-                            : {};
+                    let role =
+                        "customer";
 
 
-                    console.log(
-                        "GasHubKE saved profile:",
-                        savedData
-                    );
+                    if (userDoc.exists()) {
 
-
-                    // ==========================================
-                    // SUPPLIER PROFILE CHECK
-                    // ==========================================
-
-                    if (supplierAccount) {
-
-                        const hasLocation =
-                            Boolean(
-                                savedData.businessLocation &&
-                                (
-                                    savedData.town ||
-                                    savedData.supplierTown
-                                ) &&
-                                (
-                                    savedData.county ||
-                                    savedData.supplierCounty
-                                )
-                            );
-
-
-                        // --------------------------------------
-                        // LOCATION MISSING
-                        // --------------------------------------
-
-                        if (!hasLocation) {
-
-                            if (authModal) {
-
-                                authModal.style.display =
-                                    "none";
-
-                            }
-
-
-                            showProfileAfterRegistrationError(
-                                user
-                            );
-
-                            return;
-
-                        }
-
+                        role =
+                            userDoc.data().role ||
+                            "customer";
                     }
 
 
-                    // ==========================================
-                    // NORMAL SUCCESS
-                    // ==========================================
-
                     alert(
-                        "Registration successful!"
+                        "Signed in successfully!"
                     );
 
 
                     if (authModal) {
-
                         authModal.style.display =
                             "none";
-
                     }
 
 
                     if (
-                        window.handlePostLoginUI
+                        typeof window.handlePostLoginUI ===
+                        "function"
                     ) {
 
                         window.handlePostLoginUI(
                             role
                         );
-
                     }
-
-
-                } catch (error) {
-
-                    console.error(
-                        "Registration error:",
-                        error
-                    );
-
-
-                    // ==================================================
-                    // IMPORTANT:
-                    //
-                    // Firebase Auth may have already created the
-                    // account even if Firestore then failed.
-                    //
-                    // In that case, show the profile form after OK.
-                    // ==================================================
-
-                    if (
-                        supplierAccount &&
-                        user
-                    ) {
-
-                        if (authModal) {
-
-                            authModal.style.display =
-                                "none";
-
-                        }
-
-
-                        showProfileAfterRegistrationError(
-                            user,
-                            "Your account was created, but your business profile could not be completed.\n\n" +
-                            "Press OK to enter your Business Name, Town and County."
-                        );
-
-
-                        return;
-
-                    }
-
-
-                    // ==================================================
-                    // IF AUTH ACCOUNT WAS CREATED BUT VARIABLE WAS
-                    // NOT REACHED, CHECK CURRENT USER
-                    // ==================================================
-
-                    if (
-                        supplierAccount &&
-                        auth.currentUser
-                    ) {
-
-                        if (authModal) {
-
-                            authModal.style.display =
-                                "none";
-
-                        }
-
-
-                        showProfileAfterRegistrationError(
-                            auth.currentUser,
-                            "Your account was created, but your business profile needs to be completed.\n\n" +
-                            "Press OK to enter your Business Name, Town and County."
-                        );
-
-
-                        return;
-
-                    }
-
-
-                    // ==================================================
-                    // NORMAL AUTH ERROR
-                    // ==================================================
-
-                    let message =
-                        error.message ||
-                        "Registration failed.";
-
-
-                    switch (error.code) {
-
-                        case "auth/email-already-in-use":
-
-                            message =
-                                "An account with this email already exists.";
-
-                            break;
-
-
-                        case "auth/invalid-email":
-
-                            message =
-                                "Please enter a valid email address.";
-
-                            break;
-
-
-                        case "auth/weak-password":
-
-                            message =
-                                "Password is too weak. Please use a stronger password.";
-
-                            break;
-
-
-                        case "auth/network-request-failed":
-
-                            message =
-                                "Network error. Check your internet connection and try again.";
-
-                            break;
-
-
-                        case "auth/too-many-requests":
-
-                            message =
-                                "Too many attempts. Please try again later.";
-
-                            break;
-
-
-                        case "auth/operation-not-allowed":
-
-                            message =
-                                "This sign-in method is not enabled in Firebase.";
-
-                            break;
-
-                    }
-
-
-                    alert(
-                        "Registration Error: " +
-                        message
-                    );
-
-                }
-
-
-                return;
-            }
-
-
-            // ==================================================
-            // LOGIN
-            // ==================================================
-
-            try {
-
-                const userCredential =
-                    await signInWithEmailAndPassword(
-                        auth,
-                        email,
-                        password
-                    );
-
-
-                const user =
-                    userCredential.user;
-
-
-                // ------------------------------------------------
-                // LOAD PROFILE
-                // ------------------------------------------------
-
-                const userDoc =
-                    await getDoc(
-                        doc(
-                            db,
-                            "users",
-                            user.uid
-                        )
-                    );
-
-
-                let role =
-                    "customer";
-
-
-                let profileData = {};
-
-
-                if (
-                    userDoc.exists()
-                ) {
-
-                    profileData =
-                        userDoc.data();
-
-                    role =
-                        profileData.role ||
-                        "customer";
-
-                }
-
-
-                // ------------------------------------------------
-                // SUPPLIER LOGIN
-                // ------------------------------------------------
-
-                if (
-                    isSupplierRole(role)
-                ) {
-
-                    const hasLocation =
-                        Boolean(
-                            profileData.businessLocation ||
-                            (
-                                profileData.supplierTown &&
-                                profileData.supplierCounty
-                            )
-                        );
-
-
-                    if (!hasLocation) {
-
-                        if (authModal) {
-
-                            authModal.style.display =
-                                "none";
-
-                        }
-
-
-                        alert(
-                            "Your supplier profile is incomplete.\n\n" +
-                            "Press OK to add your Business Name, Town and County."
-                        );
-
-
-                        showSupplierProfileForm(
-                            user
-                        );
-
-
-                        return;
-
-                    }
-
-                }
-
-
-                // ------------------------------------------------
-                // NORMAL LOGIN SUCCESS
-                // ------------------------------------------------
-
-                alert(
-                    "Signed in successfully!"
-                );
-
-
-                if (authModal) {
-
-                    authModal.style.display =
-                        "none";
-
-                }
-
-
-                if (
-                    window.handlePostLoginUI
-                ) {
-
-                    window.handlePostLoginUI(
-                        role
-                    );
-
                 }
 
 
             } catch (error) {
 
                 console.error(
-                    "Login error:",
+                    "Authentication error:",
                     error
                 );
 
@@ -2084,6 +1776,30 @@ if (authForm) {
 
 
                 switch (error.code) {
+
+                    case "auth/email-already-in-use":
+
+                        message =
+                            "An account with this email already exists.";
+
+                        break;
+
+
+                    case "auth/invalid-email":
+
+                        message =
+                            "Please enter a valid email address.";
+
+                        break;
+
+
+                    case "auth/weak-password":
+
+                        message =
+                            "Password is too weak. Please use a stronger password.";
+
+                        break;
+
 
                     case "auth/invalid-credential":
 
@@ -2112,7 +1828,7 @@ if (authForm) {
                     case "auth/network-request-failed":
 
                         message =
-                            "Network error. Check your internet connection.";
+                            "Network error. Check your internet connection and try again.";
 
                         break;
 
@@ -2124,6 +1840,21 @@ if (authForm) {
 
                         break;
 
+
+                    case "auth/operation-not-allowed":
+
+                        message =
+                            "This sign-in method is not enabled in Firebase.";
+
+                        break;
+
+
+                    case "permission-denied":
+
+                        message =
+                            "Firebase denied access to your profile. Check your Firestore security rules.";
+
+                        break;
                 }
 
 
@@ -2131,17 +1862,15 @@ if (authForm) {
                     "Authentication Error: " +
                     message
                 );
-
             }
-
         }
     );
 }
 
 
-// ============================================================
-// AUTH STATE
-// ============================================================
+/* =========================================================
+   AUTH STATE
+========================================================= */
 
 onAuthStateChanged(
     auth,
@@ -2149,16 +1878,27 @@ onAuthStateChanged(
 
         if (!user) {
 
-            if (
-                window.handlePostLogoutUI
-            ) {
+            if (!profileCompletionOpen) {
 
-                window.handlePostLogoutUI();
-
+                if (
+                    typeof window.handlePostLogoutUI ===
+                    "function"
+                ) {
+                    window.handlePostLogoutUI();
+                }
             }
 
             return;
+        }
 
+
+        /*
+           Do not interfere with the supplier profile
+           completion form.
+        */
+
+        if (profileCompletionOpen) {
+            return;
         }
 
 
@@ -2178,40 +1918,61 @@ onAuthStateChanged(
                 "customer";
 
 
-            let profileData = {};
-
-
-            if (
-                userDoc.exists()
-            ) {
-
-                profileData =
-                    userDoc.data();
+            if (userDoc.exists()) {
 
                 role =
-                    profileData.role ||
+                    userDoc.data().role ||
                     "customer";
-
             }
 
 
-            // ------------------------------------------------
-            // DO NOT AUTOMATICALLY OPEN THE PROFILE FORM
-            // FROM AUTH STATE.
-            //
-            // Registration/login handlers already handle it.
-            // ------------------------------------------------
+            /*
+               If this is a supplier account and the profile
+               has no Town or County, open the profile form.
+            */
+
+            if (isSupplierRole(role)) {
+
+                const data =
+                    userDoc.exists()
+                        ? userDoc.data()
+                        : {};
+
+
+                const town =
+                    data.town ||
+                    data.supplierTown ||
+                    data.supplierLocation?.town ||
+                    "";
+
+
+                const county =
+                    data.county ||
+                    data.supplierCounty ||
+                    data.supplierLocation?.county ||
+                    "";
+
+
+                if (!town || !county) {
+
+                    await showSupplierProfileForm(
+                        user
+                    );
+
+                    return;
+                }
+            }
+
 
             if (
-                window.handlePostLoginUI
+                typeof window.handlePostLoginUI ===
+                "function"
             ) {
 
                 window.handlePostLoginUI(
                     role
                 );
-
             }
-
 
         } catch (error) {
 
@@ -2219,25 +1980,6 @@ onAuthStateChanged(
                 "Error loading user state:",
                 error
             );
-
         }
-
     }
 );
-
-
-// ============================================================
-// GLOBAL ACCESS
-// ============================================================
-
-window.gasHubAuth = {
-
-    updateUserProfile,
-
-    getCurrentUserProfile,
-
-    getSupplierLocation,
-
-    showSupplierProfileForm
-
-};
