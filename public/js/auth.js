@@ -65,8 +65,8 @@ function getFieldValue(...ids) {
 // Kitale, Trans Nzoia
 // Nanyuki, Laikipia
 //
-// IMPORTANT:
-// "city" IS NOT USED.
+// ONLY TOWN + COUNTY
+// AREA IS NOT USED
 // ============================================================
 
 function getSupplierLocation() {
@@ -75,9 +75,7 @@ function getSupplierLocation() {
         "supplierTown",
         "town",
         "businessTown",
-        "registeredTown",
-        "area",
-        "supplierArea"
+        "registeredTown"
     );
 
     const county = getFieldValue(
@@ -101,18 +99,7 @@ function getSupplierLocation() {
 
 // ============================================================
 // UPDATE USER PROFILE
-// Used by the Settings page.
-//
-// Example:
-//
-// await updateUserProfile({
-//     businessName: "ABC Gas",
-//     town: "Ruiru",
-//     county: "Kiambu"
-// });
-//
-// Result:
-// Ruiru, Kiambu
+// Used by Settings page
 // ============================================================
 
 export async function updateUserProfile({
@@ -133,11 +120,10 @@ export async function updateUserProfile({
     town = String(town).trim();
     county = String(county).trim();
 
-    // Build:
-    // Ruiru, Kiambu
     const location = [town, county]
         .filter(Boolean)
         .join(", ");
+
 
     // --------------------------------------------------------
     // UPDATE FIREBASE AUTH PROFILE
@@ -150,6 +136,7 @@ export async function updateUserProfile({
         });
 
     }
+
 
     // --------------------------------------------------------
     // FIRESTORE USER DOCUMENT
@@ -166,6 +153,7 @@ export async function updateUserProfile({
     const existingData = existingDoc.exists()
         ? existingDoc.data()
         : {};
+
 
     const role =
         existingData.role || "customer";
@@ -203,6 +191,10 @@ export async function updateUserProfile({
 
         updatedData.town = town;
         updatedData.county = county;
+
+        updatedData.supplierTown = town;
+        updatedData.supplierCounty = county;
+
         updatedData.location = location;
 
         updatedData.supplierLocation = {
@@ -211,6 +203,9 @@ export async function updateUserProfile({
 
             county: county,
 
+            label: location,
+
+            // Kept for compatibility with existing dashboard
             display: location
 
         };
@@ -247,16 +242,20 @@ export async function updateUserProfile({
         town:
             updatedData.town ||
             existingData.town ||
+            existingData.supplierLocation?.town ||
             "",
 
         county:
             updatedData.county ||
             existingData.county ||
+            existingData.supplierLocation?.county ||
             "",
 
         location:
             updatedData.location ||
             existingData.location ||
+            existingData.supplierLocation?.label ||
+            existingData.supplierLocation?.display ||
             ""
 
     };
@@ -266,11 +265,6 @@ export async function updateUserProfile({
 
 // ============================================================
 // LOAD CURRENT PROFILE
-// Useful for Settings page.
-//
-// Example:
-//
-// const profile = await getCurrentUserProfile();
 // ============================================================
 
 export async function getCurrentUserProfile() {
@@ -283,6 +277,7 @@ export async function getCurrentUserProfile() {
         );
     }
 
+
     const userRef = doc(
         db,
         "users",
@@ -294,6 +289,7 @@ export async function getCurrentUserProfile() {
     const data = userDoc.exists()
         ? userDoc.data()
         : {};
+
 
     return {
 
@@ -320,16 +316,19 @@ export async function getCurrentUserProfile() {
 
         town:
             data.town ||
+            data.supplierTown ||
             data.supplierLocation?.town ||
             "",
 
         county:
             data.county ||
+            data.supplierCounty ||
             data.supplierLocation?.county ||
             "",
 
         location:
             data.location ||
+            data.supplierLocation?.label ||
             data.supplierLocation?.display ||
             ""
 
@@ -348,10 +347,11 @@ function ensureForgotPasswordButton() {
         return;
     }
 
-    // Already exists
+
     if (document.getElementById("forgotPassword")) {
         return;
     }
+
 
     const passwordInput =
         document.getElementById("authPassword");
@@ -360,11 +360,13 @@ function ensureForgotPasswordButton() {
         return;
     }
 
+
     const wrapper =
         document.createElement("div");
 
     wrapper.className =
         "text-end mt-2";
+
 
     const button =
         document.createElement("button");
@@ -379,7 +381,9 @@ function ensureForgotPasswordButton() {
     button.textContent =
         "Forgot Password?";
 
+
     wrapper.appendChild(button);
+
 
     passwordInput.parentElement?.appendChild(
         wrapper
@@ -398,6 +402,7 @@ async function handleForgotPassword() {
         document.getElementById("authEmail")
             ?.value.trim() || "";
 
+
     if (!email) {
 
         alert(
@@ -410,6 +415,7 @@ async function handleForgotPassword() {
         return;
 
     }
+
 
     try {
 
@@ -429,8 +435,10 @@ async function handleForgotPassword() {
             error
         );
 
+
         let message =
             "Unable to send password reset email.";
+
 
         switch (error.code) {
 
@@ -441,6 +449,7 @@ async function handleForgotPassword() {
 
                 break;
 
+
             case "auth/user-not-found":
 
                 message =
@@ -448,12 +457,14 @@ async function handleForgotPassword() {
 
                 break;
 
+
             case "auth/network-request-failed":
 
                 message =
                     "Network error. Check your internet connection.";
 
                 break;
+
 
             case "auth/too-many-requests":
 
@@ -463,6 +474,7 @@ async function handleForgotPassword() {
                 break;
 
         }
+
 
         alert(
             "Password Reset Error: " +
@@ -499,7 +511,6 @@ document.addEventListener(
 );
 
 
-// Create it after DOM is available
 ensureForgotPasswordButton();
 
 
@@ -515,14 +526,18 @@ if (authLink) {
 
             e.preventDefault();
 
+
             if (auth.currentUser) {
 
                 try {
 
                     await signOut(auth);
 
+
                     if (window.handlePostLogoutUI) {
+
                         window.handlePostLogoutUI();
+
                     }
 
                 } catch (error) {
@@ -541,7 +556,10 @@ if (authLink) {
             } else {
 
                 if (authModal) {
-                    authModal.style.display = "flex";
+
+                    authModal.style.display =
+                        "flex";
+
                 }
 
             }
@@ -563,7 +581,10 @@ if (closeModal) {
         () => {
 
             if (authModal) {
-                authModal.style.display = "none";
+
+                authModal.style.display =
+                    "none";
+
             }
 
         }
@@ -582,46 +603,66 @@ if (toggleAuthMode) {
         "click",
         () => {
 
-            isRegistering = !isRegistering;
+            isRegistering =
+                !isRegistering;
+
 
             if (isRegistering) {
 
                 if (authModalTitle) {
+
                     authModalTitle.innerText =
                         "Register Platform Account";
+
                 }
 
+
                 if (authSubmitBtn) {
+
                     authSubmitBtn.innerText =
                         "Sign Up";
+
                 }
+
 
                 toggleAuthMode.innerText =
                     "Already have an account? Sign In";
 
+
                 if (vendorFields) {
+
                     vendorFields.style.display =
                         "block";
+
                 }
 
             } else {
 
                 if (authModalTitle) {
+
                     authModalTitle.innerText =
                         "Sign In";
+
                 }
 
+
                 if (authSubmitBtn) {
+
                     authSubmitBtn.innerText =
                         "Sign In";
+
                 }
+
 
                 toggleAuthMode.innerText =
                     "Need an account? Register";
 
+
                 if (vendorFields) {
+
                     vendorFields.style.display =
                         "none";
+
                 }
 
             }
@@ -644,10 +685,12 @@ if (authForm) {
 
             e.preventDefault();
 
+
             const email =
                 document.getElementById(
                     "authEmail"
                 )?.value.trim() || "";
+
 
             const password =
                 document.getElementById(
@@ -679,6 +722,7 @@ if (authForm) {
                             "userRole"
                         ) || "customer";
 
+
                     const businessName =
                         getFieldValue(
                             "businessName"
@@ -694,18 +738,22 @@ if (authForm) {
                         getSupplierLocation();
 
 
-                    // Supplier location required
+                    // ------------------------------------------------
+                    // SUPPLIER LOCATION VALIDATION
+                    // ------------------------------------------------
+
                     if (role === "supplier") {
 
                         if (!town) {
 
                             alert(
-                                "Please select or enter your town/area."
+                                "Please select your town."
                             );
 
                             return;
 
                         }
+
 
                         if (!county) {
 
@@ -720,7 +768,10 @@ if (authForm) {
                     }
 
 
-                    // Create account
+                    // ------------------------------------------------
+                    // CREATE ACCOUNT
+                    // ------------------------------------------------
+
                     const userCredential =
                         await createUserWithEmailAndPassword(
                             auth,
@@ -728,11 +779,15 @@ if (authForm) {
                             password
                         );
 
+
                     const user =
                         userCredential.user;
 
 
-                    // Auth display name
+                    // ------------------------------------------------
+                    // AUTH DISPLAY NAME
+                    // ------------------------------------------------
+
                     try {
 
                         await updateProfile(
@@ -753,7 +808,10 @@ if (authForm) {
                     }
 
 
-                    // Firestore profile
+                    // ------------------------------------------------
+                    // FIRESTORE PROFILE
+                    // ------------------------------------------------
+
                     const userData = {
 
                         email:
@@ -769,7 +827,14 @@ if (authForm) {
                     };
 
 
-                    // Supplier location
+                    // ------------------------------------------------
+                    // SUPPLIER LOCATION
+                    //
+                    // Town + County only
+                    // Example:
+                    // Ruiru, Kiambu
+                    // ------------------------------------------------
+
                     if (role === "supplier") {
 
                         userData.town =
@@ -778,15 +843,28 @@ if (authForm) {
                         userData.county =
                             county;
 
+                        userData.supplierTown =
+                            town;
+
+                        userData.supplierCounty =
+                            county;
+
                         userData.location =
                             location;
 
+
                         userData.supplierLocation = {
 
-                            town,
+                            town:
+                                town,
 
-                            county,
+                            county:
+                                county,
 
+                            label:
+                                location,
+
+                            // Backward compatibility
                             display:
                                 location
 
@@ -794,6 +872,10 @@ if (authForm) {
 
                     }
 
+
+                    // ------------------------------------------------
+                    // SAVE USER PROFILE
+                    // ------------------------------------------------
 
                     await setDoc(
                         doc(
@@ -811,8 +893,10 @@ if (authForm) {
 
 
                     if (authModal) {
+
                         authModal.style.display =
                             "none";
+
                     }
 
 
@@ -839,6 +923,7 @@ if (authForm) {
                             email,
                             password
                         );
+
 
                     const user =
                         userCredential.user;
@@ -873,8 +958,10 @@ if (authForm) {
 
 
                     if (authModal) {
+
                         authModal.style.display =
                             "none";
+
                     }
 
 
@@ -913,12 +1000,14 @@ if (authForm) {
 
                         break;
 
+
                     case "auth/invalid-email":
 
                         message =
                             "Please enter a valid email address.";
 
                         break;
+
 
                     case "auth/weak-password":
 
@@ -927,12 +1016,14 @@ if (authForm) {
 
                         break;
 
+
                     case "auth/invalid-credential":
 
                         message =
                             "Incorrect email or password.";
 
                         break;
+
 
                     case "auth/user-not-found":
 
@@ -941,12 +1032,14 @@ if (authForm) {
 
                         break;
 
+
                     case "auth/wrong-password":
 
                         message =
                             "Incorrect password.";
 
                         break;
+
 
                     case "auth/network-request-failed":
 
@@ -955,12 +1048,14 @@ if (authForm) {
 
                         break;
 
+
                     case "auth/too-many-requests":
 
                         message =
                             "Too many attempts. Please try again later.";
 
                         break;
+
 
                     case "auth/operation-not-allowed":
 
