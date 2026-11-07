@@ -1,3 +1,4 @@
+
 import { db } from "./firebase-config.js";
 
 import {
@@ -19,23 +20,43 @@ import {
 
 
 // ============================================================
-// GAS HUB KE - SUPPLIER DASHBOARD / LISTINGS
-// Production Supplier Listing Management
+// GAS HUB KE - SUPPLIER DASHBOARD
+// Improved Supplier Listing Management
+// Compatible with existing Firestore listing structure
 // ============================================================
 
 const auth = getAuth();
 
 let editingListingId = null;
+let isSavingListing = false;
 
 window._supplierListingsCache = {};
 
 
 // ============================================================
-// HELPERS
+// CONFIGURATION
+// ============================================================
+
+const MAX_IMAGES = 5;
+
+const MAX_ORIGINAL_IMAGE_SIZE = 8 * 1024 * 1024;
+
+// Maximum compressed Base64 string length per image.
+// Helps keep listing documents within Firestore limits.
+const MAX_COMPRESSED_IMAGE_LENGTH = 150 * 1024;
+
+const ALLOWED_IMAGE_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+];
+
+
+// ============================================================
+// GENERAL HELPERS
 // ============================================================
 
 function escapeHTML(value) {
-
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -45,26 +66,77 @@ function escapeHTML(value) {
 }
 
 
+function getElement(id) {
+    return document.getElementById(id);
+}
+
+
+function showMessage(message) {
+    alert(message);
+}
+
+
+function formatCurrency(value) {
+    const amount = Number(value);
+
+    if (!Number.isFinite(amount)) {
+        return "0";
+    }
+
+    return amount.toLocaleString("en-KE", {
+        maximumFractionDigits: 2
+    });
+}
+
+
+function getListingImages(item) {
+    if (!item) {
+        return [];
+    }
+
+    if (
+        Array.isArray(item.images) &&
+        item.images.length > 0
+    ) {
+        return item.images.filter(
+            image => typeof image === "string" && image.trim()
+        );
+    }
+
+    if (
+        Array.isArray(item.imageUrls) &&
+        item.imageUrls.length > 0
+    ) {
+        return item.imageUrls.filter(
+            image => typeof image === "string" && image.trim()
+        );
+    }
+
+    if (
+        typeof item.imageUrl === "string" &&
+        item.imageUrl.trim()
+    ) {
+        return [item.imageUrl];
+    }
+
+    return [];
+}
+
+
 // ============================================================
 // FORMAT LOCATION
 // ============================================================
 
 function formatLocation(location) {
-
     if (!location) {
         return "";
     }
 
-
-    // String
     if (typeof location === "string") {
         return location.trim();
     }
 
-
-    // Array
     if (Array.isArray(location)) {
-
         return location
             .filter(Boolean)
             .map(value => formatLocation(value))
@@ -72,10 +144,7 @@ function formatLocation(location) {
             .join(", ");
     }
 
-
-    // Object
     if (typeof location === "object") {
-
         const town =
             location.town ||
             location.townName ||
@@ -89,20 +158,18 @@ function formatLocation(location) {
             location.countyName ||
             "";
 
-
         if (town && county) {
             return `${town}, ${county}`;
         }
 
-
         return (
             town ||
             county ||
+            location.display ||
             location.name ||
             ""
         );
     }
-
 
     return String(location);
 }
@@ -113,7 +180,6 @@ function formatLocation(location) {
 // ============================================================
 
 function extractRegisteredLocation(data) {
-
     if (!data) {
         return {
             text: "",
@@ -122,17 +188,13 @@ function extractRegisteredLocation(data) {
         };
     }
 
-
-    // --------------------------------------------------------
-    // 1. supplierLocation object
-    // --------------------------------------------------------
+    // 1. Structured supplier location
 
     if (
         data.supplierLocation &&
         typeof data.supplierLocation === "object" &&
         !Array.isArray(data.supplierLocation)
     ) {
-
         const town =
             data.supplierLocation.town ||
             data.supplierLocation.townName ||
@@ -145,15 +207,10 @@ function extractRegisteredLocation(data) {
             data.supplierLocation.countyName ||
             "";
 
-
         const text =
-            formatLocation(
-                data.supplierLocation
-            );
-
+            formatLocation(data.supplierLocation);
 
         if (text) {
-
             return {
                 text,
                 town: String(town || ""),
@@ -162,10 +219,7 @@ function extractRegisteredLocation(data) {
         }
     }
 
-
-    // --------------------------------------------------------
     // 2. Separate registration fields
-    // --------------------------------------------------------
 
     const town =
         data.town ||
@@ -176,7 +230,6 @@ function extractRegisteredLocation(data) {
         data.supplierTown ||
         "";
 
-
     const county =
         data.county ||
         data.countyName ||
@@ -185,14 +238,11 @@ function extractRegisteredLocation(data) {
         data.supplierCounty ||
         "";
 
-
     if (town || county) {
-
         const text =
             town && county
                 ? `${town}, ${county}`
                 : String(town || county);
-
 
         return {
             text,
@@ -201,51 +251,32 @@ function extractRegisteredLocation(data) {
         };
     }
 
-
-    // --------------------------------------------------------
-    // 3. Location object/string
-    // --------------------------------------------------------
+    // 3. Legacy location fields
 
     const possibleLocationFields = [
-
         data.location,
-
         data.businessLocation,
-
         data.registeredLocation,
-
         data.address,
-
         data.supplierArea
-
     ];
 
-
-    for (
-        const location of possibleLocationFields
-    ) {
-
+    for (const location of possibleLocationFields) {
         if (!location) {
             continue;
         }
 
-
-        const text =
-            formatLocation(location);
-
+        const text = formatLocation(location);
 
         if (!text) {
             continue;
         }
 
-
         if (
             typeof location === "object" &&
             !Array.isArray(location)
         ) {
-
             return {
-
                 text,
 
                 town: String(
@@ -264,14 +295,12 @@ function extractRegisteredLocation(data) {
             };
         }
 
-
         return {
             text,
             town: "",
             county: ""
         };
     }
-
 
     return {
         text: "",
@@ -286,7 +315,6 @@ function extractRegisteredLocation(data) {
 // ============================================================
 
 async function getCurrentUserSession() {
-
     let uid = null;
 
     let businessName = "Vendor";
@@ -297,45 +325,28 @@ async function getCurrentUserSession() {
         county: ""
     };
 
-
-    // ========================================================
-    // FIREBASE AUTH
-    // ========================================================
+    // Firebase Authentication session
 
     if (auth.currentUser) {
-
-        uid =
-            auth.currentUser.uid;
-
+        uid = auth.currentUser.uid;
 
         businessName =
             auth.currentUser.displayName ||
             "Vendor";
 
-
         try {
+            const userDocRef = doc(
+                db,
+                "users",
+                uid
+            );
 
-            const userDocRef =
-                doc(
-                    db,
-                    "users",
-                    uid
-                );
+            const userDocSnap = await getDoc(
+                userDocRef
+            );
 
-
-            const userDocSnap =
-                await getDoc(
-                    userDocRef
-                );
-
-
-            if (
-                userDocSnap.exists()
-            ) {
-
-                const data =
-                    userDocSnap.data();
-
+            if (userDocSnap.exists()) {
+                const data = userDocSnap.data();
 
                 businessName =
                     data.businessName ||
@@ -344,27 +355,18 @@ async function getCurrentUserSession() {
                     data.fullName ||
                     businessName;
 
-
                 registeredLocation =
-                    extractRegisteredLocation(
-                        data
-                    );
+                    extractRegisteredLocation(data);
             }
-
-
         } catch (error) {
-
             console.error(
                 "Error fetching supplier profile:",
                 error
             );
         }
 
-
         return {
-
             uid,
-
             businessName,
 
             supplierLocation:
@@ -378,53 +380,31 @@ async function getCurrentUserSession() {
         };
     }
 
-
-    // ========================================================
-    // LOCAL STORAGE FALLBACK
-    // ========================================================
+    // Legacy local storage compatibility
 
     const possibleKeys = [
-
         "gas_user_session",
-
         "user",
-
         "currentUser",
-
         "vendor_session",
-
         "logged_in_user",
-
         "firebase:authUser"
     ];
 
-
-    for (
-        const key of possibleKeys
-    ) {
-
-        const val =
-            localStorage.getItem(
-                key
-            );
-
+    for (const key of possibleKeys) {
+        const val = localStorage.getItem(key);
 
         if (!val) {
             continue;
         }
 
-
         try {
-
-            const parsed =
-                JSON.parse(val);
-
+            const parsed = JSON.parse(val);
 
             const nestedUser =
                 parsed.user ||
                 parsed.firebaseUser ||
                 {};
-
 
             uid =
                 parsed.uid ||
@@ -435,11 +415,9 @@ async function getCurrentUserSession() {
                 nestedUser.userId ||
                 null;
 
-
             if (!uid) {
                 continue;
             }
-
 
             businessName =
                 parsed.businessName ||
@@ -450,28 +428,16 @@ async function getCurrentUserSession() {
                 nestedUser.email ||
                 "Vendor";
 
-
             registeredLocation =
-                extractRegisteredLocation(
-                    parsed
-                );
+                extractRegisteredLocation(parsed);
 
-
-            if (
-                !registeredLocation.text
-            ) {
-
+            if (!registeredLocation.text) {
                 registeredLocation =
-                    extractRegisteredLocation(
-                        nestedUser
-                    );
+                    extractRegisteredLocation(nestedUser);
             }
 
-
             return {
-
                 uid,
-
                 businessName,
 
                 supplierLocation:
@@ -484,85 +450,63 @@ async function getCurrentUserSession() {
                     registeredLocation.county
             };
 
-
         } catch (error) {
-
             console.warn(
-                `Invalid session data in ${key}`
+                `Invalid session data in ${key}`,
+                error
             );
         }
     }
-
 
     return null;
 }
 
 
 // ============================================================
-// ENSURE REGISTERED LOCATION EXISTS
+// REQUIRE REGISTERED LOCATION
 // ============================================================
 
-function requireRegisteredLocation(
-    session
-) {
-
-    if (
-        !session ||
-        !session.uid
-    ) {
+function requireRegisteredLocation(session) {
+    if (!session || !session.uid) {
         return false;
     }
 
-
-    if (
-        !session.supplierLocation
-    ) {
-
-        alert(
+    if (!session.supplierLocation) {
+        showMessage(
             "Your supplier account does not have a registered business location. Please update your supplier registration before posting a listing."
         );
 
         return false;
     }
 
-
     return true;
 }
 
 
 // ============================================================
-// LOCK LOCATION FIELD
+// APPLY REGISTERED LOCATION TO FORM
 // ============================================================
 
-function applyRegisteredLocationToForm(
-    session
-) {
-
-    const locationInput =
-        document.getElementById(
-            "supplierItemLocation"
-        );
-
+function applyRegisteredLocationToForm(session) {
+    const locationInput = getElement(
+        "supplierItemLocation"
+    );
 
     if (!locationInput) {
         return;
     }
 
-
     locationInput.value =
         session?.supplierLocation ||
         "Location not registered";
 
-
     locationInput.readOnly = true;
-
     locationInput.disabled = false;
 
     locationInput.setAttribute(
         "readonly",
         "readonly"
     );
-
 
     locationInput.setAttribute(
         "title",
@@ -572,128 +516,114 @@ function applyRegisteredLocationToForm(
 
 
 // ============================================================
+// RESET LISTING FORM
+// ============================================================
+
+function resetListingForm(session = null) {
+    const form = getElement(
+        "supplierListingForm"
+    );
+
+    if (form) {
+        form.reset();
+    }
+
+    editingListingId = null;
+
+    const formTitle = document.querySelector(
+        "#supplierListingForm h3"
+    );
+
+    if (formTitle) {
+        formTitle.textContent =
+            "Post New Gas Listing";
+    }
+
+    const submitBtn = document.querySelector(
+        "#supplierListingForm button[type='submit']"
+    );
+
+    if (submitBtn) {
+        submitBtn.textContent =
+            "Publish Listing";
+
+        submitBtn.disabled = false;
+    }
+
+    if (session) {
+        applyRegisteredLocationToForm(session);
+    }
+}
+
+
+// ============================================================
 // TAB SWITCHER
 // ============================================================
 
-window.switchSupplierTab =
-async function(tabName) {
+window.switchSupplierTab = async function(tabName) {
+    const listingsContent = getElement(
+        "supplierListingsTabContent"
+    );
 
-    const listingsContent =
-        document.getElementById(
-            "supplierListingsTabContent"
-        );
+    const ordersContent = getElement(
+        "supplierOrdersTabContent"
+    );
 
+    const tabListingsBtn = getElement(
+        "tabListingsBtn"
+    );
 
-    const ordersContent =
-        document.getElementById(
-            "supplierOrdersTabContent"
-        );
+    const tabOrdersBtn = getElement(
+        "tabOrdersBtn"
+    );
 
-
-    const tabListingsBtn =
-        document.getElementById(
-            "tabListingsBtn"
-        );
-
-
-    const tabOrdersBtn =
-        document.getElementById(
-            "tabOrdersBtn"
-        );
-
-
-    if (
-        tabName === "listings"
-    ) {
-
+    if (tabName === "listings") {
         if (listingsContent) {
-            listingsContent.style.display =
-                "block";
+            listingsContent.style.display = "block";
         }
-
 
         if (ordersContent) {
-            ordersContent.style.display =
-                "none";
+            ordersContent.style.display = "none";
         }
-
 
         if (tabListingsBtn) {
-
-            tabListingsBtn.className =
-                "btn-primary";
-
-            tabListingsBtn.style.background =
-                "";
+            tabListingsBtn.className = "btn-primary";
+            tabListingsBtn.style.background = "";
         }
-
 
         if (tabOrdersBtn) {
-
-            tabOrdersBtn.className =
-                "btn-secondary";
-
-            tabOrdersBtn.style.background =
-                "#e2e8f0";
-
-            tabOrdersBtn.style.color =
-                "#1e293b";
+            tabOrdersBtn.className = "btn-secondary";
+            tabOrdersBtn.style.background = "#e2e8f0";
+            tabOrdersBtn.style.color = "#1e293b";
         }
 
+        const session = await getCurrentUserSession();
 
-        const session =
-            await getCurrentUserSession();
-
-
-        if (
-            session &&
-            session.uid
-        ) {
-
-            loadSupplierDashboard(
-                session.uid
-            );
+        if (session?.uid) {
+            await loadSupplierDashboard(session.uid);
         }
-
 
     } else {
-
         if (listingsContent) {
-            listingsContent.style.display =
-                "none";
+            listingsContent.style.display = "none";
         }
-
 
         if (ordersContent) {
-            ordersContent.style.display =
-                "block";
+            ordersContent.style.display = "block";
         }
-
 
         if (tabOrdersBtn) {
-
-            tabOrdersBtn.className =
-                "btn-primary";
-
-            tabOrdersBtn.style.background =
-                "";
+            tabOrdersBtn.className = "btn-primary";
+            tabOrdersBtn.style.background = "";
         }
-
 
         if (tabListingsBtn) {
-
-            tabListingsBtn.className =
-                "btn-secondary";
-
-            tabListingsBtn.style.background =
-                "#e2e8f0";
-
-            tabListingsBtn.style.color =
-                "#1e293b";
+            tabListingsBtn.className = "btn-secondary";
+            tabListingsBtn.style.background = "#e2e8f0";
+            tabListingsBtn.style.color = "#1e293b";
         }
 
-
-        loadSupplierOrders();
+        await loadSupplierOrders();
     }
 };
 
@@ -702,55 +632,34 @@ async function(tabName) {
 // LOAD SUPPLIER DASHBOARD
 // ============================================================
 
-export async function loadSupplierDashboard(
-    vendorId
-) {
+export async function loadSupplierDashboard(vendorId) {
+    const grid = getElement(
+        "supplierListingsGrid"
+    );
 
-    const grid =
-        document.getElementById(
-            "supplierListingsGrid"
-        );
+    const statActiveListings = getElement(
+        "statActiveListings"
+    );
 
+    const statTotalOrders = getElement(
+        "statTotalOrders"
+    );
 
-    const statActiveListings =
-        document.getElementById(
-            "statActiveListings"
-        );
-
-
-    const statTotalOrders =
-        document.getElementById(
-            "statTotalOrders"
-        );
-
-
-    const statRevenue =
-        document.getElementById(
-            "statRevenue"
-        );
-
+    const statRevenue = getElement(
+        "statRevenue"
+    );
 
     if (!grid) {
         return;
     }
 
-
     let userSession =
         await getCurrentUserSession();
 
-
     if (!vendorId) {
-
-        if (
-            userSession &&
-            userSession.uid
-        ) {
-
-            vendorId =
-                userSession.uid;
-
+        if (userSession?.uid) {
+            vendorId = userSession.uid;
         } else {
-
             grid.innerHTML =
                 "<p>Please sign in as a supplier to view your inventory.</p>";
 
@@ -758,445 +667,286 @@ export async function loadSupplierDashboard(
         }
     }
 
-
-    // If dashboard was called with a UID,
-    // still use the current supplier profile.
     if (
         !userSession ||
         userSession.uid !== vendorId
     ) {
-
         userSession =
             await getCurrentUserSession();
     }
 
-
-    // --------------------------------------------------------
-    // LOCATION FIELD
-    // --------------------------------------------------------
-
     if (userSession) {
-
-        applyRegisteredLocationToForm(
-            userSession
-        );
+        applyRegisteredLocationToForm(userSession);
     }
-
 
     grid.innerHTML =
         "<p>Loading your inventory...</p>";
 
-
     try {
+        // Supplier listings
 
-        // ====================================================
-        // STRICT SUPPLIER LISTING QUERY
-        // ====================================================
+        const listingsQuery = query(
+            collection(db, "listings"),
+            where("vendorId", "==", vendorId)
+        );
 
-        let querySnapshot;
-
-
-        try {
-
-            const q =
-                query(
-                    collection(
-                        db,
-                        "listings"
-                    ),
-                    where(
-                        "vendorId",
-                        "==",
-                        vendorId
-                    )
-                );
-
-
-            querySnapshot =
-                await getDocs(q);
-
-
-        } catch (queryError) {
-
-            console.error(
-                "Vendor listing query failed:",
-                queryError
-            );
-
-
-            throw queryError;
-        }
-
+        const querySnapshot = await getDocs(
+            listingsQuery
+        );
 
         grid.innerHTML = "";
 
         window._supplierListingsCache = {};
 
-
         let activeCount = 0;
 
-
-        if (
-            querySnapshot.empty
-        ) {
-
+        if (querySnapshot.empty) {
             grid.innerHTML =
                 "<p>You haven't posted any listings yet.</p>";
         }
 
+        querySnapshot.forEach(docSnap => {
+            activeCount++;
 
-        querySnapshot.forEach(
-            docSnap => {
+            const item = docSnap.data();
 
-                activeCount++;
+            window._supplierListingsCache[
+                docSnap.id
+            ] = item;
 
+            const card = document.createElement("div");
 
-                const item =
-                    docSnap.data();
+            card.className =
+                "product-card card p-3 mb-3";
 
+            // Existing image compatibility
 
-                window._supplierListingsCache[
-                    docSnap.id
-                ] = item;
+            const displayImages =
+                getListingImages(item);
 
+            let imgThumbnail = "";
 
-                const card =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                card.className =
-                    "product-card card p-3 mb-3";
-
-
-                // ------------------------------------------------
-                // IMAGES
-                // ------------------------------------------------
-
-                let imgThumbnail = "";
-
-
-                let displayImages = [];
-
-
-                if (
-                    Array.isArray(
-                        item.images
-                    ) &&
-                    item.images.length > 0
-                ) {
-
-                    displayImages =
-                        item.images;
-
-                } else if (
-                    Array.isArray(
-                        item.imageUrls
-                    ) &&
-                    item.imageUrls.length > 0
-                ) {
-
-                    displayImages =
-                        item.imageUrls;
-
-                } else if (
-                    item.imageUrl
-                ) {
-
-                    displayImages = [
-                        item.imageUrl
-                    ];
-                }
-
-
-                if (
-                    displayImages.length > 0
-                ) {
-
-                    imgThumbnail = `
-
-                        <div
+            if (displayImages.length > 0) {
+                imgThumbnail = `
+                    <div style="
+                        width:60px;
+                        height:60px;
+                        background:#f8fafc;
+                        border-radius:6px;
+                        margin-right:1rem;
+                        overflow:hidden;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        flex-shrink:0;
+                    ">
+                        <img
+                            src="${escapeHTML(displayImages[0])}"
+                            alt="${escapeHTML(item.title || "Gas product")}"
+                            loading="lazy"
                             style="
-                                width:60px;
-                                height:60px;
-                                background:#f8fafc;
-                                border-radius:4px;
-                                margin-right:1rem;
-                                overflow:hidden;
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
+                                width:100%;
+                                height:100%;
+                                object-fit:contain;
                             "
                         >
-
-                            <img
-                                src="${escapeHTML(
-                                    displayImages[0]
-                                )}"
-                                alt="Gas"
-                                style="
-                                    width:100%;
-                                    height:100%;
-                                    object-fit:contain;
-                                "
-                            >
-
-                        </div>
-                    `;
-                }
-
-
-                // ------------------------------------------------
-                // LOCATION
-                // ------------------------------------------------
-
-                const listingLocation =
-                    formatLocation(
-                        item.supplierLocation
-                    ) ||
-                    formatLocation(
-                        item.location
-                    ) ||
-                    "Location unavailable";
-
-
-                // ------------------------------------------------
-                // CARD
-                // ------------------------------------------------
-
-                card.innerHTML = `
-
-                    <div
-                        class="
-                            d-flex
-                            justify-content-between
-                            align-items-start
-                        "
-                    >
-
-                        <div
-                            class="
-                                d-flex
-                                align-items-center
-                            "
-                        >
-
-                            ${imgThumbnail}
-
-
-                            <div>
-
-                                <h4
-                                    class="
-                                        fs-6
-                                        fw-bold
-                                        mb-1
-                                    "
-                                >
-                                    ${escapeHTML(
-                                        item.title ||
-                                        "Cooking Gas"
-                                    )}
-                                </h4>
-
-
-                                <p
-                                    class="
-                                        text-primary
-                                        fw-semibold
-                                        mb-1
-                                    "
-                                >
-                                    KES
-                                    ${escapeHTML(
-                                        item.price ??
-                                        ""
-                                    )}
-                                </p>
-
-
-                                <p
-                                    class="
-                                        text-muted
-                                        small
-                                        mb-1
-                                    "
-                                >
-                                    Location:
-                                    ${escapeHTML(
-                                        listingLocation
-                                    )}
-                                </p>
-
-
-                                <p
-                                    style="
-                                        font-size:0.85rem;
-                                        color:#64748b;
-                                    "
-                                    class="mb-2"
-                                >
-                                    Size:
-                                    ${escapeHTML(
-                                        item.size ||
-                                        "Not specified"
-                                    )}
-
-                                    |
-
-                                    Category:
-                                    ${escapeHTML(
-                                        item.category ||
-                                        "Not specified"
-                                    )}
-                                </p>
-
-                            </div>
-
-                        </div>
-
                     </div>
-
-
-                    <div
-                        class="
-                            d-flex
-                            gap-2
-                            mt-2
-                        "
-                    >
-
-                        <button
-                            type="button"
-                            class="
-                                btn
-                                btn-warning
-                                btn-sm
-                                text-white
-                                px-3
-                            "
-                            onclick="
-                                window.editListing(
-                                    '${escapeHTML(
-                                        docSnap.id
-                                    )}'
-                                )
-                            "
-                        >
-                            Edit
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="
-                                btn
-                                btn-danger
-                                btn-sm
-                                px-3
-                            "
-                            onclick="
-                                window.deleteListing(
-                                    '${escapeHTML(
-                                        docSnap.id
-                                    )}'
-                                )
-                            "
-                        >
-                            Delete
-                        </button>
-
-                    </div>
-
                 `;
-
-
-                grid.appendChild(
-                    card
-                );
+            } else {
+                imgThumbnail = `
+                    <div style="
+                        width:60px;
+                        height:60px;
+                        background:#f1f5f9;
+                        border-radius:6px;
+                        margin-right:1rem;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        flex-shrink:0;
+                        color:#94a3b8;
+                        font-size:12px;
+                    ">
+                        No image
+                    </div>
+                `;
             }
-        );
 
+            const listingLocation =
+                formatLocation(item.supplierLocation) ||
+                formatLocation(item.location) ||
+                "Location unavailable";
+
+            card.innerHTML = `
+                <div class="
+                    d-flex
+                    justify-content-between
+                    align-items-start
+                ">
+                    <div class="
+                        d-flex
+                        align-items-center
+                        min-w-0
+                    ">
+                        ${imgThumbnail}
+
+                        <div class="min-w-0">
+                            <h4 class="
+                                fs-6
+                                fw-bold
+                                mb-1
+                            ">
+                                ${escapeHTML(
+                                    item.title || "Cooking Gas"
+                                )}
+                            </h4>
+
+                            <p class="
+                                text-primary
+                                fw-semibold
+                                mb-1
+                            ">
+                                KES ${escapeHTML(
+                                    formatCurrency(item.price)
+                                )}
+                            </p>
+
+                            <p class="
+                                text-muted
+                                small
+                                mb-1
+                            ">
+                                Location:
+                                ${escapeHTML(listingLocation)}
+                            </p>
+
+                            <p style="
+                                font-size:0.85rem;
+                                color:#64748b;
+                            " class="mb-2">
+                                Size:
+                                ${escapeHTML(
+                                    item.size || "Not specified"
+                                )}
+
+                                |
+
+                                Category:
+                                ${escapeHTML(
+                                    item.category || "Not specified"
+                                )}
+                            </p>
+
+                            <p class="
+                                small
+                                text-muted
+                                mb-0
+                            ">
+                                ${displayImages.length}
+                                image(s)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="
+                    d-flex
+                    gap-2
+                    mt-2
+                ">
+                    <button
+                        type="button"
+                        class="
+                            btn
+                            btn-warning
+                            btn-sm
+                            text-white
+                            px-3
+                        "
+                        data-action="edit"
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        type="button"
+                        class="
+                            btn
+                            btn-danger
+                            btn-sm
+                            px-3
+                        "
+                        data-action="delete"
+                    >
+                        Delete
+                    </button>
+                </div>
+            `;
+
+            // Bind buttons without inserting IDs into inline JS.
+
+            const editBtn = card.querySelector(
+                '[data-action="edit"]'
+            );
+
+            const deleteBtn = card.querySelector(
+                '[data-action="delete"]'
+            );
+
+            editBtn.addEventListener("click", () => {
+                window.editListing(docSnap.id);
+            });
+
+            deleteBtn.addEventListener("click", () => {
+                window.deleteListing(docSnap.id);
+            });
+
+            grid.appendChild(card);
+        });
 
         if (statActiveListings) {
-
-            statActiveListings.textContent =
-                activeCount;
+            statActiveListings.textContent = activeCount;
         }
 
+        // Supplier orders and statistics
 
-        // ====================================================
-        // SUPPLIER ORDERS
-        // ====================================================
-
-        const ordersQuery =
-            query(
-                collection(
-                    db,
-                    "orders"
-                ),
-                where(
-                    "vendorId",
-                    "==",
-                    vendorId
-                )
-            );
-
-
-        const ordersSnapshot =
-            await getDocs(
-                ordersQuery
-            );
-
-
-        let orderCount = 0;
-
-        let totalRev = 0;
-
-
-        ordersSnapshot.forEach(
-            ordDoc => {
-
-                orderCount++;
-
-
-                const ordData =
-                    ordDoc.data();
-
-
-                totalRev +=
-                    Number(
-                        ordData.total || 0
-                    );
-            }
+        const ordersQuery = query(
+            collection(db, "orders"),
+            where("vendorId", "==", vendorId)
         );
 
+        const ordersSnapshot = await getDocs(
+            ordersQuery
+        );
+
+        let orderCount = 0;
+        let totalRev = 0;
+
+        ordersSnapshot.forEach(ordDoc => {
+            orderCount++;
+
+            const ordData = ordDoc.data();
+
+            totalRev += Number(ordData.total || 0);
+        });
 
         if (statTotalOrders) {
-
-            statTotalOrders.textContent =
-                orderCount;
+            statTotalOrders.textContent = orderCount;
         }
-
 
         if (statRevenue) {
-
             statRevenue.textContent =
-                totalRev.toLocaleString();
+                formatCurrency(totalRev);
         }
 
-
     } catch (err) {
-
         console.error(
-            "Error loading supplier dashboard data:",
+            "Error loading supplier dashboard:",
             err
         );
 
-
         grid.innerHTML =
-            "<p>Failed to load dashboard inventory.</p>";
+            "<p>Failed to load dashboard inventory. Please refresh and try again.</p>";
     }
 }
 
@@ -1205,142 +955,104 @@ export async function loadSupplierDashboard(
 // EDIT LISTING
 // ============================================================
 
-window.editListing =
-function(id) {
-
+window.editListing = async function(id) {
     const item =
-        window._supplierListingsCache[
-            id
-        ];
-
+        window._supplierListingsCache[id];
 
     if (!item) {
+        showMessage(
+            "Listing information could not be found. Please refresh your dashboard."
+        );
+
         return;
     }
 
+    const session =
+        await getCurrentUserSession();
 
-    const titleInput =
-        document.getElementById(
-            "supplierItemTitle"
+    if (!session?.uid) {
+        showMessage("Please sign in again.");
+        return;
+    }
+
+    const owner =
+        item.vendorId ||
+        item.supplierId;
+
+    if (owner !== session.uid) {
+        showMessage(
+            "You are not authorized to edit this listing."
         );
 
+        return;
+    }
 
-    const sizeInput =
-        document.getElementById(
-            "supplierItemSize"
-        );
+    const titleInput = getElement(
+        "supplierItemTitle"
+    );
 
+    const sizeInput = getElement(
+        "supplierItemSize"
+    );
 
-    const categoryInput =
-        document.getElementById(
-            "supplierItemCategory"
-        );
+    const categoryInput = getElement(
+        "supplierItemCategory"
+    );
 
+    const priceInput = getElement(
+        "supplierItemPrice"
+    );
 
-    const priceInput =
-        document.getElementById(
-            "supplierItemPrice"
-        );
-
-
-    const descriptionInput =
-        document.getElementById(
-            "supplierItemDescription"
-        );
-
+    const descriptionInput = getElement(
+        "supplierItemDescription"
+    );
 
     if (titleInput) {
-        titleInput.value =
-            item.title || "";
+        titleInput.value = item.title || "";
     }
-
 
     if (sizeInput) {
-        sizeInput.value =
-            item.size || "6kg";
+        sizeInput.value = item.size || "6kg";
     }
-
 
     if (categoryInput) {
-        categoryInput.value =
-            item.category || "refill";
+        categoryInput.value = item.category || "refill";
     }
-
 
     if (priceInput) {
-        priceInput.value =
-            item.price || "";
+        priceInput.value = item.price ?? "";
     }
-
 
     if (descriptionInput) {
         descriptionInput.value =
             item.description || "";
     }
 
+    applyRegisteredLocationToForm(session);
 
-    // --------------------------------------------------------
-    // LOCATION
-    // --------------------------------------------------------
-    //
-    // Do NOT allow an old listing location to become the
-    // supplier's current registered location.
-    //
-    // It will be replaced with the registered location when
-    // the form is submitted.
-    //
-    // --------------------------------------------------------
+    editingListingId = id;
 
-    getCurrentUserSession()
-        .then(session => {
-
-            if (session) {
-
-                applyRegisteredLocationToForm(
-                    session
-                );
-            }
-        });
-
-
-    editingListingId =
-        id;
-
-
-    const submitBtn =
-        document.querySelector(
-            "#supplierListingForm button[type='submit']"
-        );
-
+    const submitBtn = document.querySelector(
+        "#supplierListingForm button[type='submit']"
+    );
 
     if (submitBtn) {
-
-        submitBtn.textContent =
-            "Update Listing";
+        submitBtn.textContent = "Update Listing";
     }
 
-
-    const formTitle =
-        document.querySelector(
-            "#supplierListingForm h3"
-        );
-
+    const formTitle = document.querySelector(
+        "#supplierListingForm h3"
+    );
 
     if (formTitle) {
-
-        formTitle.textContent =
-            "Edit Gas Listing";
+        formTitle.textContent = "Edit Gas Listing";
     }
 
-
-    const form =
-        document.getElementById(
-            "supplierListingForm"
-        );
-
+    const form = getElement(
+        "supplierListingForm"
+    );
 
     if (form) {
-
         form.scrollIntoView({
             behavior: "smooth",
             block: "start"
@@ -1353,9 +1065,7 @@ function(id) {
 // DELETE LISTING
 // ============================================================
 
-window.deleteListing =
-async function(id) {
-
+window.deleteListing = async function(id) {
     if (
         !confirm(
             "Are you sure you want to delete this listing?"
@@ -1364,103 +1074,66 @@ async function(id) {
         return;
     }
 
-
     try {
-
         const session =
             await getCurrentUserSession();
 
-
-        if (
-            !session ||
-            !session.uid
-        ) {
-
-            alert(
-                "Please sign in again."
-            );
-
+        if (!session?.uid) {
+            showMessage("Please sign in again.");
             return;
         }
 
+        const listingRef = doc(
+            db,
+            "listings",
+            id
+        );
 
-        // ----------------------------------------------------
-        // SECURITY CHECK
-        // ----------------------------------------------------
+        const listingSnap = await getDoc(
+            listingRef
+        );
 
-        const listingRef =
-            doc(
-                db,
-                "listings",
-                id
-            );
-
-
-        const listingSnap =
-            await getDoc(
-                listingRef
-            );
-
-
-        if (
-            !listingSnap.exists()
-        ) {
-
-            alert(
+        if (!listingSnap.exists()) {
+            showMessage(
                 "This listing no longer exists."
             );
 
+            await loadSupplierDashboard(session.uid);
             return;
         }
 
-
-        const listing =
-            listingSnap.data();
-
+        const listing = listingSnap.data();
 
         const listingOwner =
             listing.vendorId ||
             listing.supplierId;
 
-
-        if (
-            listingOwner !==
-            session.uid
-        ) {
-
-            alert(
+        if (listingOwner !== session.uid) {
+            showMessage(
                 "You are not authorized to delete this listing."
             );
 
             return;
         }
 
+        await deleteDoc(listingRef);
 
-        await deleteDoc(
-            listingRef
-        );
+        delete window._supplierListingsCache[id];
 
-
-        alert(
+        showMessage(
             "Listing removed successfully."
         );
 
-
-        loadSupplierDashboard(
-            session.uid
-        );
-
+        await loadSupplierDashboard(session.uid);
 
     } catch (err) {
-
         console.error(
             "Error deleting listing:",
             err
         );
 
-
-        alert(
-            "Failed to delete listing."
+        showMessage(
+            "Failed to delete listing. Please try again."
         );
     }
 };
@@ -1471,812 +1144,149 @@ async function(id) {
 // ============================================================
 
 async function loadSupplierOrders() {
-
-    const ordersListEl =
-        document.getElementById(
-            "supplierOrdersList"
-        );
-
+    const ordersListEl = getElement(
+        "supplierOrdersList"
+    );
 
     if (!ordersListEl) {
         return;
     }
 
-
     const userSession =
         await getCurrentUserSession();
 
-
-    if (
-        !userSession ||
-        !userSession.uid
-    ) {
-
+    if (!userSession?.uid) {
         ordersListEl.innerHTML =
             "<p>Please sign in as a supplier to view orders.</p>";
 
         return;
     }
 
-
     ordersListEl.innerHTML =
         "<p>Loading customer orders...</p>";
 
-
     try {
+        const q = query(
+            collection(db, "orders"),
+            where("vendorId", "==", userSession.uid)
+        );
 
-        const q =
-            query(
-                collection(
-                    db,
-                    "orders"
-                ),
-                where(
-                    "vendorId",
-                    "==",
-                    userSession.uid
-                )
-            );
+        const querySnapshot = await getDocs(q);
 
-
-        const querySnapshot =
-            await getDocs(q);
-
-
-        if (
-            querySnapshot.empty
-        ) {
-
+        if (querySnapshot.empty) {
             ordersListEl.innerHTML =
                 "<p>No orders received yet.</p>";
 
             return;
         }
 
-
         let html = "";
 
+        querySnapshot.forEach(docSnap => {
+            const order = docSnap.data();
 
-        querySnapshot.forEach(
-            docSnap => {
+            html += `
+                <div style="
+                    border-bottom:1px solid #e2e8f0;
+                    padding:0.75rem 0;
+                ">
+                    <p>
+                        <strong>Order ID:</strong>
+                        ${escapeHTML(docSnap.id)}
+                    </p>
 
-                const order =
-                    docSnap.data();
+                    <p>
+                        <strong>Customer:</strong>
+                        ${escapeHTML(
+                            order.customerName || "Customer"
+                        )}
 
+                        ${
+                            order.customerPhone
+                                ? `(${escapeHTML(order.customerPhone)})`
+                                : ""
+                        }
+                    </p>
 
-                html += `
+                    <p>
+                        <strong>Delivery Location:</strong>
+                        ${escapeHTML(
+                            order.deliveryAddress || "Not provided"
+                        )}
+                    </p>
 
-                    <div
-                        style="
-                            border-bottom:1px solid #e2e8f0;
-                            padding:0.75rem 0;
-                        "
-                    >
+                    <p>
+                        <strong>Total Amount:</strong>
+                        KES ${escapeHTML(
+                            formatCurrency(order.total ?? 0)
+                        )}
+                    </p>
 
-                        <p>
-                            <strong>
-                                Order ID:
-                            </strong>
+                    <p style="
+                        font-size:0.85rem;
+                        color:#64748b;
+                    ">
+                        <strong>Status:</strong>
+                        ${escapeHTML(
+                            order.status ||
+                            "Pending M-Pesa Confirmation"
+                        )}
+                    </p>
+                </div>
+            `;
+        });
 
-                            ${escapeHTML(
-                                docSnap.id
-                            )}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Customer:
-                            </strong>
-
-                            ${escapeHTML(
-                                order.customerName ||
-                                "Customer"
-                            )}
-
-                            ${
-                                order.customerPhone
-                                    ? `(${escapeHTML(
-                                        order.customerPhone
-                                      )})`
-                                    : ""
-                            }
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Delivery Location:
-                            </strong>
-
-                            ${escapeHTML(
-                                order.deliveryAddress ||
-                                "Not provided"
-                            )}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Total Amount:
-                            </strong>
-
-                            KES
-                            ${escapeHTML(
-                                order.total ??
-                                0
-                            )}
-                        </p>
-
-
-                        <p
-                            style="
-                                font-size:0.85rem;
-                                color:#64748b;
-                            "
-                        >
-                            Status:
-
-                            ${escapeHTML(
-                                order.status ||
-                                "Pending M-Pesa Confirmation"
-                            )}
-                        </p>
-
-                    </div>
-                `;
-            }
-        );
-
-
-        ordersListEl.innerHTML =
-            html;
-
+        ordersListEl.innerHTML = html;
 
     } catch (err) {
-
         console.error(
-            "Error loading orders:",
+            "Error loading supplier orders:",
             err
         );
 
-
         ordersListEl.innerHTML =
-            "<p>Error loading customer orders.</p>";
+            "<p>Error loading customer orders. Please try again.</p>";
     }
 }
 
 
 // ============================================================
-// LISTING FORM
+// IMAGE VALIDATION
 // ============================================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+function validateImageFiles(files) {
+    if (!files || files.length === 0) {
+        return true;
+    }
 
-        const listingForm =
-            document.getElementById(
-                "supplierListingForm"
+    if (files.length > MAX_IMAGES) {
+        showMessage(
+            `You can upload a maximum of ${MAX_IMAGES} images per listing.`
+        );
+
+        return false;
+    }
+
+    for (const file of files) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            showMessage(
+                "Only JPG, PNG and WebP images are supported."
             );
 
-
-        // ====================================================
-        // FIREBASE AUTH STATE
-        // ====================================================
-
-        onAuthStateChanged(
-            auth,
-            async user => {
-
-                if (user) {
-
-                    await loadSupplierDashboard(
-                        user.uid
-                    );
-
-                } else {
-
-                    const session =
-                        await getCurrentUserSession();
-
-
-                    if (
-                        session &&
-                        session.uid
-                    ) {
-
-                        await loadSupplierDashboard(
-                            session.uid
-                        );
-                    }
-                }
-            }
-        );
-
-
-        if (!listingForm) {
-            return;
+            return false;
         }
 
-
-        // ====================================================
-        // SUBMIT
-        // ====================================================
-
-        listingForm.addEventListener(
-            "submit",
-            async e => {
-
-                e.preventDefault();
-
-
-                const userSession =
-                    await getCurrentUserSession();
-
-
-                if (
-                    !userSession ||
-                    !userSession.uid
-                ) {
-
-                    alert(
-                        "Please sign in as a supplier to post listings. No active session found."
-                    );
-
-                    return;
-                }
-
-
-                // ------------------------------------------------
-                // LOCATION MUST BE REGISTERED
-                // ------------------------------------------------
-
-                if (
-                    !requireRegisteredLocation(
-                        userSession
-                    )
-                ) {
-                    return;
-                }
-
-
-                const submitBtn =
-                    listingForm.querySelector(
-                        'button[type="submit"]'
-                    );
-
-
-                const isEditing =
-                    Boolean(
-                        editingListingId
-                    );
-
-
-                if (submitBtn) {
-
-                    submitBtn.disabled =
-                        true;
-
-                    submitBtn.textContent =
-                        isEditing
-                            ? "Updating..."
-                            : "Publishing...";
-                }
-
-
-                try {
-
-                    // ==========================================
-                    // FORM VALUES
-                    // ==========================================
-
-                    const titleInput =
-                        document.getElementById(
-                            "supplierItemTitle"
-                        );
-
-
-                    const sizeInput =
-                        document.getElementById(
-                            "supplierItemSize"
-                        );
-
-
-                    const categoryInput =
-                        document.getElementById(
-                            "supplierItemCategory"
-                        );
-
-
-                    const priceInput =
-                        document.getElementById(
-                            "supplierItemPrice"
-                        );
-
-
-                    const descriptionInput =
-                        document.getElementById(
-                            "supplierItemDescription"
-                        );
-
-
-                    const title =
-                        titleInput?.value
-                            .trim() || "";
-
-
-                    const size =
-                        sizeInput?.value || "";
-
-
-                    const category =
-                        categoryInput?.value || "";
-
-
-                    const price =
-                        parseFloat(
-                            priceInput?.value
-                        );
-
-
-                    const description =
-                        descriptionInput?.value
-                            .trim() || "";
-
-
-                    // ==========================================
-                    // VALIDATION
-                    // ==========================================
-
-                    if (!title) {
-
-                        alert(
-                            "Please enter a product title."
-                        );
-
-                        return;
-                    }
-
-
-                    if (!size) {
-
-                        alert(
-                            "Please select the gas size."
-                        );
-
-                        return;
-                    }
-
-
-                    if (!category) {
-
-                        alert(
-                            "Please select the product category."
-                        );
-
-                        return;
-                    }
-
-
-                    if (
-                        !Number.isFinite(price) ||
-                        price <= 0
-                    ) {
-
-                        alert(
-                            "Please enter a valid product price."
-                        );
-
-                        return;
-                    }
-
-
-                    // ==========================================
-                    // AUTHORITATIVE LOCATION
-                    // ==========================================
-                    //
-                    // IMPORTANT:
-                    // Never read the location from the form.
-                    //
-                    // The supplier profile is the source of truth.
-                    //
-                    // ==========================================
-
-                    const supplierLocation =
-                        userSession.supplierLocation;
-
-
-                    const supplierTown =
-                        userSession.supplierTown ||
-                        "";
-
-
-                    const supplierCounty =
-                        userSession.supplierCounty ||
-                        "";
-
-
-                    // ==========================================
-                    // IMAGES
-                    // ==========================================
-
-                    const imageInput =
-                        document.getElementById(
-                            "supplierItemImage"
-                        ) ||
-
-                        document.getElementById(
-                            "supplierItemImages"
-                        ) ||
-
-                        listingForm.querySelector(
-                            'input[type="file"]'
-                        );
-
-
-                    let imageUrls = [];
-
-
-                    if (
-                        imageInput &&
-                        imageInput.files &&
-                        imageInput.files.length > 0
-                    ) {
-
-                        for (
-                            const file of imageInput.files
-                        ) {
-
-                            const compressedBase64 =
-                                await compressImage(
-                                    file,
-                                    800,
-                                    0.7
-                                );
-
-
-                            if (
-                                compressedBase64
-                            ) {
-
-                                imageUrls.push(
-                                    compressedBase64
-                                );
-                            }
-                        }
-                    }
-
-
-                    // ------------------------------------------------
-                    // KEEP OLD IMAGES DURING EDIT
-                    // ------------------------------------------------
-
-                    if (
-                        imageUrls.length === 0 &&
-                        editingListingId &&
-                        window
-                            ._supplierListingsCache[
-                                editingListingId
-                            ]
-                    ) {
-
-                        const oldListing =
-                            window
-                                ._supplierListingsCache[
-                                    editingListingId
-                                ];
-
-
-                        imageUrls =
-                            Array.isArray(
-                                oldListing.images
-                            )
-                                ? oldListing.images
-                                : (
-                                    Array.isArray(
-                                        oldListing.imageUrls
-                                    )
-                                        ? oldListing.imageUrls
-                                        : (
-                                            oldListing.imageUrl
-                                                ? [
-                                                    oldListing.imageUrl
-                                                  ]
-                                                : []
-                                        )
-                                );
-                    }
-
-
-                    // ==========================================
-                    // LOCATION SNAPSHOT
-                    // ==========================================
-
-                    const supplierLocationData = {
-
-                        town:
-                            supplierTown,
-
-                        county:
-                            supplierCounty,
-
-                        display:
-                            supplierLocation
-                    };
-
-
-                    // ==========================================
-                    // UPDATE EXISTING LISTING
-                    // ==========================================
-
-                    if (
-                        editingListingId
-                    ) {
-
-                        const listingRef =
-                            doc(
-                                db,
-                                "listings",
-                                editingListingId
-                            );
-
-
-                        const existingSnap =
-                            await getDoc(
-                                listingRef
-                            );
-
-
-                        if (
-                            !existingSnap.exists()
-                        ) {
-
-                            alert(
-                                "This listing no longer exists."
-                            );
-
-                            return;
-                        }
-
-
-                        const existingListing =
-                            existingSnap.data();
-
-
-                        const existingOwner =
-                            existingListing.vendorId ||
-                            existingListing.supplierId;
-
-
-                        if (
-                            existingOwner !==
-                            userSession.uid
-                        ) {
-
-                            alert(
-                                "You are not authorized to edit this listing."
-                            );
-
-                            return;
-                        }
-
-
-                        await updateDoc(
-                            listingRef,
-                            {
-
-                                title,
-
-                                size,
-
-                                category,
-
-                                price,
-
-                                description,
-
-                                // Authoritative location
-                                location:
-                                    supplierLocation,
-
-                                supplierLocation:
-                                    supplierLocationData,
-
-                                // Keep both IDs for compatibility
-                                vendorId:
-                                    userSession.uid,
-
-                                supplierId:
-                                    userSession.uid,
-
-                                vendorName:
-                                    userSession.businessName,
-
-                                images:
-                                    imageUrls,
-
-                                updatedAt:
-                                    new Date().toISOString()
-                            }
-                        );
-
-
-                        alert(
-                            "Listing updated successfully!"
-                        );
-
-
-                    } else {
-
-                        // ==========================================
-                        // CREATE NEW LISTING
-                        // ==========================================
-
-                        await addDoc(
-                            collection(
-                                db,
-                                "listings"
-                            ),
-                            {
-
-                                // --------------------------------
-                                // SUPPLIER IDENTITY
-                                // --------------------------------
-
-                                vendorId:
-                                    userSession.uid,
-
-                                supplierId:
-                                    userSession.uid,
-
-                                vendorName:
-                                    userSession.businessName,
-
-
-                                // --------------------------------
-                                // REGISTERED LOCATION
-                                // --------------------------------
-
-                                location:
-                                    supplierLocation,
-
-                                supplierLocation:
-                                    supplierLocationData,
-
-
-                                supplierTown:
-                                    supplierTown,
-
-                                supplierCounty:
-                                    supplierCounty,
-
-
-                                // --------------------------------
-                                // PRODUCT
-                                // --------------------------------
-
-                                title,
-
-                                size,
-
-                                category,
-
-                                price,
-
-                                description,
-
-
-                                // --------------------------------
-                                // IMAGES
-                                // --------------------------------
-
-                                images:
-                                    imageUrls,
-
-
-                                // --------------------------------
-                                // TIMESTAMPS
-                                // --------------------------------
-
-                                createdAt:
-                                    new Date().toISOString(),
-
-                                updatedAt:
-                                    new Date().toISOString()
-                            }
-                        );
-
-
-                        alert(
-                            "Listing published successfully!"
-                        );
-                    }
-
-
-                    // ==================================================
-                    // RESET FORM
-                    // ==================================================
-
-                    listingForm.reset();
-
-
-                    editingListingId =
-                        null;
-
-
-                    const formTitle =
-                        document.querySelector(
-                            "#supplierListingForm h3"
-                        );
-
-
-                    if (formTitle) {
-
-                        formTitle.textContent =
-                            "Post New Gas Listing";
-                    }
-
-
-                    const locationInput =
-                        document.getElementById(
-                            "supplierItemLocation"
-                        );
-
-
-                    if (locationInput) {
-
-                        locationInput.value =
-                            userSession.supplierLocation;
-
-                        locationInput.readOnly =
-                            true;
-                    }
-
-
-                    if (submitBtn) {
-
-                        submitBtn.textContent =
-                            "Publish Listing";
-                    }
-
-
-                    await loadSupplierDashboard(
-                        userSession.uid
-                    );
-
-
-                } catch (err) {
-
-                    console.error(
-                        "Error saving listing:",
-                        err
-                    );
-
-
-                    alert(
-                        "Failed to save listing. Please try again."
-                    );
-
-
-                } finally {
-
-                    if (submitBtn) {
-
-                        submitBtn.disabled =
-                            false;
-
-
-                        submitBtn.textContent =
-                            editingListingId
-                                ? "Update Listing"
-                                : "Publish Listing";
-                    }
-                }
-            }
-        );
+        if (file.size > MAX_ORIGINAL_IMAGE_SIZE) {
+            showMessage(
+                `${file.name} is too large. Each image must be 8 MB or smaller.`
+            );
+
+            return false;
+        }
     }
-);
+
+    return true;
+}
 
 
 // ============================================================
@@ -2288,141 +1298,567 @@ function compressImage(
     maxWidth = 800,
     quality = 0.7
 ) {
-
-    return new Promise(
-        resolve => {
-
-            const reader =
-                new FileReader();
-
-
-            reader.readAsDataURL(
-                file
+    return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith("image/")) {
+            reject(
+                new Error("Invalid image file.")
             );
 
+            return;
+        }
 
-            reader.onload =
-                event => {
+        const reader = new FileReader();
 
-                    const img =
-                        new Image();
+        reader.onerror = () => {
+            reject(
+                new Error("Could not read image file.")
+            );
+        };
 
+        reader.onload = event => {
+            const img = new Image();
 
-                    img.onload =
-                        () => {
+            img.onerror = () => {
+                reject(
+                    new Error("Could not load selected image.")
+                );
+            };
 
-                            try {
+            img.onload = () => {
+                try {
+                    const attempts = [
+                        {
+                            width: maxWidth,
+                            quality
+                        },
+                        {
+                            width: 700,
+                            quality: 0.6
+                        },
+                        {
+                            width: 600,
+                            quality: 0.5
+                        },
+                        {
+                            width: 500,
+                            quality: 0.4
+                        }
+                    ];
 
-                                const canvas =
-                                    document.createElement(
-                                        "canvas"
-                                    );
+                    let compressedImage = null;
 
+                    for (const attempt of attempts) {
+                        const scale = Math.min(
+                            1,
+                            attempt.width / img.width,
+                            800 / img.height
+                        );
 
-                                let width =
-                                    img.width;
+                        const width = Math.max(
+                            1,
+                            Math.round(img.width * scale)
+                        );
 
+                        const height = Math.max(
+                            1,
+                            Math.round(img.height * scale)
+                        );
 
-                                let height =
-                                    img.height;
+                        const canvas =
+                            document.createElement("canvas");
 
+                        canvas.width = width;
+                        canvas.height = height;
 
-                                if (
-                                    width >
-                                    maxWidth
-                                ) {
+                        const ctx = canvas.getContext("2d");
 
-                                    height =
-                                        Math.round(
-                                            (
-                                                height *
-                                                maxWidth
-                                            ) /
-                                            width
-                                        );
-
-
-                                    width =
-                                        maxWidth;
-                                }
-
-
-                                canvas.width =
-                                    width;
-
-
-                                canvas.height =
-                                    height;
-
-
-                                const ctx =
-                                    canvas.getContext(
-                                        "2d"
-                                    );
-
-
-                                ctx.drawImage(
-                                    img,
-                                    0,
-                                    0,
-                                    width,
-                                    height
-                                );
-
-
-                                resolve(
-                                    canvas.toDataURL(
-                                        "image/jpeg",
-                                        quality
-                                    )
-                                );
-
-
-                            } catch (error) {
-
-                                console.error(
-                                    "Canvas compression error:",
-                                    error
-                                );
-
-
-                                resolve(
-                                    event.target.result
-                                );
-                            }
-                        };
-
-
-                    img.onerror =
-                        () => {
-
-                            console.error(
-                                "Image load error."
+                        if (!ctx) {
+                            throw new Error(
+                                "Image compression is not supported by this browser."
                             );
+                        }
+
+                        // White background preserves a clean
+                        // appearance for transparent PNG images.
+
+                        ctx.fillStyle = "#ffffff";
+
+                        ctx.fillRect(
+                            0,
+                            0,
+                            width,
+                            height
+                        );
+
+                        ctx.drawImage(
+                            img,
+                            0,
+                            0,
+                            width,
+                            height
+                        );
+
+                        const result = canvas.toDataURL(
+                            "image/jpeg",
+                            attempt.quality
+                        );
+
+                        if (
+                            result.length <=
+                            MAX_COMPRESSED_IMAGE_LENGTH
+                        ) {
+                            compressedImage = result;
+                            break;
+                        }
+
+                        compressedImage = result;
+                    }
+
+                    if (
+                        !compressedImage ||
+                        compressedImage.length >
+                        MAX_COMPRESSED_IMAGE_LENGTH
+                    ) {
+                        throw new Error(
+                            `${file.name} could not be compressed sufficiently. Please choose a smaller image.`
+                        );
+                    }
+
+                    resolve(compressedImage);
+
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            img.src = event.target.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
 
 
-                            resolve(
-                                event.target.result
-                            );
-                        };
+// ============================================================
+// PROCESS SELECTED IMAGES
+// ============================================================
+
+async function processSelectedImages(imageInput) {
+    if (
+        !imageInput ||
+        !imageInput.files ||
+        imageInput.files.length === 0
+    ) {
+        return [];
+    }
+
+    const files = Array.from(imageInput.files);
+
+    if (!validateImageFiles(files)) {
+        throw new Error("Please correct the selected images.");
+    }
+
+    const compressedImages = [];
+
+    for (const file of files) {
+        const compressed = await compressImage(
+            file,
+            800,
+            0.7
+        );
+
+        if (compressed) {
+            compressedImages.push(compressed);
+        }
+    }
+
+    return compressedImages;
+}
 
 
-                    img.src =
-                        event.target.result;
-                };
+// ============================================================
+// LISTING FORM INITIALIZATION
+// ============================================================
 
+document.addEventListener("DOMContentLoaded", () => {
+    const listingForm = getElement(
+        "supplierListingForm"
+    );
 
-            reader.onerror =
-                error => {
+    // Firebase authentication state
 
-                    console.error(
-                        "FileReader error:",
-                        error
+    onAuthStateChanged(auth, async user => {
+        if (user) {
+            await loadSupplierDashboard(user.uid);
+        } else {
+            const session =
+                await getCurrentUserSession();
+
+            if (session?.uid) {
+                await loadSupplierDashboard(session.uid);
+            }
+        }
+    });
+
+    if (!listingForm) {
+        return;
+    }
+
+    // ========================================================
+    // FORM SUBMISSION
+    // ========================================================
+
+    listingForm.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        if (isSavingListing) {
+            return;
+        }
+
+        const userSession =
+            await getCurrentUserSession();
+
+        if (!userSession?.uid) {
+            showMessage(
+                "Please sign in as a supplier to post listings. No active session found."
+            );
+
+            return;
+        }
+
+        if (
+            !requireRegisteredLocation(userSession)
+        ) {
+            return;
+        }
+
+        const submitBtn = listingForm.querySelector(
+            'button[type="submit"]'
+        );
+
+        const isEditing = Boolean(editingListingId);
+
+        isSavingListing = true;
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+
+            submitBtn.textContent = isEditing
+                ? "Updating..."
+                : "Publishing...";
+        }
+
+        try {
+            // ------------------------------------------------
+            // FORM VALUES
+            // ------------------------------------------------
+
+            const titleInput = getElement(
+                "supplierItemTitle"
+            );
+
+            const sizeInput = getElement(
+                "supplierItemSize"
+            );
+
+            const categoryInput = getElement(
+                "supplierItemCategory"
+            );
+
+            const priceInput = getElement(
+                "supplierItemPrice"
+            );
+
+            const descriptionInput = getElement(
+                "supplierItemDescription"
+            );
+
+            const title =
+                titleInput?.value.trim() || "";
+
+            const size =
+                sizeInput?.value || "";
+
+            const category =
+                categoryInput?.value || "";
+
+            const price =
+                Number(priceInput?.value);
+
+            const description =
+                descriptionInput?.value.trim() || "";
+
+            // ------------------------------------------------
+            // VALIDATION
+            // ------------------------------------------------
+
+            if (!title) {
+                showMessage(
+                    "Please enter a product title."
+                );
+
+                return;
+            }
+
+            if (!size) {
+                showMessage(
+                    "Please select the gas size."
+                );
+
+                return;
+            }
+
+            if (!category) {
+                showMessage(
+                    "Please select the product category."
+                );
+
+                return;
+            }
+
+            if (
+                !Number.isFinite(price) ||
+                price <= 0
+            ) {
+                showMessage(
+                    "Please enter a valid product price."
+                );
+
+                return;
+            }
+
+            // ------------------------------------------------
+            // REGISTERED SUPPLIER LOCATION
+            // ------------------------------------------------
+
+            const supplierLocation =
+                userSession.supplierLocation;
+
+            const supplierTown =
+                userSession.supplierTown || "";
+
+            const supplierCounty =
+                userSession.supplierCounty || "";
+
+            const supplierLocationData = {
+                town: supplierTown,
+                county: supplierCounty,
+                display: supplierLocation
+            };
+
+            // ------------------------------------------------
+            // IMAGE INPUT
+            // ------------------------------------------------
+
+            const imageInput =
+                getElement("supplierItemImage") ||
+                getElement("supplierItemImages") ||
+                listingForm.querySelector(
+                    'input[type="file"]'
+                );
+
+            // ------------------------------------------------
+            // PROCESS NEW IMAGES
+            // ------------------------------------------------
+
+            let imageUrls = [];
+
+            if (
+                imageInput &&
+                imageInput.files &&
+                imageInput.files.length > 0
+            ) {
+                imageUrls =
+                    await processSelectedImages(imageInput);
+            }
+
+            // ------------------------------------------------
+            // KEEP EXISTING IMAGES WHEN NO NEW IMAGE SELECTED
+            // ------------------------------------------------
+
+            if (
+                imageUrls.length === 0 &&
+                editingListingId
+            ) {
+                const oldListing =
+                    window._supplierListingsCache[
+                        editingListingId
+                    ];
+
+                imageUrls =
+                    getListingImages(oldListing);
+            }
+
+            // ------------------------------------------------
+            // UPDATE EXISTING LISTING
+            // ------------------------------------------------
+
+            if (editingListingId) {
+                const listingRef = doc(
+                    db,
+                    "listings",
+                    editingListingId
+                );
+
+                const existingSnap = await getDoc(
+                    listingRef
+                );
+
+                if (!existingSnap.exists()) {
+                    showMessage(
+                        "This listing no longer exists."
                     );
 
+                    return;
+                }
 
-                    resolve(null);
-                };
+                const existingListing =
+                    existingSnap.data();
+
+                const existingOwner =
+                    existingListing.vendorId ||
+                    existingListing.supplierId;
+
+                if (
+                    existingOwner !== userSession.uid
+                ) {
+                    showMessage(
+                        "You are not authorized to edit this listing."
+                    );
+
+                    return;
+                }
+
+                await updateDoc(listingRef, {
+                    title,
+                    size,
+                    category,
+                    price,
+                    description,
+
+                    // Registered location remains authoritative.
+
+                    location: supplierLocation,
+
+                    supplierLocation:
+                        supplierLocationData,
+
+                    vendorId:
+                        userSession.uid,
+
+                    supplierId:
+                        userSession.uid,
+
+                    vendorName:
+                        userSession.businessName,
+
+                    // Keep the existing marketplace image format.
+
+                    images: imageUrls,
+
+                    updatedAt:
+                        new Date().toISOString()
+                });
+
+                showMessage(
+                    "Listing updated successfully!"
+                );
+
+            } else {
+                // --------------------------------------------
+                // CREATE NEW LISTING
+                // --------------------------------------------
+
+                await addDoc(
+                    collection(db, "listings"),
+                    {
+                        vendorId:
+                            userSession.uid,
+
+                        supplierId:
+                            userSession.uid,
+
+                        vendorName:
+                            userSession.businessName,
+
+                        location:
+                            supplierLocation,
+
+                        supplierLocation:
+                            supplierLocationData,
+
+                        supplierTown:
+                            supplierTown,
+
+                        supplierCounty:
+                            supplierCounty,
+
+                        title,
+                        size,
+                        category,
+                        price,
+                        description,
+
+                        // Existing marketplace image format.
+
+                        images: imageUrls,
+
+                        createdAt:
+                            new Date().toISOString(),
+
+                        updatedAt:
+                            new Date().toISOString()
+                    }
+                );
+
+                showMessage(
+                    "Listing published successfully!"
+                );
+            }
+
+            // ------------------------------------------------
+            // RESET FORM
+            // ------------------------------------------------
+
+            resetListingForm(userSession);
+
+            // Clear selected files explicitly.
+
+            if (imageInput) {
+                imageInput.value = "";
+            }
+
+            await loadSupplierDashboard(
+                userSession.uid
+            );
+
+        } catch (err) {
+            console.error(
+                "Error saving supplier listing:",
+                err
+            );
+
+            showMessage(
+                err.message ||
+                "Failed to save listing. Please try again."
+            );
+
+        } finally {
+            isSavingListing = false;
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+
+                submitBtn.textContent =
+                    editingListingId
+                        ? "Update Listing"
+                        : "Publish Listing";
+            }
         }
-    );
-}
+    });
+});
+
+
+// ============================================================
+// END OF SUPPLIER DASHBOARD
+// ============================================================
