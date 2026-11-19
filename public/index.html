@@ -2,768 +2,455 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GasHubKE - Kenya's Online Cooking Gas Hub</title>
+    <meta name="description" content="Fast, reliable cooking gas delivery. Find cooking gas prices, refills, cylinders, and accessories from verified local suppliers on GasHubKE.">
+    <meta name="keywords" content="GasHubKE, cooking gas delivery Kenya, gas refill near me, 6kg gas cylinder, 13kg gas price, LPG suppliers Kenya">
+    <meta name="author" content="GasHubKE">
+    <link rel="canonical" href="https://gashubke.com/">
 
-    <meta name="description"
-          content="Fast, reliable cooking gas delivery. Find cooking gas prices, refills, cylinders, and accessories from verified local suppliers on GasHubKE.">
+    <!-- OPEN GRAPH -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gashubke.com/">
+    <meta property="og:title" content="GasHubKE - Kenya's Online Cooking Gas Hub">
+    <meta property="og:description" content="Connect with trusted cooking gas suppliers and retailers for fast delivery on refills and cylinders.">
+    <meta property="og:image" content="https://gashubke.com/assets/og-banner.jpg">
 
-    <meta name="keywords"
-          content="GasHubKE, cooking gas delivery Kenya, gas refill near me, 6kg gas cylinder, 13kg gas price, LPG suppliers Kenya">
+    <!-- TWITTER -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GasHubKE - Cooking Gas Platform">
+    <meta name="twitter:description" content="Compare prices and order cooking gas cylinders and refills directly from verified local suppliers.">
+    <meta name="twitter:image" content="https://gashubke.com/assets/twitter-banner.jpg">
 
-    <meta name="author"
-          content="GasHubKE">
-
-    <link rel="canonical"
-          href="https://gashubke.com/">
-
-    <!-- =========================================================
-         OPEN GRAPH
-    ========================================================== -->
-
-    <meta property="og:type"
-          content="website">
-
-    <meta property="og:url"
-          content="https://gashubke.com/">
-
-    <meta property="og:title"
-          content="GasHubKE - Kenya's Online Cooking Gas Hub">
-
-    <meta property="og:description"
-          content="Connect with trusted cooking gas suppliers and retailers for fast delivery on refills and cylinders.">
-
-    <meta property="og:image"
-          content="https://gashubke.com/assets/og-banner.jpg">
-
-
-    <!-- =========================================================
-         TWITTER
-    ========================================================== -->
-
-    <meta name="twitter:card"
-          content="summary_large_image">
-
-    <meta name="twitter:title"
-          content="GasHubKE - Cooking Gas Platform">
-
-    <meta name="twitter:description"
-          content="Compare prices and order cooking gas cylinders and refills directly from verified local suppliers.">
-
-    <meta name="twitter:image"
-          content="https://gashubke.com/assets/twitter-banner.jpg">
-
-
-    <!-- =========================================================
-         MAIN CSS
-    ========================================================== -->
-
-    <link rel="stylesheet"
-          href="./css/styles.css">
-
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="./css/styles.css">
 
     <style>
-
-        /* =========================================================
-           PAGE LOADER
-        ========================================================== */
-
+        /* PAGE LOADER */
         #pageLoader {
             position: fixed;
             inset: 0;
-
             background: #ffffff;
-
             z-index: 99999;
-
             display: flex;
             flex-direction: column;
-
             align-items: center;
             justify-content: center;
-
-            transition:
-                opacity 0.4s ease,
-                visibility 0.4s ease;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
-
 
         .spinner-ring {
             width: 50px;
             height: 50px;
-
             border: 4px solid #f1f5f9;
             border-top-color: #f97316;
-
             border-radius: 50%;
-
-            animation:
-                gasHubSpin 0.8s linear infinite;
+            animation: gasHubSpin 0.8s linear infinite;
         }
-
 
         .spinner-text {
             margin-top: 1rem;
-
             font-size: 0.95rem;
             font-weight: 500;
-
             color: #64748b;
-
             letter-spacing: 0.5px;
         }
 
-
         @keyframes gasHubSpin {
-
-            to {
-                transform: rotate(360deg);
-            }
-
+            to { transform: rotate(360deg); }
         }
 
-
-        /* =========================================================
-           HEADER
-        ========================================================== */
-
+        /* HEADER */
         .navbar {
             position: relative;
-
             width: 100%;
-
             z-index: 5000;
         }
 
-
-        /* =========================================================
-           HAMBURGER
-        ========================================================== */
-
+        /* HAMBURGER */
         .hamburger {
-
             display: none;
-
             flex-direction: column;
             justify-content: space-between;
-
             width: 30px;
             height: 22px;
-
             background: transparent;
             border: none;
-
             padding: 0;
             margin-left: auto;
-
             cursor: pointer;
-
             z-index: 6000;
         }
 
-
         .hamburger span {
-
             display: block;
-
             width: 100%;
             height: 3px;
-
             background-color: #1e293b;
-
             border-radius: 3px;
-
-            transition:
-                transform 0.3s ease,
-                opacity 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
-
 
         .hamburger.open span:nth-child(1) {
-
-            transform:
-                translateY(9.5px)
-                rotate(45deg);
+            transform: translateY(9.5px) rotate(45deg);
         }
 
-
         .hamburger.open span:nth-child(2) {
-
             opacity: 0;
         }
 
-
         .hamburger.open span:nth-child(3) {
-
-            transform:
-                translateY(-9.5px)
-                rotate(-45deg);
+            transform: translateY(-9.5px) rotate(-45deg);
         }
 
-
-        /* =========================================================
-           DESKTOP NAVIGATION
-        ========================================================== */
-
+        /* DESKTOP NAVIGATION */
         .nav-links {
-
             display: flex;
-
             align-items: center;
-
             gap: 1.5rem;
-
             margin-left: auto;
         }
 
-
         .nav-links a {
-
             font-weight: 500;
-
             color: #1e293b;
-
             text-decoration: none;
-
-            transition:
-                color 0.2s ease;
+            transition: color 0.2s ease;
         }
 
-
         .nav-links a:hover {
-
             color: #f97316;
         }
 
-
-        /* =========================================================
-           SEARCH
-        ========================================================== */
-
+        /* SEARCH */
         .search-bar {
-
             display: flex;
-
             align-items: center;
-
             background: #f1f5f9;
-
             border-radius: 6px;
-
             padding: 0.2rem 0.5rem;
         }
 
-
         .search-bar input {
-
             border: none;
-
             background: transparent;
-
             outline: none;
-
             padding: 0.5rem;
-
             width: 180px;
         }
 
-
-        /* =========================================================
-           MARKETPLACE
-        ========================================================== */
-
+        /* MARKETPLACE */
         #marketplaceView {
-
             position: relative;
         }
 
-
-        /* =========================================================
-           STICKY FILTER BAR
-           
-           IMPORTANT:
-           It is intentionally NOT fixed.
-
-           This allows it to remain near the bottom while
-           browsing the marketplace, but once the marketplace
-           section ends, it scrolls away and does not cover
-           the footer.
-        ========================================================== */
-
         .floating-filter-bar {
-
             position: sticky;
-
             bottom: 22px;
-
-            width: min(
-                1100px,
-                calc(100% - 30px)
-            );
-
-            margin:
-                0 auto 22px;
-
+            width: min(1100px, calc(100% - 30px));
+            margin: 0 auto 22px;
             z-index: 4000;
-
             display: flex;
-
             align-items: center;
-
             gap: 12px;
-
             padding: 12px 16px;
-
-            background:
-                rgba(255, 255, 255, 0.97);
-
-            border:
-                1px solid #e2e8f0;
-
+            background: rgba(255, 255, 255, 0.97);
+            border: 1px solid #e2e8f0;
             border-radius: 16px;
-
-            box-shadow:
-                0 10px 30px
-                rgba(15, 23, 42, 0.14),
-
-                0 3px 8px
-                rgba(15, 23, 42, 0.06);
-
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14), 0 3px 8px rgba(15, 23, 42, 0.06);
             backdrop-filter: blur(10px);
-
             overflow-x: auto;
-
             scrollbar-width: thin;
         }
 
-
         .floating-filter-bar h3 {
-
             flex-shrink: 0;
-
             margin: 0;
-
             font-size: 0.9rem;
-
             font-weight: 700;
-
             color: #1e293b;
         }
 
-
         .filter-control {
-
             display: flex;
-
             align-items: center;
-
             gap: 6px;
-
             flex-shrink: 0;
         }
 
-
         .filter-control label {
-
             font-size: 0.78rem;
-
             font-weight: 600;
-
             color: #64748b;
-
             white-space: nowrap;
         }
 
-
         .filter-control select {
-
             min-width: 125px;
-
-            padding:
-                8px 30px 8px 10px;
-
-            border:
-                1px solid #cbd5e1;
-
+            padding: 8px 30px 8px 10px;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
-
             background: #ffffff;
-
             color: #1e293b;
-
             font-size: 0.82rem;
-
             outline: none;
-
             cursor: pointer;
         }
-
 
         .filter-control select:focus {
-
             border-color: #f97316;
-
-            box-shadow:
-                0 0 0 2px
-                rgba(249, 115, 22, 0.12);
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12);
         }
-
 
         .clear-filters-btn {
-
             flex-shrink: 0;
-
             padding: 8px 12px;
-
             border: none;
-
             border-radius: 8px;
-
             background: #fff7ed;
-
             color: #ea580c;
-
             font-size: 0.8rem;
-
             font-weight: 600;
-
             cursor: pointer;
-
-            transition:
-                background 0.2s ease,
-                transform 0.2s ease;
+            transition: background 0.2s ease, transform 0.2s ease;
         }
 
-
         .clear-filters-btn:hover {
-
             background: #ffedd5;
-
             transform: translateY(-1px);
         }
 
-
-        /* =========================================================
-           PRODUCT GRID
-        ========================================================== */
-
         .product-grid {
-
             padding-bottom: 20px;
         }
 
+        /* AUTH MODAL ENHANCEMENTS */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            z-index: 9000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
 
-        /* =========================================================
-           MOBILE NAVIGATION
-        ========================================================== */
+        .modal-content {
+            background: #ffffff;
+            width: 100%;
+            max-width: 440px;
+            padding: 2rem;
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+        }
 
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 0.85rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        .modal-content button[type="submit"] {
+            width: 100%;
+            padding: 0.85rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* READ-ONLY SUPPLIER LOCATION FIELD */
+        .readonly-location-group {
+            margin: 0.5rem 0 0.75rem;
+        }
+
+        .readonly-location-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.25rem;
+        }
+
+        .readonly-location-group input {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border: 1px solid #cbd5e1 !important;
+            cursor: not-allowed;
+        }
+
+        /* MOBILE NAVIGATION */
         @media (max-width: 768px) {
-
             .navbar {
-
-                padding:
-                    0.8rem 1rem !important;
+                padding: 0.8rem 1rem !important;
             }
 
-
             .hamburger {
-
                 display: flex;
             }
 
-
             .nav-links {
-
                 position: absolute;
-
                 top: 100%;
-
                 left: 0;
                 right: 0;
-
                 display: none !important;
-
                 flex-direction: column !important;
-
                 align-items: stretch !important;
-
                 gap: 0 !important;
-
                 margin-left: 0 !important;
-
-                padding:
-                    0.7rem 1rem 1rem;
-
+                padding: 0.7rem 1rem 1rem;
                 background: #ffffff;
-
-                border-bottom:
-                    1px solid #e2e8f0;
-
-                box-shadow:
-                    0 12px 25px
-                    rgba(15, 23, 42, 0.12);
-
+                border-bottom: 1px solid #e2e8f0;
+                box-shadow: 0 12px 25px rgba(15, 23, 42, 0.12);
                 z-index: 5000;
             }
 
-
             .nav-links.active {
-
                 display: flex !important;
             }
-
 
             .nav-links a {
-
                 display: flex !important;
-
                 align-items: center;
-
                 width: 100%;
-
                 min-height: 45px;
-
                 padding: 10px 8px;
-
-                border-bottom:
-                    1px solid #f1f5f9;
+                border-bottom: 1px solid #f1f5f9;
             }
 
-
             .nav-links a:last-child {
-
                 border-bottom: none;
             }
 
-
             .search-bar {
-
                 width: 100%;
-
                 max-width: 180px;
             }
 
-
             .search-bar input {
-
                 width: 100%;
             }
 
-
             .logo-container {
-
                 max-width: 45%;
             }
 
-
             .logo-container img {
-
                 max-width: 100%;
-
                 height: 42px !important;
             }
 
-
-            /* =====================================================
-               STICKY FILTER - MOBILE
-            ====================================================== */
-
             .floating-filter-bar {
-
                 position: sticky;
-
                 bottom: 14px;
-
-                width:
-                    calc(100% - 20px);
-
-                margin:
-                    0 auto 14px;
-
+                width: calc(100% - 20px);
+                margin: 0 auto 14px;
                 padding: 10px;
-
                 border-radius: 14px;
-
                 gap: 8px;
             }
 
-
             .floating-filter-bar h3 {
-
                 display: none;
             }
 
-
             .filter-control {
-
                 flex-direction: column;
-
                 align-items: stretch;
-
                 gap: 3px;
             }
 
-
             .filter-control label {
-
                 font-size: 0.7rem;
             }
 
-
             .filter-control select {
-
                 min-width: 110px;
-
                 max-width: 125px;
-
                 padding: 8px;
-
                 font-size: 0.75rem;
             }
 
-
             .clear-filters-btn {
-
-                padding:
-                    8px 10px;
+                padding: 8px 10px;
             }
 
-
             .product-grid {
-
                 padding-bottom: 20px !important;
             }
 
-
             .cart-container-grid {
-
-                grid-template-columns:
-                    1fr !important;
+                grid-template-columns: 1fr !important;
             }
-
         }
 
-
-        /* =========================================================
-           SMALL PHONES
-        ========================================================== */
-
         @media (max-width: 480px) {
-
             .search-bar {
-
                 max-width: 125px;
             }
 
-
             .search-bar input {
-
                 width: 80px;
             }
 
-
             .floating-filter-bar {
-
-                width:
-                    calc(100% - 12px);
-
+                width: calc(100% - 12px);
                 bottom: 8px;
-
                 margin-bottom: 8px;
-
                 padding: 8px;
-
                 gap: 6px;
             }
 
-
             .filter-control select {
-
                 min-width: 95px;
-
                 max-width: 105px;
-
                 font-size: 0.7rem;
             }
-
 
             .clear-filters-btn {
-
                 font-size: 0.7rem;
-
                 padding: 8px;
             }
-
         }
 
-
-        /* =========================================================
-           FILTER LOADING STATE
-        ========================================================== */
-
         .filter-loading {
-
             opacity: 0.65;
-
             pointer-events: none;
         }
 
-
-        /* =========================================================
-           EMPTY PRODUCT STATE
-        ========================================================== */
-
         .marketplace-empty-state {
-
             grid-column: 1 / -1;
-
             text-align: center;
-
             padding: 3rem 1rem;
-
             color: #64748b;
         }
 
-
         .marketplace-empty-state h3 {
-
             margin-bottom: 0.5rem;
-
             color: #1e293b;
         }
-
-
-        /* =========================================================
-           ACCESSIBILITY
-        ========================================================== */
 
         button:focus-visible,
         select:focus-visible,
         input:focus-visible,
         textarea:focus-visible,
         a:focus-visible {
-
-            outline:
-                3px solid
-                rgba(249, 115, 22, 0.35);
-
+            outline: 3px solid rgba(249, 115, 22, 0.35);
             outline-offset: 2px;
         }
-
     </style>
 
-
-    <!-- =========================================================
-         STRUCTURED DATA
-    ========================================================== -->
-
+    <!-- STRUCTURED DATA -->
     <script type="application/ld+json">
-
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -775,2200 +462,506 @@
             "query-input": "required name=search_term_string"
         }
     }
-
     </script>
-
 </head>
-
 
 <body>
 
-
-<!-- =========================================================
-     PAGE LOADER
-========================================================= -->
-
+<!-- PAGE LOADER -->
 <div id="pageLoader">
-
     <div class="spinner-ring"></div>
-
-    <div class="spinner-text">
-        Connecting to GasHubKE Firebase...
-    </div>
-
+    <div class="spinner-text">Connecting to GasHubKE Firebase...</div>
 </div>
 
-
-<!-- =========================================================
-     HEADER
-========================================================= -->
-
-<header
-    class="navbar"
-    style="
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        padding:1rem 2rem;
-        background:#fff;
-        border-bottom:1px solid #e2e8f0;
-        gap:1rem;
-    "
->
-
-
-    <!-- =====================================================
-         LOGO
-    ====================================================== -->
-
-    <div
-        class="logo-container"
-        style="flex-shrink:0;"
-    >
-
+<!-- HEADER -->
+<header class="navbar" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:#fff;border-bottom:1px solid #e2e8f0;gap:1rem;">
+    <!-- LOGO -->
+    <div class="logo-container" style="flex-shrink:0;">
         <img
             src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg"
             alt="GasHubKE Logo"
-            style="
-                height:45px;
-                object-fit:contain;
-            "
+            style="height:45px;object-fit:contain;"
         >
-
     </div>
 
-
-    <!-- =====================================================
-         SEARCH
-    ====================================================== -->
-
+    <!-- SEARCH -->
     <div class="search-bar">
-
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#64748b"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="
-                margin:0 8px;
-                flex-shrink:0;
-            "
-        >
-
-            <circle
-                cx="11"
-                cy="11"
-                r="8">
-            </circle>
-
-            <line
-                x1="21"
-                y1="21"
-                x2="16.65"
-                y2="16.65">
-            </line>
-
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 8px;flex-shrink:0;">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-
-
-        <input
-            type="search"
-            id="searchInput"
-            placeholder="Search gas, cylinders..."
-            aria-label="Search listings"
-        >
-
-
-        <button
-            id="searchBtn"
-            type="button"
-            style="display:none;"
-        >
-            Search
-        </button>
-
+        <input type="search" id="searchInput" placeholder="Search gas, cylinders..." aria-label="Search listings">
+        <button id="searchBtn" type="button" style="display:none;">Search</button>
     </div>
 
-
-    <!-- =====================================================
-         HAMBURGER
-    ====================================================== -->
-
-    <button
-        class="hamburger"
-        id="hamburgerBtn"
-        type="button"
-        aria-label="Toggle navigation menu"
-        aria-expanded="false"
-    >
-
+    <!-- HAMBURGER -->
+    <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
         <span></span>
         <span></span>
         <span></span>
-
     </button>
 
+    <!-- NAVIGATION -->
+    <nav class="nav-links" id="navLinks" aria-label="Main Navigation">
+        <a href="#" id="homeLink">Marketplace</a>
+        <a href="#" id="supplierDashboardNavLink" style="display:none;">Supplier Dashboard</a>
+        <a href="#" id="customerOrdersNavLink" style="display:none;">My Orders</a>
 
-    <!-- =====================================================
-         NAVIGATION
-    ====================================================== -->
-
-    <nav
-        class="nav-links"
-        id="navLinks"
-        aria-label="Main Navigation"
-    >
-
-        <a
-            href="#"
-            id="homeLink"
-        >
-            Marketplace
-        </a>
-
-
-        <a
-            href="#"
-            id="supplierDashboardNavLink"
-            style="display:none;"
-        >
-            Supplier Dashboard
-        </a>
-
-
-        <a
-            href="#"
-            id="customerOrdersNavLink"
-            style="display:none;"
-        >
-            My Orders
-        </a>
-
-
-        <!-- =================================================
-             CART
-        ================================================== -->
-
-        <a
-            href="#"
-            id="cartLink"
-            style="
-                display:flex;
-                align-items:center;
-            "
-        >
-
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-
-                <circle
-                    cx="9"
-                    cy="21"
-                    r="1">
-                </circle>
-
-                <circle
-                    cx="20"
-                    cy="21"
-                    r="1">
-                </circle>
-
-                <path
-                    d="
-                        M1 1h4l2.68 13.39
-                        a2 2 0 0 0 2 1.61h9.72
-                        a2 2 0 0 0 2-1.61L23 6H6
-                    "
-                >
-                </path>
-
+        <!-- CART -->
+        <a href="#" id="cartLink" style="display:flex;align-items:center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-
-
-            <span
-                id="cartCount"
-                style="
-                    margin-left:4px;
-                    font-weight:bold;
-                    color:#f97316;
-                "
-            >
-                0
-            </span>
-
+            <span id="cartCount" style="margin-left:4px;font-weight:bold;color:#f97316;">0</span>
         </a>
 
-
-        <!-- =================================================
-             AUTH
-        ================================================== -->
-
-        <a
-            href="#"
-            id="authLink"
-        >
-            Sign In
-        </a>
-
+        <!-- AUTH -->
+        <a href="#" id="authLink">Sign In</a>
     </nav>
-
 </header>
 
+<!-- MAIN -->
+<main class="container" style="max-width:1200px;margin:0 auto;padding:2rem 1rem;">
 
-<!-- =========================================================
-     MAIN
-========================================================= -->
-
-<main
-    class="container"
-    style="
-        max-width:1200px;
-        margin:0 auto;
-        padding:2rem 1rem;
-    "
->
-
-
-<!-- =========================================================
-     MARKETPLACE
-========================================================= -->
-
-<section
-    id="marketplaceView"
-    class="view"
->
-
-
-    <!-- =====================================================
-         HERO
-    ====================================================== -->
-
+<!-- MARKETPLACE -->
+<section id="marketplaceView" class="view">
     <div class="marketplace-hero">
-
         <img
             src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDpk_ohiIb9N3HD_2Am6tT0BIMLLyP3JAobCB-bxRhaki6KvVhOG1MDJM72EM-PCoSL93AfOe6STGvoZb4g9Nvqmpr6e01hWst-yd_ShLW7rlnPYYMPDJ7jr_bE5oV_CQXmaCqMyL7oEfH19wS9eGRmkS-w_Zprs4wPOibtEHu2DAki9fzR2CuXEusVJG8/s903/Gemini_Generated_Image_i5vbmti5vbmti5vb_1.jpeg"
             alt="GasHubKE Cooking Gas Marketplace"
         >
-
     </div>
 
-
-    <!-- =====================================================
-         DYNAMIC FILTER BAR
-         
-         LOCATION AND BRAND OPTIONS ARE INTENTIONALLY EMPTY.
-         
-         marketplace.js should populate them from Firestore.
-    ====================================================== -->
-
-    <div
-        class="floating-filter-bar"
-        id="floatingFilterBar"
-    >
-
-        <h3>
-            Filter Gas
-        </h3>
-
-
-        <!-- =================================================
-             LOCATION
-        ================================================== -->
+    <!-- DYNAMIC FILTER BAR -->
+    <div class="floating-filter-bar" id="floatingFilterBar">
+        <h3>Filter Gas</h3>
 
         <div class="filter-control">
-
-            <label
-                for="filterLocation"
-            >
-                Location
-            </label>
-
-
-            <select
-                id="filterLocation"
-                aria-label="Filter by location"
-            >
-
-                <option value="">
-                    All Locations
-                </option>
-
+            <label for="filterLocation">Location</label>
+            <select id="filterLocation" aria-label="Filter by location">
+                <option value="">All Locations</option>
             </select>
-
         </div>
-
-
-        <!-- =================================================
-             BRAND
-             
-             No brands are hardcoded.
-             marketplace.js extracts brand information from
-             listing titles stored in Firestore.
-        ================================================== -->
 
         <div class="filter-control">
-
-            <label
-                for="filterBrand"
-            >
-                Brand
-            </label>
-
-
-            <select
-                id="filterBrand"
-                aria-label="Filter by gas brand"
-            >
-
-                <option value="">
-                    All Brands
-                </option>
-
+            <label for="filterBrand">Brand</label>
+            <select id="filterBrand" aria-label="Filter by gas brand">
+                <option value="">All Brands</option>
             </select>
-
         </div>
-
-
-        <!-- =================================================
-             SIZE
-        ================================================== -->
 
         <div class="filter-control">
-
-            <label
-                for="filterSize"
-            >
-                Size
-            </label>
-
-
-            <select
-                id="filterSize"
-                aria-label="Filter by cylinder size"
-            >
-
-                <option value="">
-                    All Sizes
-                </option>
-
-                <option value="3kg">
-                    3 Kg
-                </option>
-
-                <option value="6kg">
-                    6 Kg
-                </option>
-
-                <option value="13kg">
-                    13 Kg
-                </option>
-
-                <option value="50kg">
-                    50 Kg
-                </option>
-
+            <label for="filterSize">Size</label>
+            <select id="filterSize" aria-label="Filter by cylinder size">
+                <option value="">All Sizes</option>
+                <option value="3kg">3 Kg</option>
+                <option value="6kg">6 Kg</option>
+                <option value="13kg">13 Kg</option>
+                <option value="50kg">50 Kg</option>
             </select>
-
         </div>
-
-
-        <!-- =================================================
-             CATEGORY
-        ================================================== -->
 
         <div class="filter-control">
-
-            <label
-                for="filterCategory"
-            >
-                Category
-            </label>
-
-
-            <select
-                id="filterCategory"
-                aria-label="Filter by category"
-            >
-
-                <option value="">
-                    All Categories
-                </option>
-
-                <option value="refill">
-                    Gas Refill
-                </option>
-
-                <option value="cylinder_complete">
-                    Complete Cylinder
-                </option>
-
-                <option value="accessories">
-                    Accessories
-                </option>
-
+            <label for="filterCategory">Category</label>
+            <select id="filterCategory" aria-label="Filter by category">
+                <option value="">All Categories</option>
+                <option value="refill">Gas Refill</option>
+                <option value="cylinder_complete">Complete Cylinder</option>
+                <option value="accessories">Accessories</option>
             </select>
-
         </div>
 
-
-        <!-- =================================================
-             CLEAR FILTERS
-        ================================================== -->
-
-        <button
-            type="button"
-            id="clearFiltersBtn"
-            class="clear-filters-btn"
-        >
-            Clear
-        </button>
-
+        <button type="button" id="clearFiltersBtn" class="clear-filters-btn">Clear</button>
     </div>
 
-
-    <!-- =====================================================
-         PRODUCT GRID
-    ====================================================== -->
-
+    <!-- PRODUCT GRID -->
     <div
         class="product-grid"
         id="productGrid"
         aria-live="polite"
-        style="
-            display:grid;
-            grid-template-columns:
-                repeat(
-                    auto-fill,
-                    minmax(220px,1fr)
-                );
-            gap:1.5rem;
-        "
-    >
-
-        <!--
-            Firestore listings are rendered by marketplace.js.
-        -->
-
-    </div>
-
+        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.5rem;"
+    ></div>
 </section>
 
+<!-- SUPPLIER DASHBOARD -->
+<section id="supplierDashboardView" class="view" style="display:none;">
+    <h2>Supplier Dashboard & Analytics</h2>
 
-<!-- =========================================================
-     SUPPLIER DASHBOARD
-========================================================= -->
-
-<section
-    id="supplierDashboardView"
-    class="view"
-    style="display:none;"
->
-
-    <h2>
-        Supplier Dashboard & Analytics
-    </h2>
-
-
-    <div
-        class="supplier-stats-grid"
-        style="
-            display:grid;
-            grid-template-columns:
-                repeat(
-                    auto-fit,
-                    minmax(220px,1fr)
-                );
-            gap:1rem;
-            margin-bottom:1.5rem;
-        "
-    >
-
-
-        <!-- TOTAL ORDERS -->
-
-        <div
-            class="card"
-            style="padding:1.25rem;"
-        >
-
-            <h4
-                style="
-                    font-size:.9rem;
-                    color:#64748b;
-                "
-            >
-                Total Orders Received
-            </h4>
-
-            <p
-                id="statTotalOrders"
-                style="
-                    font-size:1.5rem;
-                    font-weight:bold;
-                    margin-top:.5rem;
-                    color:var(--primary);
-                "
-            >
-                0
-            </p>
-
+    <div class="supplier-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem;">
+        <div class="card" style="padding:1.25rem;">
+            <h4 style="font-size:.9rem;color:#64748b;">Total Orders Received</h4>
+            <p id="statTotalOrders" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
         </div>
 
-
-        <!-- ACTIVE LISTINGS -->
-
-        <div
-            class="card"
-            style="padding:1.25rem;"
-        >
-
-            <h4
-                style="
-                    font-size:.9rem;
-                    color:#64748b;
-                "
-            >
-                Active Listings
-            </h4>
-
-            <p
-                id="statActiveListings"
-                style="
-                    font-size:1.5rem;
-                    font-weight:bold;
-                    margin-top:.5rem;
-                    color:var(--primary);
-                "
-            >
-                0
-            </p>
-
+        <div class="card" style="padding:1.25rem;">
+            <h4 style="font-size:.9rem;color:#64748b;">Active Listings</h4>
+            <p id="statActiveListings" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
         </div>
 
-
-        <!-- REVENUE -->
-
-        <div
-            class="card"
-            style="padding:1.25rem;"
-        >
-
-            <h4
-                style="
-                    font-size:.9rem;
-                    color:#64748b;
-                "
-            >
-                Total Revenue (KES)
-            </h4>
-
-            <p
-                id="statRevenue"
-                style="
-                    font-size:1.5rem;
-                    font-weight:bold;
-                    margin-top:.5rem;
-                    color:var(--primary);
-                "
-            >
-                0
-            </p>
-
+        <div class="card" style="padding:1.25rem;">
+            <h4 style="font-size:.9rem;color:#64748b;">Total Revenue (KES)</h4>
+            <p id="statRevenue" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
         </div>
-
     </div>
-
 
     <!-- SUPPLIER TABS -->
-
-    <div
-        class="supplier-tabs"
-        style="
-            margin-bottom:1rem;
-            display:flex;
-            gap:1rem;
-        "
-    >
-
-        <button
-            type="button"
-            class="btn-primary"
-            id="tabListingsBtn"
-            onclick="window.switchSupplierTab('listings')"
-        >
+    <div class="supplier-tabs" style="margin-bottom:1rem;display:flex;gap:1rem;">
+        <button type="button" class="btn-primary" id="tabListingsBtn" onclick="window.switchSupplierTab('listings')">
             Manage Inventory
         </button>
-
-
-        <button
-            type="button"
-            class="btn-secondary"
-            id="tabOrdersBtn"
-            onclick="window.switchSupplierTab('orders')"
-            style="
-                background:#e2e8f0;
-                color:#1e293b;
-            "
-        >
+        <button type="button" class="btn-secondary" id="tabOrdersBtn" onclick="window.switchSupplierTab('orders')" style="background:#e2e8f0;color:#1e293b;">
             Customer Orders
         </button>
-
     </div>
-
 
     <!-- SUPPLIER LISTINGS -->
-
     <div id="supplierListingsTabContent">
+        <form id="supplierListingForm" class="card" style="margin-bottom:1.5rem;">
+            <h3>Post New Listing</h3>
 
-        <form
-            id="supplierListingForm"
-            class="card"
-            style="margin-bottom:1.5rem;"
-        >
+            <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. TotalEnergies 13kg Gas Refill)" required>
 
-            <h3>
-                Post New Listing
-            </h3>
-
-
-            <input
-                type="text"
-                id="supplierItemTitle"
-                placeholder="Product Title (e.g. 13kg Total Gas Refill)"
-                required
-            >
-
-
-            <select
-                id="supplierItemSize"
-                required
-            >
-
-                <option value="3kg">
-                    3 Kg
-                </option>
-
-                <option value="6kg">
-                    6 Kg
-                </option>
-
-                <option value="13kg">
-                    13 Kg
-                </option>
-
-                <option value="50kg">
-                    50 Kg
-                </option>
-
+            <select id="supplierItemSize" required>
+                <option value="3kg">3 Kg</option>
+                <option value="6kg">6 Kg</option>
+                <option value="13kg" selected>13 Kg</option>
+                <option value="50kg">50 Kg</option>
             </select>
 
-
-            <select
-                id="supplierItemCategory"
-                required
-            >
-
-                <option value="refill">
-                    Gas Refill
-                </option>
-
-                <option value="cylinder_complete">
-                    Complete Cylinder
-                </option>
-
-                <option value="accessories">
-                    Accessories
-                </option>
-
+            <select id="supplierItemCategory" required>
+                <option value="refill">Gas Refill</option>
+                <option value="cylinder_complete">Complete Cylinder</option>
+                <option value="accessories">Accessories</option>
             </select>
 
+            <input type="number" id="supplierItemPrice" placeholder="Price (KES)" min="1" step="1" required>
 
-            <input
-                type="number"
-                id="supplierItemPrice"
-                placeholder="Price (KES)"
-                min="0"
-                step="1"
-                required
-            >
+            <!-- Registered Location Preview (populated automatically by supplier-dashboard.js) -->
+            <div class="readonly-location-group">
+                <label for="supplierItemLocation">Registered Business Location</label>
+                <input type="text" id="supplierItemLocation" value="Loading registered location..." readonly>
+            </div>
 
-
-            <label
-                for="supplierItemImage"
-                style="
-                    font-size:.9rem;
-                    color:#64748b;
-                    margin-top:.5rem;
-                    display:block;
-                "
-            >
+            <label for="supplierItemImage" style="font-size:.9rem;color:#64748b;margin-top:.5rem;display:block;">
                 Product Images (Max 5)
             </label>
+            <input type="file" id="supplierItemImage" accept="image/*" multiple>
 
+            <textarea id="supplierItemDescription" placeholder="Description & delivery terms" required></textarea>
 
-            <input
-                type="file"
-                id="supplierItemImage"
-                accept="image/*"
-                multiple
-                required
-            >
-
-
-            <textarea
-                id="supplierItemDescription"
-                placeholder="Description & delivery terms"
-                required
-            ></textarea>
-
-
-            <button
-                type="submit"
-                class="btn-primary"
-            >
-                Publish Listing
-            </button>
-
+            <button type="submit" class="btn-primary">Publish Listing</button>
         </form>
-
 
         <!-- MY LISTINGS -->
-
         <div class="my-listings">
-
-            <h3>
-                Your Active Listings
-            </h3>
-
-
-            <div
-                id="supplierListingsGrid"
-                style="margin-top:1rem;"
-            >
-            </div>
-
+            <h3>Your Active Listings</h3>
+            <div id="supplierListingsGrid" style="margin-top:1rem;"></div>
         </div>
-
     </div>
-
 
     <!-- SUPPLIER ORDERS -->
-
-    <div
-        id="supplierOrdersTabContent"
-        style="display:none;"
-    >
-
+    <div id="supplierOrdersTabContent" style="display:none;">
         <div class="card">
-
-            <h3>
-                Incoming Customer Orders
-            </h3>
-
-
-            <div
-                id="supplierOrdersList"
-                style="margin-top:1rem;"
-            >
-
-                <p>
-                    No customer orders received yet.
-                </p>
-
+            <h3>Incoming Customer Orders</h3>
+            <div id="supplierOrdersList" style="margin-top:1rem;">
+                <p>No customer orders received yet.</p>
             </div>
-
         </div>
-
     </div>
-
 </section>
 
-
-<!-- =========================================================
-     CUSTOMER ORDERS
-========================================================= -->
-
-<section
-    id="customerOrdersView"
-    class="view"
-    style="display:none;"
->
-
-    <h2>
-        My Orders & Account Portal
-    </h2>
-
-
-    <div
-        class="card"
-        style="
-            padding:1.5rem;
-            margin-top:1rem;
-        "
-    >
-
-        <h3>
-            Order History
-        </h3>
-
-
-        <div
-            id="customerOrdersList"
-            style="margin-top:1rem;"
-        >
-
-            <p>
-                You have not placed any orders yet.
-            </p>
-
+<!-- CUSTOMER ORDERS -->
+<section id="customerOrdersView" class="view" style="display:none;">
+    <h2>My Orders & Account Portal</h2>
+    <div class="card" style="padding:1.5rem;margin-top:1rem;">
+        <h3>Order History</h3>
+        <div id="customerOrdersList" style="margin-top:1rem;">
+            <p>You have not placed any orders yet.</p>
         </div>
-
     </div>
-
 </section>
 
-
-<!-- =========================================================
-     CART
-========================================================= -->
-
-<section
-    id="cartView"
-    class="view"
-    style="display:none;"
->
-
-    <h2>
-        Your Shopping Cart & Checkout
-    </h2>
-
-
-    <div
-        class="cart-container-grid"
-        style="
-            display:grid;
-            grid-template-columns:2fr 1fr;
-            gap:2rem;
-        "
-    >
-
-
-        <!-- CART ITEMS -->
-
-        <div
-            class="cart-items-card card"
-            style="padding:1.5rem;"
-        >
-
-            <h3>
-                Review Items
-            </h3>
-
-
-            <div
-                id="cartItemsList"
-                style="margin-top:1rem;"
-            >
-
-                <p>
-                    Your cart is currently empty.
-                </p>
-
+<!-- CART -->
+<section id="cartView" class="view" style="display:none;">
+    <h2>Your Shopping Cart & Checkout</h2>
+    <div class="cart-container-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:2rem;">
+        <div class="cart-items-card card" style="padding:1.5rem;">
+            <h3>Review Items</h3>
+            <div id="cartItemsList" style="margin-top:1rem;">
+                <p>Your cart is currently empty.</p>
             </div>
-
         </div>
 
-
-        <!-- CART SUMMARY -->
-
-        <div
-            class="cart-summary-card card"
-            style="padding:1.5rem;"
-        >
-
-            <h3>
-                Order Summary
-            </h3>
-
-
-            <div
-                class="summary-row"
-                style="
-                    margin-top:1rem;
-                    display:flex;
-                    justify-content:space-between;
-                "
-            >
-
-                <span>
-                    Subtotal
-                </span>
-
-
-                <span id="cartSubtotal">
-                    KES 0
-                </span>
-
+        <div class="cart-summary-card card" style="padding:1.5rem;">
+            <h3>Order Summary</h3>
+            <div class="summary-row" style="margin-top:1rem;display:flex;justify-content:space-between;">
+                <span>Subtotal</span>
+                <span id="cartSubtotal">KES 0</span>
+            </div>
+            <div class="summary-row" style="display:flex;justify-content:space-between;margin-top:.5rem;">
+                <span>Estimated Delivery</span>
+                <span>KES 200</span>
+            </div>
+            <hr style="margin:1rem 0;border:0;border-top:1px solid #e2e8f0;">
+            <div class="summary-row total-row" style="display:flex;justify-content:space-between;font-size:1.2rem;">
+                <strong>Total</strong>
+                <strong id="cartTotal">KES 200</strong>
             </div>
 
-
-            <div
-                class="summary-row"
-                style="
-                    display:flex;
-                    justify-content:space-between;
-                    margin-top:.5rem;
-                "
-            >
-
-                <span>
-                    Estimated Delivery
-                </span>
-
-
-                <span>
-                    KES 200
-                </span>
-
-            </div>
-
-
-            <hr
-                style="
-                    margin:1rem 0;
-                    border:0;
-                    border-top:
-                        1px solid #e2e8f0;
-                "
-            >
-
-
-            <div
-                class="summary-row total-row"
-                style="
-                    display:flex;
-                    justify-content:space-between;
-                    font-size:1.2rem;
-                "
-            >
-
-                <strong>
-                    Total
-                </strong>
-
-
-                <strong id="cartTotal">
-                    KES 200
-                </strong>
-
-            </div>
-
-
-            <!-- CHECKOUT -->
-
-            <form
-                id="checkoutForm"
-                style="margin-top:1.5rem;"
-            >
-
-                <h4
-                    style="
-                        margin-bottom:.75rem;
-                        font-size:.95rem;
-                    "
-                >
-                    Delivery Details
-                </h4>
-
-
-                <input
-                    type="text"
-                    id="deliveryName"
-                    placeholder="Full Name"
-                    style="
-                        width:100%;
-                        padding:.5rem;
-                        margin-bottom:.5rem;
-                        border-radius:4px;
-                        border:1px solid #cbd5e1;
-                    "
-                    required
-                >
-
-
-                <input
-                    type="tel"
-                    id="deliveryPhone"
-                    placeholder="Phone Number (e.g. 0712345678)"
-                    style="
-                        width:100%;
-                        padding:.5rem;
-                        margin-bottom:.5rem;
-                        border-radius:4px;
-                        border:1px solid #cbd5e1;
-                    "
-                    required
-                >
-
-
-                <input
-                    type="text"
-                    id="deliveryAddress"
-                    placeholder="Delivery Location / Estate / House No."
-                    style="
-                        width:100%;
-                        padding:.5rem;
-                        margin-bottom:1rem;
-                        border-radius:4px;
-                        border:1px solid #cbd5e1;
-                    "
-                    required
-                >
-
-
-                <button
-                    type="submit"
-                    class="btn-primary"
-                    style="
-                        width:100%;
-                        padding:.75rem;
-                    "
-                >
+            <form id="checkoutForm" style="margin-top:1.5rem;">
+                <h4 style="margin-bottom:.75rem;font-size:.95rem;">Delivery Details</h4>
+                <input type="text" id="deliveryName" placeholder="Full Name" style="width:100%;padding:.5rem;margin-bottom:.5rem;border-radius:4px;border:1px solid #cbd5e1;" required>
+                <input type="tel" id="deliveryPhone" placeholder="Phone Number (e.g. 0712345678)" style="width:100%;padding:.5rem;margin-bottom:.5rem;border-radius:4px;border:1px solid #cbd5e1;" required>
+                <input type="text" id="deliveryAddress" placeholder="Delivery Location / Estate / House No." style="width:100%;padding:.5rem;margin-bottom:1rem;border-radius:4px;border:1px solid #cbd5e1;" required>
+                <button type="submit" class="btn-primary" style="width:100%;padding:.75rem;">
                     Place Order & Pay via M-Pesa
                 </button>
-
             </form>
-
         </div>
-
     </div>
-
 </section>
 
-
-<!-- =========================================================
-     AUTH MODAL
-========================================================= -->
-
-<div
-    id="authModal"
-    class="modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="authModalTitle"
-    style="display:none;"
->
-
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" style="display:none;">
     <div class="modal-content">
-
-        <span
-            id="closeModal"
-            class="close"
-            role="button"
-            tabindex="0"
-            aria-label="Close modal"
-        >
-            &times;
-        </span>
-
-
-        <h2 id="authModalTitle">
-            Sign In
-        </h2>
-
+        <span id="closeModal" class="close" role="button" tabindex="0" aria-label="Close modal">&times;</span>
+        <h2 id="authModalTitle">Sign In</h2>
 
         <form id="authForm">
+            <input type="email" id="authEmail" placeholder="Email Address" autocomplete="email" required>
+            <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password" required>
 
-            <input
-                type="email"
-                id="authEmail"
-                placeholder="Email Address"
-                autocomplete="email"
-                required
-            >
-
-
-            <input
-                type="password"
-                id="authPassword"
-                placeholder="Password"
-                autocomplete="current-password"
-                required
-            >
-
-
-            <!-- SUPPLIER REGISTRATION FIELDS -->
-
-            <div
-                id="vendorFields"
-                style="display:none;"
-            >
-
-                <input
-                    type="text"
-                    id="businessName"
-                    placeholder="Business / Supplier Name"
-                >
-
-
-                <select
-                    id="supplierCounty"
-                >
-
-                    <option value="">
-                        Select County
-                    </option>
-
+            <!-- REGISTRATION FIELDS -->
+            <div id="vendorFields" style="display:none;">
+                <select id="userRole" aria-label="Account Type">
+                    <option value="customer">Customer</option>
+                    <option value="vendor">Supplier / Retailer</option>
                 </select>
 
+                <div id="supplierExtraFields" style="display:none;">
+                    <input type="text" id="businessName" placeholder="Business / Supplier Name">
 
-                <select
-                    id="supplierArea"
-                >
+                    <select id="supplierCounty" aria-label="Supplier County">
+                        <option value="">Select County</option>
+                    </select>
 
-                    <option value="">
-                        Select Town / Area First
-                    </option>
-
-                </select>
-
-
-                <select
-                    id="userRole"
-                >
-
-                    <option value="customer">
-                        Customer
-                    </option>
-
-                    <option value="vendor">
-                        Supplier / Retailer
-                    </option>
-
-                </select>
-
+                    <select id="supplierArea" aria-label="Supplier Town or Area" disabled>
+                        <option value="">Select County First</option>
+                    </select>
+                </div>
             </div>
 
+            <button type="submit" id="authSubmitBtn" class="btn-primary">Sign In</button>
 
-            <button
-                type="submit"
-                id="authSubmitBtn"
-                class="btn-primary"
-            >
-                Sign In
-            </button>
-
-
-            <p
-                id="toggleAuthMode"
-                style="
-                    cursor:pointer;
-                    margin-top:1rem;
-                    font-size:.9rem;
-                    text-align:center;
-                "
-            >
+            <p id="toggleAuthMode" style="cursor:pointer;margin-top:1rem;font-size:.9rem;text-align:center;color:#f97316;font-weight:600;">
                 Need an account? Register
             </p>
-
         </form>
-
     </div>
-
 </div>
 
 </main>
 
-
-<!-- =========================================================
-     FOOTER
-========================================================= -->
-
-<footer
-    class="site-footer"
-    style="
-        background:#1e293b;
-        color:#fff;
-        padding:3rem 1rem 1rem;
-    "
->
-
-    <div
-        class="footer-container"
-        style="
-            max-width:1200px;
-            margin:0 auto;
-            display:flex;
-            flex-wrap:wrap;
-            gap:2rem;
-            justify-content:space-between;
-        "
-    >
-
-
-        <!-- BRAND -->
-
-        <div
-            class="footer-col"
-            style="max-width:300px;"
-        >
-
-            <h3
-                style="margin-bottom:1rem;"
-            >
-                GasHubKE
-            </h3>
-
-
-            <p
-                style="
-                    color:#cbd5e1;
-                    line-height:1.5;
-                    font-size:.9rem;
-                "
-            >
-                Connecting verified cooking gas suppliers,
-                retailers, and households with fast and reliable
-                service across Kenya.
+<!-- FOOTER -->
+<footer class="site-footer" style="background:#1e293b;color:#fff;padding:3rem 1rem 1rem;">
+    <div class="footer-container" style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2rem;justify-content:space-between;">
+        <div class="footer-col" style="max-width:300px;">
+            <h3 style="margin-bottom:1rem;">GasHubKE</h3>
+            <p style="color:#cbd5e1;line-height:1.5;font-size:.9rem;">
+                Connecting verified cooking gas suppliers, retailers, and households with fast and reliable service across Kenya.
             </p>
-
         </div>
-
-
-        <!-- QUICK LINKS -->
 
         <div class="footer-col">
-
-            <h4
-                style="margin-bottom:1rem;"
-            >
-                Quick Links
-            </h4>
-
-
-            <ul
-                style="
-                    list-style:none;
-                    padding:0;
-                "
-            >
-
-                <li style="margin-bottom:.5rem;">
-
-                    <a
-                        href="#"
-                        style="
-                            color:#94a3b8;
-                            text-decoration:none;
-                        "
-                    >
-                        About Us
-                    </a>
-
-                </li>
-
-
-                <li style="margin-bottom:.5rem;">
-
-                    <a
-                        href="#"
-                        style="
-                            color:#94a3b8;
-                            text-decoration:none;
-                        "
-                    >
-                        Supplier Guidelines
-                    </a>
-
-                </li>
-
-
-                <li style="margin-bottom:.5rem;">
-
-                    <a
-                        href="#"
-                        style="
-                            color:#94a3b8;
-                            text-decoration:none;
-                        "
-                    >
-                        Safety & Compliance
-                    </a>
-
-                </li>
-
-
-                <li style="margin-bottom:.5rem;">
-
-                    <a
-                        href="#"
-                        style="
-                            color:#94a3b8;
-                            text-decoration:none;
-                        "
-                    >
-                        Contact Support
-                    </a>
-
-                </li>
-
+            <h4 style="margin-bottom:1rem;">Quick Links</h4>
+            <ul style="list-style:none;padding:0;">
+                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">About Us</a></li>
+                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Supplier Guidelines</a></li>
+                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Safety & Compliance</a></li>
+                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Contact Support</a></li>
             </ul>
-
         </div>
-
-
-        <!-- LEGAL -->
 
         <div class="footer-col">
-
-            <h4
-                style="margin-bottom:1rem;"
-            >
-                Legal
-            </h4>
-
-
-            <ul
-                style="
-                    list-style:none;
-                    padding:0;
-                "
-            >
-
-                <li style="margin-bottom:.5rem;">
-
-                    <a
-                        href="#"
-                        style="
-                            color:#94a3b8;
-                            text-decoration:none;
-                        "
-                    >
-                        Privacy Policy
-                    </a>
-
-                </li>
-
-
-                <li style="margin-bottom:.5rem;">
-
-                    <a
-                        href="#"
-                        style="
-                            color:#94a3b8;
-                            text-decoration:none;
-                        "
-                    >
-                        Terms of Service
-                    </a>
-
-                </li>
-
+            <h4 style="margin-bottom:1rem;">Legal</h4>
+            <ul style="list-style:none;padding:0;">
+                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Privacy Policy</a></li>
+                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Terms of Service</a></li>
             </ul>
-
         </div>
-
     </div>
 
-
-    <!-- FOOTER BOTTOM -->
-
-    <div
-        class="footer-bottom"
-        style="
-            text-align:center;
-            margin-top:2rem;
-            padding-top:1rem;
-            border-top:1px solid #334155;
-            color:#94a3b8;
-            font-size:.85rem;
-        "
-    >
-
-        <p>
-
-            &copy;
-
-            <span id="currentYear"></span>
-
-            GasHubKE.
-            All rights reserved.
-
-        </p>
-
+    <div class="footer-bottom" style="text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #334155;color:#94a3b8;font-size:.85rem;">
+        <p>&copy; <span id="currentYear"></span> GasHubKE. All rights reserved.</p>
     </div>
-
 </footer>
 
-
-<!-- =========================================================
-     UI JAVASCRIPT
-========================================================= -->
-
+<!-- UI JAVASCRIPT -->
 <script>
-
-    /* =========================================================
-       PAGE LOADER
-    ========================================================== */
-
+    /* PAGE LOADER */
     window.addEventListener('load', () => {
-
-        const loader =
-            document.getElementById('pageLoader');
-
+        const loader = document.getElementById('pageLoader');
         if (!loader) return;
-
         loader.style.opacity = '0';
-
         setTimeout(() => {
-
             loader.style.display = 'none';
-
         }, 400);
-
     });
 
-
-    /* =========================================================
-       YEAR
-    ========================================================== */
-
-    const yearElement =
-        document.getElementById('currentYear');
-
+    /* YEAR */
+    const yearElement = document.getElementById('currentYear');
     if (yearElement) {
-
-        yearElement.textContent =
-            new Date().getFullYear();
-
+        yearElement.textContent = new Date().getFullYear();
     }
 
+    /* MOBILE HAMBURGER */
+    document.addEventListener('DOMContentLoaded', () => {
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const navLinks = document.getElementById('navLinks');
 
-    /* =========================================================
-       MOBILE HAMBURGER
-    ========================================================== */
+        if (!hamburgerBtn || !navLinks) return;
 
-    document.addEventListener(
-        'DOMContentLoaded',
-        () => {
+        hamburgerBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const isOpen = navLinks.classList.toggle('active');
+            hamburgerBtn.classList.toggle('open', isOpen);
+            hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
+        });
 
-            const hamburgerBtn =
-                document.getElementById(
-                    'hamburgerBtn'
-                );
-
-            const navLinks =
-                document.getElementById(
-                    'navLinks'
-                );
-
-
-            if (!hamburgerBtn || !navLinks) {
-                return;
-            }
-
-
-            hamburgerBtn.addEventListener(
-                'click',
-                (event) => {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    const isOpen =
-                        navLinks.classList.toggle(
-                            'active'
-                        );
-
-                    hamburgerBtn.classList.toggle(
-                        'open',
-                        isOpen
-                    );
-
-                    hamburgerBtn.setAttribute(
-                        'aria-expanded',
-                        String(isOpen)
-                    );
-
-                }
-            );
-
-
-            /* Close after navigation */
-
-            navLinks
-                .querySelectorAll('a')
-                .forEach(link => {
-
-                    link.addEventListener(
-                        'click',
-                        () => {
-
-                            navLinks.classList.remove(
-                                'active'
-                            );
-
-                            hamburgerBtn.classList.remove(
-                                'open'
-                            );
-
-                            hamburgerBtn.setAttribute(
-                                'aria-expanded',
-                                'false'
-                            );
-
-                        }
-                    );
-
-                });
-
-
-            /* Close outside */
-
-            document.addEventListener(
-                'click',
-                (event) => {
-
-                    if (
-                        !hamburgerBtn.contains(
-                            event.target
-                        ) &&
-                        !navLinks.contains(
-                            event.target
-                        )
-                    ) {
-
-                        navLinks.classList.remove(
-                            'active'
-                        );
-
-                        hamburgerBtn.classList.remove(
-                            'open'
-                        );
-
-                        hamburgerBtn.setAttribute(
-                            'aria-expanded',
-                            'false'
-                        );
-
-                    }
-
-                }
-            );
-
-        }
-    );
-
-
-    /* =========================================================
-       NAVIGATION ELEMENTS
-    ========================================================== */
-
-    const homeLink =
-        document.getElementById('homeLink');
-
-    const cartLink =
-        document.getElementById('cartLink');
-
-    const supplierDashboardNavLink =
-        document.getElementById(
-            'supplierDashboardNavLink'
-        );
-
-    const customerOrdersNavLink =
-        document.getElementById(
-            'customerOrdersNavLink'
-        );
-
-    const authLink =
-        document.getElementById('authLink');
-
-    const authModal =
-        document.getElementById('authModal');
-
-    const closeModal =
-        document.getElementById('closeModal');
-
-
-    /* =========================================================
-       VIEW MANAGEMENT
-    ========================================================== */
-
-    function hideAllViews() {
-
-        document
-            .querySelectorAll('.view')
-            .forEach(view => {
-
-                view.style.display = 'none';
-
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                hamburgerBtn.classList.remove('open');
+                hamburgerBtn.setAttribute('aria-expanded', 'false');
             });
+        });
 
-    }
-
-
-    /* =========================================================
-       LOGIN UI
-    ========================================================== */
-
-    window.handlePostLoginUI =
-        function(role) {
-
-            hideAllViews();
-
-
-            if (authModal) {
-
-                authModal.style.display =
-                    'none';
-
+        document.addEventListener('click', (event) => {
+            if (!hamburgerBtn.contains(event.target) && !navLinks.contains(event.target)) {
+                navLinks.classList.remove('active');
+                hamburgerBtn.classList.remove('open');
+                hamburgerBtn.setAttribute('aria-expanded', 'false');
             }
+        });
+    });
 
+    /* VIEW MANAGEMENT */
+    window.hideAllViews = function () {
+        document.querySelectorAll('.view').forEach(view => {
+            view.style.display = 'none';
+        });
+    };
 
-            const marketplaceView =
-                document.getElementById(
-                    'marketplaceView'
-                );
+    window.switchView = function (viewId) {
+        window.hideAllViews();
+        const target = document.getElementById(viewId);
+        if (target) {
+            target.style.display = 'block';
+        }
+    };
 
-            if (marketplaceView) {
+    /* LOGIN / LOGOUT UI */
+    const supplierDashboardNavLink = document.getElementById('supplierDashboardNavLink');
+    const customerOrdersNavLink = document.getElementById('customerOrdersNavLink');
+    const authLink = document.getElementById('authLink');
+    const authModal = document.getElementById('authModal');
+    const closeModal = document.getElementById('closeModal');
 
-                marketplaceView.style.display =
-                    'block';
+    window.handlePostLoginUI = function (role) {
+        window.switchView('marketplaceView');
+        if (authModal) authModal.style.display = 'none';
 
-            }
+        if (role === 'vendor' || role === 'supplier') {
+            if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'inline-block';
+            if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+        } else {
+            if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'inline-block';
+            if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
+        }
 
+        if (authLink) authLink.textContent = 'Sign Out';
+    };
 
-            if (
-                role === 'vendor' ||
-                role === 'supplier'
-            ) {
+    window.handlePostLogoutUI = function () {
+        window.switchView('marketplaceView');
+        if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
+        if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
+        if (authLink) authLink.textContent = 'Sign In';
+    };
 
-                if (
-                    supplierDashboardNavLink
-                ) {
-
-                    supplierDashboardNavLink.style.display =
-                        'inline-block';
-
-                }
-
-
-                if (
-                    customerOrdersNavLink
-                ) {
-
-                    customerOrdersNavLink.style.display =
-                        'none';
-
-                }
-
-            } else {
-
-                if (
-                    customerOrdersNavLink
-                ) {
-
-                    customerOrdersNavLink.style.display =
-                        'inline-block';
-
-                }
-
-
-                if (
-                    supplierDashboardNavLink
-                ) {
-
-                    supplierDashboardNavLink.style.display =
-                        'none';
-
-                }
-
-            }
-
-
-            if (authLink) {
-
-                authLink.textContent =
-                    'Sign Out';
-
-            }
-
-        };
-
-
-    /* =========================================================
-       LOGOUT UI
-    ========================================================== */
-
-    window.handlePostLogoutUI =
-        function() {
-
-            hideAllViews();
-
-
-            const marketplaceView =
-                document.getElementById(
-                    'marketplaceView'
-                );
-
-            if (marketplaceView) {
-
-                marketplaceView.style.display =
-                    'block';
-
-            }
-
-
-            if (
-                supplierDashboardNavLink
-            ) {
-
-                supplierDashboardNavLink.style.display =
-                    'none';
-
-            }
-
-
-            if (
-                customerOrdersNavLink
-            ) {
-
-                customerOrdersNavLink.style.display =
-                    'none';
-
-            }
-
-
-            if (authLink) {
-
-                authLink.textContent =
-                    'Sign In';
-
-            }
-
-        };
-
-
-    /* =========================================================
-       HOME
-    ========================================================== */
-
+    /* NAVIGATION LINKS */
+    const homeLink = document.getElementById('homeLink');
     if (homeLink) {
-
-        homeLink.addEventListener(
-            'click',
-            (event) => {
-
-                event.preventDefault();
-
-                hideAllViews();
-
-
-                const marketplaceView =
-                    document.getElementById(
-                        'marketplaceView'
-                    );
-
-                if (marketplaceView) {
-
-                    marketplaceView.style.display =
-                        'block';
-
-                }
-
-            }
-        );
-
+        homeLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            window.switchView('marketplaceView');
+        });
     }
 
-
-    /* =========================================================
-       CART
-    ========================================================== */
-
+    const cartLink = document.getElementById('cartLink');
     if (cartLink) {
-
-        cartLink.addEventListener(
-            'click',
-            (event) => {
-
-                event.preventDefault();
-
-                hideAllViews();
-
-
-                const cartView =
-                    document.getElementById(
-                        'cartView'
-                    );
-
-                if (cartView) {
-
-                    cartView.style.display =
-                        'block';
-
-                }
-
+        cartLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (typeof window.renderCartView === 'function') {
+                window.renderCartView();
             }
-        );
-
+            window.switchView('cartView');
+        });
     }
-
-
-    /* =========================================================
-       SUPPLIER DASHBOARD
-    ========================================================== */
 
     if (supplierDashboardNavLink) {
-
-        supplierDashboardNavLink
-            .addEventListener(
-                'click',
-                (event) => {
-
-                    event.preventDefault();
-
-                    hideAllViews();
-
-
-                    const dashboard =
-                        document.getElementById(
-                            'supplierDashboardView'
-                        );
-
-                    if (dashboard) {
-
-                        dashboard.style.display =
-                            'block';
-
-                    }
-
-                }
-            );
-
+        supplierDashboardNavLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            window.switchView('supplierDashboardView');
+            if (typeof window.refreshSupplierDashboard === 'function') {
+                window.refreshSupplierDashboard();
+            }
+        });
     }
-
-
-    /* =========================================================
-       CUSTOMER ORDERS
-    ========================================================== */
 
     if (customerOrdersNavLink) {
-
-        customerOrdersNavLink
-            .addEventListener(
-                'click',
-                (event) => {
-
-                    event.preventDefault();
-
-                    hideAllViews();
-
-
-                    const orders =
-                        document.getElementById(
-                            'customerOrdersView'
-                        );
-
-                    if (orders) {
-
-                        orders.style.display =
-                            'block';
-
-                    }
-
-                }
-            );
-
+        customerOrdersNavLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            window.switchView('customerOrdersView');
+        });
     }
 
-
-    /* =========================================================
-       AUTH MODAL
-    ========================================================== */
-
-    if (authLink && authModal) {
-
-        authLink.addEventListener(
-            'click',
-            (event) => {
-
-                event.preventDefault();
-
-                authModal.style.display =
-                    'flex';
-
-            }
-        );
-
-    }
-
-
+    /* MODAL CLOSE HANDLERS */
     if (closeModal && authModal) {
+        closeModal.addEventListener('click', () => {
+            authModal.style.display = 'none';
+        });
 
-        closeModal.addEventListener(
-            'click',
-            () => {
-
-                authModal.style.display =
-                    'none';
-
+        closeModal.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                authModal.style.display = 'none';
             }
-        );
-
+        });
     }
 
-
-    window.addEventListener(
-        'click',
-        (event) => {
-
-            if (
-                event.target === authModal
-            ) {
-
-                authModal.style.display =
-                    'none';
-
-            }
-
+    window.addEventListener('click', (event) => {
+        if (event.target === authModal) {
+            authModal.style.display = 'none';
         }
-    );
+    });
 
-
-    /* =========================================================
-       FILTER CHANGE EVENTS
-       
-       marketplace.js listens to these events and refreshes
-       the Firestore listings.
-    ========================================================== */
-
-    document.addEventListener(
-        'DOMContentLoaded',
-        () => {
-
-            const filterIds = [
-
-                'filterLocation',
-
-                'filterBrand',
-
-                'filterSize',
-
-                'filterCategory'
-
-            ];
-
-
-            filterIds.forEach(id => {
-
-                const filter =
-                    document.getElementById(id);
-
-                if (!filter) return;
-
-
-                filter.addEventListener(
-                    'change',
-                    () => {
-
-                        document.dispatchEvent(
-                            new CustomEvent(
-                                'gashubkeFiltersChanged'
-                            )
-                        );
-
-                    }
-                );
-
-            });
-
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && authModal && authModal.style.display === 'flex') {
+            authModal.style.display = 'none';
         }
-    );
-
-
-    /* =========================================================
-       CLEAR FILTERS
-    ========================================================== */
-
-    const clearFiltersBtn =
-        document.getElementById(
-            'clearFiltersBtn'
-        );
-
-
-    if (clearFiltersBtn) {
-
-        clearFiltersBtn.addEventListener(
-            'click',
-            () => {
-
-                const filterLocation =
-                    document.getElementById(
-                        'filterLocation'
-                    );
-
-                const filterBrand =
-                    document.getElementById(
-                        'filterBrand'
-                    );
-
-                const filterSize =
-                    document.getElementById(
-                        'filterSize'
-                    );
-
-                const filterCategory =
-                    document.getElementById(
-                        'filterCategory'
-                    );
-
-
-                if (filterLocation) {
-
-                    filterLocation.value = '';
-
-                }
-
-
-                if (filterBrand) {
-
-                    filterBrand.value = '';
-
-                }
-
-
-                if (filterSize) {
-
-                    filterSize.value = '';
-
-                }
-
-
-                if (filterCategory) {
-
-                    filterCategory.value = '';
-
-                }
-
-
-                document.dispatchEvent(
-                    new CustomEvent(
-                        'gashubkeFiltersCleared'
-                    )
-                );
-
-            }
-        );
-
-    }
-
-
-    /* =========================================================
-       CLOSE AUTH MODAL WITH ESC
-    ========================================================== */
-
-    document.addEventListener(
-        'keydown',
-        (event) => {
-
-            if (
-                event.key === 'Escape' &&
-                authModal &&
-                authModal.style.display === 'flex'
-            ) {
-
-                authModal.style.display =
-                    'none';
-
-            }
-
-        }
-    );
-
-
-    /* =========================================================
-       ACCESSIBLE MODAL CLOSE
-    ========================================================== */
-
-    if (closeModal) {
-
-        closeModal.addEventListener(
-            'keydown',
-            (event) => {
-
-                if (
-                    event.key === 'Enter' ||
-                    event.key === ' '
-                ) {
-
-                    event.preventDefault();
-
-                    if (authModal) {
-
-                        authModal.style.display =
-                            'none';
-
-                    }
-
-                }
-
-            }
-        );
-
-    }
-
+    });
 </script>
 
-
-<!-- =========================================================
-     FIREBASE & FEATURE MODULES
-========================================================= -->
-
-<script
-    type="module"
-    src="./js/firebase-config.js">
-</script>
-
-
-<script
-    type="module"
-    src="./js/auth.js">
-</script>
-
-
-<script
-    type="module"
-    src="./js/counties.js">
-</script>
-
-
-<script
-    type="module"
-    src="./js/marketplace.js">
-</script>
-
-
-<script
-    type="module"
-    src="./js/supplier-dashboard.js">
-</script>
-
+<!-- FIREBASE & FEATURE MODULES -->
+<script type="module" src="./js/firebase-config.js"></script>
+<script type="module" src="./js/counties.js"></script>
+<script type="module" src="./js/auth.js"></script>
+<script type="module" src="./js/marketplace.js"></script>
+<script type="module" src="./js/supplier-dashboard.js"></script>
 
 </body>
-
 </html>
