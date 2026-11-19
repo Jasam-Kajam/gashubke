@@ -1,10 +1,10 @@
 // Complete comprehensive data mapping of all 47 Kenyan Counties and their respective towns and operational areas
-const kenyaLocations = {
+export const kenyaLocations = {
     "Baringo": ["Kabarnet", "Eldama Ravine", "Marigat", "Mogotio", "Kiptagich", "Eldume", "Kimaro", "Tangulbei", "Bartabwa", "Koron", "Chemolingot", "Loboi"],
     "Bomet": ["Bomet Town", "Sotik", "Longisa", "Mulot", "Sigor", "Chebunyo", "Ndanai", "Merigi", "Kaplong", "Tenwek", "Bishara Market"],
     "Bungoma": ["Bungoma Town", "Webuye", "Kimiliti", "Chwele", "Malaba (Border)", "Kanduyi", "Sirisia", "Kimilili", "Kaptama", "Naitiri", "Luuanda", "Myanga"],
     "Busia": ["Busia Town", "Malaba", "Port Victoria", "Nambale", "Butula", "Amagoro", "Funyula", "Sio Port", "Matayos", "Murende", "Bumula"],
-    "Elgeyo-Marakwet": ["Iten", "Kapsowar", "Chebiemit", "Kapsowar", "Kamariny", "Tambach", "Biretwo", "Chesongoch", "Kapcherop", "Kibargoi"],
+    "Elgeyo-Marakwet": ["Iten", "Kapsowar", "Chebiemit", "Kamariny", "Tambach", "Biretwo", "Chesongoch", "Kapcherop", "Kibargoi"],
     "Embu": ["Embu Town", "Runyenjes", "Kiritiri", "Siakago", "Ishiara", "Kianjokoma", "Manyatta", "Karurumo", "Rianjeru", "Gachoka"],
     "Garissa": ["Garissa Town", "Masalani", "Dadaab", "Hulugho", "Balambala", "Liboi", "Modogashe", "Bura East", "Hagadera", "Danyere"],
     "Homa Bay": ["Homa Bay Town", "Kendu Bay", "Ndhiwa", "Mbita", "Oyugis", "Kosele", "Ringa", "Sindo", "Katito (Border)", "Magunga", "Kachuor", "Arujo"],
@@ -49,36 +49,39 @@ const kenyaLocations = {
     "West Pokot": ["Kapenguria", "Sigor", "Makutano", "Chepareria", "Ortum", "Kacheliba", "Alale", "Lomut"]
 };
 
+// Required exports for auth.js and supplier profile completion
+export const kenyaCounties = Object.keys(kenyaLocations).sort();
+
+export function getTowns(county) {
+    if (!county || !kenyaLocations[county]) return [];
+    return [...kenyaLocations[county]].sort();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const countySelect = document.getElementById("supplierCounty");
     const areaSelect = document.getElementById("supplierArea");
 
     if (countySelect && areaSelect) {
-        // Populate Counties alphabetical order for easy user lookup
         countySelect.innerHTML = '<option value="">Select County</option>';
-        const sortedCounties = Object.keys(kenyaLocations).sort();
-        
-        sortedCounties.forEach(county => {
+
+        kenyaCounties.forEach(county => {
             const option = document.createElement("option");
             option.value = county;
             option.textContent = county;
             countySelect.appendChild(option);
         });
 
-        // Update Towns/Areas dynamically when County changes
         countySelect.addEventListener("change", (e) => {
             const selectedCounty = e.target.value;
             areaSelect.innerHTML = '<option value="">Select Town / Area</option>';
-            
-            if (selectedCounty && kenyaLocations[selectedCounty]) {
-                const sortedTowns = kenyaLocations[selectedCounty].sort();
-                sortedTowns.forEach(area => {
-                    const option = document.createElement("option");
-                    option.value = area;
-                    option.textContent = area;
-                    areaSelect.appendChild(option);
-                });
-            }
+
+            const towns = getTowns(selectedCounty);
+            towns.forEach(area => {
+                const option = document.createElement("option");
+                option.value = area;
+                option.textContent = area;
+                areaSelect.appendChild(option);
+            });
         });
     }
 });
