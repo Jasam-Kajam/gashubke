@@ -23,11 +23,6 @@ let clearFiltersBtn;
 let searchBtn;
 let searchInput;
 
-
-// ============================================================
-// SUPPLIER LOCATION CACHE
-// ============================================================
-
 const supplierLocationCache = new Map();
 
 
@@ -36,28 +31,19 @@ const supplierLocationCache = new Map();
 // ============================================================
 
 function normalize(value) {
-
     return String(value ?? "")
         .toLowerCase()
         .trim()
         .replace(/\s+/g, " ");
 }
 
-
 function normalizeKey(value) {
-
     return normalize(value)
         .replace(/[-_]/g, "")
         .replace(/\s+/g, "");
 }
 
-
-// ============================================================
-// ESCAPE HTML
-// ============================================================
-
 function escapeHTML(value) {
-
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -66,13 +52,7 @@ function escapeHTML(value) {
         .replace(/'/g, "&#039;");
 }
 
-
-// ============================================================
-// ESCAPE JAVASCRIPT
-// ============================================================
-
 function escapeJS(value) {
-
     return String(value ?? "")
         .replace(/\\/g, "\\\\")
         .replace(/'/g, "\\'")
@@ -86,22 +66,13 @@ function escapeJS(value) {
 // ============================================================
 
 function formatLocation(location) {
+    if (!location) return "";
 
-    if (!location) {
-        return "";
-    }
-
-
-    // STRING
     if (typeof location === "string") {
-
         return location.trim();
     }
 
-
-    // ARRAY
     if (Array.isArray(location)) {
-
         return location
             .filter(Boolean)
             .map(value => formatLocation(value))
@@ -109,10 +80,7 @@ function formatLocation(location) {
             .join(", ");
     }
 
-
-    // OBJECT
     if (typeof location === "object") {
-
         const town =
             location.town ||
             location.townName ||
@@ -121,86 +89,41 @@ function formatLocation(location) {
             location.location ||
             "";
 
-
         const county =
             location.county ||
             location.countyName ||
             "";
 
-
         if (town && county) {
-
             return `${town}, ${county}`;
         }
 
-
-        return (
-            town ||
-            county ||
-            location.name ||
-            location.label ||
-            ""
-        );
+        return town || county || location.name || location.label || "";
     }
-
 
     return String(location);
 }
 
-
-// ============================================================
-// GET SUPPLIER LOCATION FROM PROFILE
-// ============================================================
-
 function extractSupplierLocation(profile) {
+    if (!profile) return "";
 
-    if (!profile) {
-        return "";
-    }
-
-
-    // REGISTERED LOCATION
     if (profile.supplierLocation) {
-
-        const location =
-            formatLocation(
-                profile.supplierLocation
-            );
-
-
-        if (location) {
-            return location;
-        }
+        const location = formatLocation(profile.supplierLocation);
+        if (location) return location;
     }
 
-
-    // OTHER LOCATION OBJECTS
     const nestedLocations = [
-
         profile.location,
-
         profile.address,
-
         profile.businessLocation,
-
         profile.registeredLocation
-
     ];
 
-
     for (const location of nestedLocations) {
-
-        const formatted =
-            formatLocation(location);
-
-
-        if (formatted) {
-            return formatted;
-        }
+        const formatted = formatLocation(location);
+        if (formatted) return formatted;
     }
 
-
-    // SEPARATE REGISTRATION FIELDS
     const town =
         profile.town ||
         profile.townName ||
@@ -209,7 +132,6 @@ function extractSupplierLocation(profile) {
         profile.registeredTown ||
         "";
 
-
     const county =
         profile.county ||
         profile.countyName ||
@@ -217,187 +139,59 @@ function extractSupplierLocation(profile) {
         profile.registeredCounty ||
         "";
 
-
     const area =
         profile.area ||
         profile.businessArea ||
         profile.supplierArea ||
         "";
 
-
-    if (town && county) {
-
-        return `${town}, ${county}`;
-    }
-
-
-    if (town) {
-        return String(town);
-    }
-
-
-    if (area) {
-        return String(area);
-    }
-
-
-    if (county) {
-        return String(county);
-    }
-
+    if (town && county) return `${town}, ${county}`;
+    if (town) return String(town);
+    if (area) return String(area);
+    if (county) return String(county);
 
     return "";
 }
-
-
-// ============================================================
-// LOAD SUPPLIER PROFILE LOCATION
-// ============================================================
 
 async function getSupplierLocation(supplierId) {
+    if (!supplierId) return "";
 
-    if (!supplierId) {
-        return "";
+    const cacheKey = String(supplierId);
+    if (supplierLocationCache.has(cacheKey)) {
+        return supplierLocationCache.get(cacheKey);
     }
-
-
-    const cacheKey =
-        String(supplierId);
-
-
-    if (
-        supplierLocationCache.has(cacheKey)
-    ) {
-
-        return supplierLocationCache.get(
-            cacheKey
-        );
-    }
-
 
     try {
-
-        // ----------------------------------------------------
-        // SUPPLIERS COLLECTION
-        // ----------------------------------------------------
-
-        const supplierRef =
-            doc(
-                db,
-                "suppliers",
-                cacheKey
-            );
-
-
-        const supplierSnap =
-            await getDoc(supplierRef);
-
-
+        const supplierSnap = await getDoc(doc(db, "suppliers", cacheKey));
         if (supplierSnap.exists()) {
-
-            const location =
-                extractSupplierLocation(
-                    supplierSnap.data()
-                );
-
-
+            const location = extractSupplierLocation(supplierSnap.data());
             if (location) {
-
-                supplierLocationCache.set(
-                    cacheKey,
-                    location
-                );
-
-
+                supplierLocationCache.set(cacheKey, location);
                 return location;
             }
         }
 
-
-        // ----------------------------------------------------
-        // USERS COLLECTION
-        // ----------------------------------------------------
-
-        const userRef =
-            doc(
-                db,
-                "users",
-                cacheKey
-            );
-
-
-        const userSnap =
-            await getDoc(userRef);
-
-
+        const userSnap = await getDoc(doc(db, "users", cacheKey));
         if (userSnap.exists()) {
-
-            const location =
-                extractSupplierLocation(
-                    userSnap.data()
-                );
-
-
+            const location = extractSupplierLocation(userSnap.data());
             if (location) {
-
-                supplierLocationCache.set(
-                    cacheKey,
-                    location
-                );
-
-
+                supplierLocationCache.set(cacheKey, location);
                 return location;
             }
         }
-
-
     } catch (error) {
-
-        console.warn(
-            "Unable to load supplier location:",
-            supplierId,
-            error
-        );
+        console.warn("Unable to load supplier location:", supplierId, error);
     }
 
-
-    supplierLocationCache.set(
-        cacheKey,
-        ""
-    );
-
-
+    supplierLocationCache.set(cacheKey, "");
     return "";
 }
 
-
-// ============================================================
-// RESOLVE LISTING LOCATION
-// ============================================================
-
 async function resolveListingLocation(item) {
-
-    // --------------------------------------------------------
-    // 1. STRUCTURED LISTING LOCATION
-    // --------------------------------------------------------
-
     if (item.supplierLocation) {
-
-        const location =
-            formatLocation(
-                item.supplierLocation
-            );
-
-
-        if (location) {
-            return location;
-        }
+        const location = formatLocation(item.supplierLocation);
+        if (location) return location;
     }
-
-
-    // --------------------------------------------------------
-    // 2. SUPPLIER PROFILE
-    // --------------------------------------------------------
 
     const supplierId =
         item.supplierId ||
@@ -410,58 +204,25 @@ async function resolveListingLocation(item) {
         item.ownerID ||
         "";
 
-
     if (supplierId) {
-
-        const supplierLocation =
-            await getSupplierLocation(
-                supplierId
-            );
-
-
-        if (supplierLocation) {
-
-            return supplierLocation;
-        }
+        const supplierLocation = await getSupplierLocation(supplierId);
+        if (supplierLocation) return supplierLocation;
     }
-
-
-    // --------------------------------------------------------
-    // 3. LEGACY FIELDS
-    // --------------------------------------------------------
 
     const legacyLocations = [
-
         item.location,
-
         item.town,
-
         item.city,
-
         item.county,
-
         item.area,
-
         item.deliveryLocation,
-
         item.deliveryArea
-
     ];
 
-
-    for (
-        const location of legacyLocations
-    ) {
-
-        const formatted =
-            formatLocation(location);
-
-
-        if (formatted) {
-            return formatted;
-        }
+    for (const location of legacyLocations) {
+        const formatted = formatLocation(location);
+        if (formatted) return formatted;
     }
-
 
     return "Location unavailable";
 }
@@ -470,28 +231,9 @@ async function resolveListingLocation(item) {
 // ============================================================
 // DYNAMIC BRAND EXTRACTION
 // ============================================================
-//
-// Brands are stored inside the listing title.
-// Example:
-//
-// "Pro Gas 13 KG"
-// "TotalEnergies 6 KG"
-// "New Brand 3 KG"
-//
-// The code extracts everything before the KG size.
-// No brands are hardcoded.
-// ============================================================
 
 function getListingBrand(item) {
-
-    if (!item) {
-        return "";
-    }
-
-
-    // --------------------------------------------------------
-    // If a real brand field exists, use it.
-    // --------------------------------------------------------
+    if (!item) return "";
 
     const explicitBrand =
         item.brand ||
@@ -501,56 +243,17 @@ function getListingBrand(item) {
         item.product_brand ||
         "";
 
-
     if (explicitBrand) {
-
-        return String(
-            explicitBrand
-        ).trim();
+        return String(explicitBrand).trim();
     }
 
+    const title = String(item.title || "").trim();
+    if (!title) return "";
 
-    // --------------------------------------------------------
-    // BRAND FROM TITLE
-    // --------------------------------------------------------
-
-    const title =
-        String(
-            item.title || ""
-        ).trim();
-
-
-    if (!title) {
-        return "";
-    }
-
-
-    // Example:
-    // Pro Gas 13 KG
-    // TotalEnergies 6 KG
-    // Any New Brand 50 KG
-
-    const sizeMatch =
-        title.match(
-            /^(.+?)\s+\d+(?:\.\d+)?\s*KG\b/i
-        );
-
-
+    const sizeMatch = title.match(/^(.+?)\s+\d+(?:\.\d+)?\s*KG\b/i);
     if (sizeMatch) {
-
-        return sizeMatch[1]
-            .trim()
-            .replace(/\s+/g, " ");
+        return sizeMatch[1].trim().replace(/\s+/g, " ");
     }
-
-
-    // --------------------------------------------------------
-    // FALLBACK
-    // --------------------------------------------------------
-    //
-    // If title has no KG size, do not assume a brand.
-    // This prevents the whole title becoming a fake brand.
-    // --------------------------------------------------------
 
     return "";
 }
@@ -560,271 +263,85 @@ function getListingBrand(item) {
 // POPULATE DYNAMIC LOCATION + BRAND FILTERS
 // ============================================================
 
-function populateDynamicFilters(
-    listingData
-) {
+function populateDynamicFilters(listingData) {
+    if (!filterLocation || !filterBrand) return;
 
-    if (!filterLocation || !filterBrand) {
-        return;
-    }
+    const previousLocation = filterLocation.value;
+    const previousBrand = filterBrand.value;
 
+    const locations = new Map();
+    const brands = new Map();
 
-    const previousLocation =
-        filterLocation.value;
-
-
-    const previousBrand =
-        filterBrand.value;
-
-
-    const locations =
-        new Map();
-
-
-    const brands =
-        new Map();
-
-
-    listingData.forEach(
-        listing => {
-
-            const location =
-                String(
-                    listing.location || ""
-                ).trim();
-
-
-            if (
-                location &&
-                location !== "Location unavailable"
-            ) {
-
-                const key =
-                    normalize(location);
-
-
-                if (!locations.has(key)) {
-
-                    locations.set(
-                        key,
-                        location
-                    );
-                }
-            }
-
-
-            const brand =
-                getListingBrand(
-                    listing.item
-                );
-
-
-            if (brand) {
-
-                const key =
-                    normalize(brand);
-
-
-                if (!brands.has(key)) {
-
-                    brands.set(
-                        key,
-                        brand
-                    );
-                }
+    listingData.forEach(listing => {
+        const location = String(listing.location || "").trim();
+        if (location && location !== "Location unavailable") {
+            const key = normalize(location);
+            if (!locations.has(key)) {
+                locations.set(key, location);
             }
         }
-    );
 
+        const brand = getListingBrand(listing.item);
+        if (brand) {
+            const key = normalize(brand);
+            if (!brands.has(key)) {
+                brands.set(key, brand);
+            }
+        }
+    });
 
-    // --------------------------------------------------------
-    // LOCATIONS
-    // --------------------------------------------------------
-
-    filterLocation.innerHTML = `
-        <option value="">
-            All Locations
-        </option>
-    `;
-
-
+    filterLocation.innerHTML = `<option value="">All Locations</option>`;
     [...locations.values()]
-        .sort(
-            (a, b) =>
-                a.localeCompare(
-                    b,
-                    undefined,
-                    {
-                        sensitivity: "base"
-                    }
-                )
-        )
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }))
         .forEach(location => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                location;
-
-
-            option.textContent =
-                location;
-
-
-            filterLocation.appendChild(
-                option
-            );
+            const option = document.createElement("option");
+            option.value = location;
+            option.textContent = location;
+            filterLocation.appendChild(option);
         });
 
-
-    // --------------------------------------------------------
-    // BRANDS
-    // --------------------------------------------------------
-
-    filterBrand.innerHTML = `
-        <option value="">
-            All Brands
-        </option>
-    `;
-
-
+    filterBrand.innerHTML = `<option value="">All Brands</option>`;
     [...brands.values()]
-        .sort(
-            (a, b) =>
-                a.localeCompare(
-                    b,
-                    undefined,
-                    {
-                        sensitivity: "base"
-                    }
-                )
-        )
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }))
         .forEach(brand => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                brand;
-
-
-            option.textContent =
-                brand;
-
-
-            filterBrand.appendChild(
-                option
-            );
+            const option = document.createElement("option");
+            option.value = brand;
+            option.textContent = brand;
+            filterBrand.appendChild(option);
         });
-
-
-    // --------------------------------------------------------
-    // RESTORE PREVIOUS LOCATION
-    // --------------------------------------------------------
 
     if (
         previousLocation &&
-        [...filterLocation.options]
-            .some(
-                option =>
-                    normalize(option.value) ===
-                    normalize(previousLocation)
-            )
+        [...filterLocation.options].some(option => normalize(option.value) === normalize(previousLocation))
     ) {
-
-        filterLocation.value =
-            previousLocation;
+        filterLocation.value = previousLocation;
     }
-
-
-    // --------------------------------------------------------
-    // RESTORE PREVIOUS BRAND
-    // --------------------------------------------------------
 
     if (
         previousBrand &&
-        [...filterBrand.options]
-            .some(
-                option =>
-                    normalize(option.value) ===
-                    normalize(previousBrand)
-            )
+        [...filterBrand.options].some(option => normalize(option.value) === normalize(previousBrand))
     ) {
-
-        filterBrand.value =
-            previousBrand;
+        filterBrand.value = previousBrand;
     }
 }
 
 
 // ============================================================
-// BRAND FILTER
+// MATCHERS
 // ============================================================
 
-function brandMatches(
-    item,
-    selectedBrand
-) {
-
-    if (!selectedBrand) {
-        return true;
-    }
-
-
-    const listingBrand =
-        getListingBrand(item);
-
-
-    if (!listingBrand) {
-        return false;
-    }
-
-
-    return (
-        normalize(listingBrand) ===
-        normalize(selectedBrand)
-    );
+function brandMatches(item, selectedBrand) {
+    if (!selectedBrand) return true;
+    const listingBrand = getListingBrand(item);
+    if (!listingBrand) return false;
+    return normalize(listingBrand) === normalize(selectedBrand);
 }
 
-
-// ============================================================
-// LOCATION FILTER
-// ============================================================
-
-function locationMatches(
-    location,
-    selectedLocation
-) {
-
-    if (!selectedLocation) {
-        return true;
-    }
-
-
-    const selected =
-        normalize(
-            selectedLocation
-        );
-
-
-    const actualLocation =
-        normalize(
-            location
-        );
-
-
-    if (!actualLocation) {
-        return false;
-    }
-
-
+function locationMatches(location, selectedLocation) {
+    if (!selectedLocation) return true;
+    const selected = normalize(selectedLocation);
+    const actualLocation = normalize(location);
+    if (!actualLocation) return false;
     return (
         actualLocation === selected ||
         actualLocation.includes(selected) ||
@@ -832,35 +349,10 @@ function locationMatches(
     );
 }
 
-
-// ============================================================
-// SIZE FILTER
-// ============================================================
-
-function sizeMatches(
-    item,
-    selectedSize
-) {
-
-    if (!selectedSize) {
-        return true;
-    }
-
-
-    const selected =
-        normalizeKey(
-            selectedSize
-        );
-
-
-    const itemSize =
-        normalizeKey(
-            item.size ||
-            item.weight ||
-            ""
-        );
-
-
+function sizeMatches(item, selectedSize) {
+    if (!selectedSize) return true;
+    const selected = normalizeKey(selectedSize);
+    const itemSize = normalizeKey(item.size || item.weight || "");
     return (
         itemSize === selected ||
         itemSize.includes(selected) ||
@@ -868,36 +360,10 @@ function sizeMatches(
     );
 }
 
-
-// ============================================================
-// CATEGORY FILTER
-// ============================================================
-
-function categoryMatches(
-    item,
-    selectedCategory
-) {
-
-    if (!selectedCategory) {
-        return true;
-    }
-
-
-    const selected =
-        normalizeKey(
-            selectedCategory
-        );
-
-
-    const itemCategory =
-        normalizeKey(
-            item.category ||
-            item.productCategory ||
-            item.type ||
-            ""
-        );
-
-
+function categoryMatches(item, selectedCategory) {
+    if (!selectedCategory) return true;
+    const selected = normalizeKey(selectedCategory);
+    const itemCategory = normalizeKey(item.category || item.productCategory || item.type || "");
     return (
         itemCategory === selected ||
         itemCategory.includes(selected) ||
@@ -907,315 +373,98 @@ function categoryMatches(
 
 
 // ============================================================
-// VIEW SWITCHING
-// ============================================================
-
-window.switchView =
-function(viewId) {
-
-    document
-        .querySelectorAll(".view")
-        .forEach(view => {
-
-            view.style.display =
-                "none";
-        });
-
-
-    const target =
-        document.getElementById(
-            viewId
-        );
-
-
-    if (target) {
-
-        target.style.display =
-            "block";
-    }
-};
-
-
-// ============================================================
 // IMAGE TICKER
 // ============================================================
 
-function createImageTicker(
-    images,
-    title
-) {
+function createImageTicker(images, title) {
+    if (!Array.isArray(images)) return "";
 
-    if (!Array.isArray(images)) {
-        return "";
-    }
+    const validImages = [
+        ...new Set(
+            images
+                .filter(Boolean)
+                .map(image => String(image).trim())
+                .filter(Boolean)
+        )
+    ];
 
+    if (validImages.length === 0) return "";
 
-    const validImages =
-        [
-            ...new Set(
-                images
-                    .filter(Boolean)
-                    .map(
-                        image =>
-                            String(image).trim()
-                    )
-                    .filter(Boolean)
-            )
-        ];
+    const tickerId = "ticker-" + Math.random().toString(36).substring(2, 12);
 
-
-    if (
-        validImages.length === 0
-    ) {
-        return "";
-    }
-
-
-    const tickerId =
-        "ticker-" +
-        Math.random()
-            .toString(36)
-            .substring(2, 12);
-
-
-    if (
-        validImages.length === 1
-    ) {
-
+    if (validImages.length === 1) {
         return `
-            <div
-                id="${tickerId}"
-                class="listing-image-ticker"
-            >
-
-                <div
-                    class="listing-image-track"
-                >
-
-                    <div
-                        class="listing-image-slide active"
-                    >
-
+            <div id="${tickerId}" class="listing-image-ticker">
+                <div class="listing-image-track">
+                    <div class="listing-image-slide active">
                         <img
                             src="${escapeHTML(validImages[0])}"
                             alt="${escapeHTML(title)}"
                             loading="lazy"
-                            onerror="
-                                this.style.display='none';
-                            "
+                            onerror="this.style.display='none';"
                         >
-
                     </div>
-
                 </div>
-
             </div>
         `;
     }
 
+    const slides = validImages
+        .map((image, index) => `
+            <div class="listing-image-slide ${index === 0 ? "active" : ""}" data-slide="${index}">
+                <img
+                    src="${escapeHTML(image)}"
+                    alt="${escapeHTML(title)} - Photo ${index + 1}"
+                    loading="${index === 0 ? "eager" : "lazy"}"
+                    onerror="this.style.visibility='hidden';"
+                >
+            </div>
+        `)
+        .join("");
 
-    const slides =
-        validImages
-            .map(
-                (image, index) => {
-
-                    return `
-                        <div
-                            class="
-                                listing-image-slide
-                                ${
-                                    index === 0
-                                        ? "active"
-                                        : ""
-                                }
-                            "
-                            data-slide="${index}"
-                        >
-
-                            <img
-                                src="${escapeHTML(image)}"
-                                alt="${escapeHTML(title)} - Photo ${index + 1}"
-                                loading="${
-                                    index === 0
-                                        ? "eager"
-                                        : "lazy"
-                                }"
-                                onerror="
-                                    this.style.visibility='hidden';
-                                "
-                            >
-
-                        </div>
-                    `;
-                }
-            )
-            .join("");
-
-
-    const indicators =
-        validImages
-            .map(
-                (_, index) => {
-
-                    return `
-                        <span
-                            class="
-                                listing-image-dot
-                                ${
-                                    index === 0
-                                        ? "active"
-                                        : ""
-                                }
-                            "
-                            data-slide="${index}"
-                        ></span>
-                    `;
-                }
-            )
-            .join("");
-
+    const indicators = validImages
+        .map((_, index) => `
+            <span class="listing-image-dot ${index === 0 ? "active" : ""}" data-slide="${index}"></span>
+        `)
+        .join("");
 
     const html = `
-        <div
-            id="${tickerId}"
-            class="listing-image-ticker"
-        >
-
-            <div
-                class="listing-image-track"
-            >
-
-                ${slides}
-
-            </div>
-
-
-            <div
-                class="listing-image-indicators"
-            >
-
-                ${indicators}
-
-            </div>
-
-
-            <div
-                class="listing-image-counter"
-            >
-                1 / ${validImages.length}
-            </div>
-
+        <div id="${tickerId}" class="listing-image-ticker">
+            <div class="listing-image-track">${slides}</div>
+            <div class="listing-image-indicators">${indicators}</div>
+            <div class="listing-image-counter">1 / ${validImages.length}</div>
         </div>
     `;
 
+    setTimeout(() => {
+        const ticker = document.getElementById(tickerId);
+        if (!ticker) return;
 
-    setTimeout(
-        () => {
+        const tickerSlides = ticker.querySelectorAll(".listing-image-slide");
+        const tickerDots = ticker.querySelectorAll(".listing-image-dot");
+        const counter = ticker.querySelector(".listing-image-counter");
 
-            const ticker =
-                document.getElementById(
-                    tickerId
-                );
+        let currentIndex = 0;
 
-
-            if (!ticker) {
+        const timer = setInterval(() => {
+            if (!document.body.contains(ticker)) {
+                clearInterval(timer);
                 return;
             }
 
+            tickerSlides[currentIndex]?.classList.remove("active");
+            tickerDots[currentIndex]?.classList.remove("active");
 
-            const tickerSlides =
-                ticker.querySelectorAll(
-                    ".listing-image-slide"
-                );
+            currentIndex = (currentIndex + 1) % tickerSlides.length;
 
+            tickerSlides[currentIndex]?.classList.add("active");
+            tickerDots[currentIndex]?.classList.add("active");
 
-            const tickerDots =
-                ticker.querySelectorAll(
-                    ".listing-image-dot"
-                );
-
-
-            const counter =
-                ticker.querySelector(
-                    ".listing-image-counter"
-                );
-
-
-            let currentIndex = 0;
-
-
-            const timer =
-                setInterval(
-                    () => {
-
-                        if (
-                            !document.body.contains(
-                                ticker
-                            )
-                        ) {
-
-                            clearInterval(
-                                timer
-                            );
-
-                            return;
-                        }
-
-
-                        tickerSlides[
-                            currentIndex
-                        ]?.classList.remove(
-                            "active"
-                        );
-
-
-                        tickerDots[
-                            currentIndex
-                        ]?.classList.remove(
-                            "active"
-                        );
-
-
-                        currentIndex++;
-
-
-                        if (
-                            currentIndex >=
-                            tickerSlides.length
-                        ) {
-
-                            currentIndex = 0;
-                        }
-
-
-                        tickerSlides[
-                            currentIndex
-                        ]?.classList.add(
-                            "active"
-                        );
-
-
-                        tickerDots[
-                            currentIndex
-                        ]?.classList.add(
-                            "active"
-                        );
-
-
-                        if (counter) {
-
-                            counter.textContent =
-                                `${currentIndex + 1} / ${tickerSlides.length}`;
-                        }
-
-                    },
-                    3000
-                );
-
-        },
-        100
-    );
-
+            if (counter) {
+                counter.textContent = `${currentIndex + 1} / ${tickerSlides.length}`;
+            }
+        }, 3000);
+    }, 100);
 
     return html;
 }
@@ -1225,497 +474,127 @@ function createImageTicker(
 // CART
 // ============================================================
 
-window.addToListingCart =
-function(
-    id,
-    title,
-    price,
-    location
-) {
-
-    const currentUser =
-        auth.currentUser;
-
+window.addToListingCart = function (id, title, price, location) {
+    const currentUser = auth.currentUser;
 
     if (!currentUser) {
-
-        alert(
-            "Please sign in or create an account to add items to your cart."
-        );
-
-
-        const authModal =
-            document.getElementById(
-                "authModal"
-            );
-
-
+        alert("Please sign in or create an account to add items to your cart.");
+        const authModal = document.getElementById("authModal");
         if (authModal) {
-
-            authModal.style.display =
-                "block";
+            authModal.style.display = "flex";
         }
-
-
         return;
     }
 
+    const cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
+    const existingIndex = cart.findIndex(item => item.id === id);
 
-    let cart =
-        JSON.parse(
-            localStorage.getItem(
-                "gas_cart"
-            )
-        ) || [];
-
-
-    const existingIndex =
-        cart.findIndex(
-            item =>
-                item.id === id
-        );
-
-
-    if (
-        existingIndex > -1
-    ) {
-
-        cart[
-            existingIndex
-        ].quantity += 1;
-
+    if (existingIndex > -1) {
+        cart[existingIndex].quantity += 1;
     } else {
-
         cart.push({
-
             id,
-
             title,
-
-            price:
-                Number(price) || 0,
-
+            price: Number(price) || 0,
             location,
-
             quantity: 1
         });
     }
 
-
-    localStorage.setItem(
-        "gas_cart",
-        JSON.stringify(cart)
-    );
-
-
+    localStorage.setItem("gas_cart", JSON.stringify(cart));
     updateCartUI();
-
-
-    alert(
-        `${title} added to your cart.`
-    );
+    alert(`${title} added to your cart.`);
 };
 
-
-// ============================================================
-// CART QUANTITY
-// ============================================================
-
-window.updateCartQuantity =
-function(
-    id,
-    delta
-) {
-
-    let cart =
-        JSON.parse(
-            localStorage.getItem(
-                "gas_cart"
-            )
-        ) || [];
-
-
-    const index =
-        cart.findIndex(
-            item =>
-                item.id === id
-        );
-
+window.updateCartQuantity = function (id, delta) {
+    const cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
+    const index = cart.findIndex(item => item.id === id);
 
     if (index > -1) {
-
-        cart[index].quantity +=
-            Number(delta);
-
-
-        if (
-            cart[index].quantity <= 0
-        ) {
-
-            cart.splice(
-                index,
-                1
-            );
+        cart[index].quantity += Number(delta);
+        if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
         }
     }
 
-
-    localStorage.setItem(
-        "gas_cart",
-        JSON.stringify(cart)
-    );
-
-
+    localStorage.setItem("gas_cart", JSON.stringify(cart));
     renderCartView();
-
     updateCartUI();
 };
 
-
-// ============================================================
-// REMOVE CART ITEM
-// ============================================================
-
-window.removeFromCart =
-function(id) {
-
-    let cart =
-        JSON.parse(
-            localStorage.getItem(
-                "gas_cart"
-            )
-        ) || [];
-
-
-    cart =
-        cart.filter(
-            item =>
-                item.id !== id
-        );
-
-
-    localStorage.setItem(
-        "gas_cart",
-        JSON.stringify(cart)
-    );
-
-
+window.removeFromCart = function (id) {
+    let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
+    cart = cart.filter(item => item.id !== id);
+    localStorage.setItem("gas_cart", JSON.stringify(cart));
     renderCartView();
-
     updateCartUI();
 };
-
-
-// ============================================================
-// CART UI
-// ============================================================
 
 function updateCartUI() {
+    const cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
+    const totalCount = cart.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
 
-    const cart =
-        JSON.parse(
-            localStorage.getItem(
-                "gas_cart"
-            )
-        ) || [];
-
-
-    const totalCount =
-        cart.reduce(
-            (sum, item) =>
-                sum +
-                Number(
-                    item.quantity || 0
-                ),
-            0
-        );
-
-
-    const cartLink =
-        document.getElementById(
-            "cartLink"
-        );
-
-
-    if (!cartLink) {
-        return;
+    const cartCountEl = document.getElementById("cartCount");
+    if (cartCountEl) {
+        cartCountEl.textContent = String(totalCount);
+        cartCountEl.style.display = totalCount > 0 ? "inline-block" : "none";
     }
-
-
-    cartLink.innerHTML = `
-
-        <span
-            style="
-                position:relative;
-                display:inline-flex;
-                align-items:center;
-                cursor:pointer;
-            "
-            title="Cart"
-        >
-
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-
-                <circle
-                    cx="9"
-                    cy="21"
-                    r="1"
-                ></circle>
-
-                <circle
-                    cx="20"
-                    cy="21"
-                    r="1"
-                ></circle>
-
-                <path
-                    d="
-                        M1 1h4l2.68 13.39
-                        a2 2 0 0 0 2 1.61h9.72
-                        a2 2 0 0 0 2-1.61L23 6H6
-                    "
-                ></path>
-
-            </svg>
-
-
-            ${
-                totalCount > 0
-                    ? `
-                        <span
-                            id="cartCount"
-                            class="cart-badge"
-                            style="
-                                position:absolute;
-                                top:-8px;
-                                right:-10px;
-                            "
-                        >
-                            ${totalCount}
-                        </span>
-                    `
-                    : ""
-            }
-
-        </span>
-    `;
 }
-
-
-// ============================================================
-// CART VIEW
-// ============================================================
 
 function renderCartView() {
+    const cartItemsList = document.getElementById("cartItemsList");
+    const cartSubtotal = document.getElementById("cartSubtotal");
+    const cartTotal = document.getElementById("cartTotal");
 
-    const cartItemsList =
-        document.getElementById(
-            "cartItemsList"
-        );
+    if (!cartItemsList) return;
 
+    const cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
 
-    const cartSubtotal =
-        document.getElementById(
-            "cartSubtotal"
-        );
-
-
-    const cartTotal =
-        document.getElementById(
-            "cartTotal"
-        );
-
-
-    if (!cartItemsList) {
+    if (cart.length === 0) {
+        cartItemsList.innerHTML = "<p>Your cart is currently empty.</p>";
+        if (cartSubtotal) cartSubtotal.textContent = "KES 0";
+        if (cartTotal) cartTotal.textContent = "KES 200";
         return;
     }
-
-
-    const cart =
-        JSON.parse(
-            localStorage.getItem(
-                "gas_cart"
-            )
-        ) || [];
-
-
-    if (
-        cart.length === 0
-    ) {
-
-        cartItemsList.innerHTML =
-            "<p>Your cart is currently empty.</p>";
-
-
-        if (cartSubtotal) {
-
-            cartSubtotal.textContent =
-                "KES 0";
-        }
-
-
-        if (cartTotal) {
-
-            cartTotal.textContent =
-                "KES 200";
-        }
-
-
-        return;
-    }
-
 
     let html = "";
-
     let subtotal = 0;
 
+    cart.forEach(item => {
+        const itemPrice = Number(item.price) || 0;
+        const quantity = Number(item.quantity) || 0;
+        subtotal += itemPrice * quantity;
 
-    cart.forEach(
-        item => {
-
-            const itemPrice =
-                Number(item.price) || 0;
-
-
-            const quantity =
-                Number(item.quantity) || 0;
-
-
-            subtotal +=
-                itemPrice * quantity;
-
-
-            html += `
-
-                <div
-                    class="cart-item-row"
-                >
-
-                    <div>
-
-                        <strong>
-                            ${escapeHTML(item.title)}
-                        </strong>
-
-                        <p
-                            style="
-                                font-size:0.85rem;
-                                color:var(--text-muted);
-                            "
-                        >
-                            KES ${itemPrice} each
-                        </p>
-
-                        <small
-                            style="
-                                color:var(--text-muted);
-                            "
-                        >
-                            ${escapeHTML(item.location || "")}
-                        </small>
-
-                    </div>
-
-
-                    <div
-                        style="
-                            display:flex;
-                            align-items:center;
-                            gap:0.5rem;
-                        "
-                    >
-
-                        <button
-                            type="button"
-                            class="btn-secondary"
-                            style="padding:2px 10px;"
-                            onclick="
-                                window.updateCartQuantity(
-                                    '${escapeJS(item.id)}',
-                                    -1
-                                )
-                            "
-                        >
-                            -
-                        </button>
-
-
-                        <span>
-                            ${quantity}
-                        </span>
-
-
-                        <button
-                            type="button"
-                            class="btn-secondary"
-                            style="padding:2px 10px;"
-                            onclick="
-                                window.updateCartQuantity(
-                                    '${escapeJS(item.id)}',
-                                    1
-                                )
-                            "
-                        >
-                            +
-                        </button>
-
-
-                        <button
-                            type="button"
-                            onclick="
-                                window.removeFromCart(
-                                    '${escapeJS(item.id)}'
-                                )
-                            "
-                            style="
-                                background:#ef4444;
-                                color:#fff;
-                                border:none;
-                                padding:4px 8px;
-                                border-radius:4px;
-                                cursor:pointer;
-                                margin-left:0.5rem;
-                                font-size:0.85rem;
-                            "
-                        >
-                            Remove
-                        </button>
-
-                    </div>
-
+        html += `
+            <div class="cart-item-row" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-bottom:1px solid #e2e8f0;">
+                <div>
+                    <strong>${escapeHTML(item.title)}</strong>
+                    <p style="font-size:0.85rem;color:#64748b;margin:0.25rem 0;">KES ${itemPrice} each</p>
+                    <small style="color:#64748b;">${escapeHTML(item.location || "")}</small>
                 </div>
-            `;
-        }
-    );
 
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <button type="button" class="btn-secondary" style="padding:2px 10px;" onclick="window.updateCartQuantity('${escapeJS(item.id)}', -1)">-</button>
+                    <span>${quantity}</span>
+                    <button type="button" class="btn-secondary" style="padding:2px 10px;" onclick="window.updateCartQuantity('${escapeJS(item.id)}', 1)">+</button>
+                    <button
+                        type="button"
+                        onclick="window.removeFromCart('${escapeJS(item.id)}')"
+                        style="background:#ef4444;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-left:0.5rem;font-size:0.85rem;"
+                    >
+                        Remove
+                    </button>
+                </div>
+            </div>
+        `;
+    });
 
-    cartItemsList.innerHTML =
-        html;
-
-
-    if (cartSubtotal) {
-
-        cartSubtotal.textContent =
-            `KES ${subtotal}`;
-    }
-
-
-    if (cartTotal) {
-
-        cartTotal.textContent =
-            `KES ${subtotal + 200}`;
-    }
+    cartItemsList.innerHTML = html;
+    if (cartSubtotal) cartSubtotal.textContent = `KES ${subtotal}`;
+    if (cartTotal) cartTotal.textContent = `KES ${subtotal + 200}`;
 }
+
+window.renderCartView = renderCartView;
 
 
 // ============================================================
@@ -1723,581 +602,148 @@ function renderCartView() {
 // ============================================================
 
 async function loadListings() {
+    if (!productGrid) return;
 
-    if (!productGrid) {
-        return;
-    }
-
-
-    productGrid.innerHTML = `
-        <p>
-            Loading gas suppliers & inventory...
-        </p>
-    `;
-
+    productGrid.innerHTML = `<p>Loading gas suppliers & inventory...</p>`;
 
     try {
+        const querySnapshot = await getDocs(collection(db, "listings"));
 
-        const listingsRef =
-            collection(
-                db,
-                "listings"
-            );
-
-
-        const querySnapshot =
-            await getDocs(
-                listingsRef
-            );
-
-
-        // ====================================================
-        // RESOLVE ALL LISTINGS FIRST
-        // ====================================================
-
-        const listingData = [];
-
-
-        for (
-            const docSnap of querySnapshot.docs
-        ) {
-
-            const item =
-                docSnap.data();
-
-
-            const itemId =
-                docSnap.id;
-
-
-            const location =
-                await resolveListingLocation(
-                    item
-                );
-
-
-            listingData.push({
-
-                item,
-
-                itemId,
-
-                location
-
-            });
-        }
-
-
-        // ====================================================
-        // POPULATE DYNAMIC FILTERS
-        // ====================================================
-
-        populateDynamicFilters(
-            listingData
+        // Resolve locations in parallel for fast initial loads
+        const listingData = await Promise.all(
+            querySnapshot.docs.map(async docSnap => {
+                const item = docSnap.data();
+                const itemId = docSnap.id;
+                const location = await resolveListingLocation(item);
+                return { item, itemId, location };
+            })
         );
 
+        populateDynamicFilters(listingData);
+        productGrid.innerHTML = "";
 
-        productGrid.innerHTML =
-            "";
-
-
-        if (
-            listingData.length === 0
-        ) {
-
+        if (listingData.length === 0) {
             productGrid.innerHTML = `
-
-                <div
-                    style="
-                        grid-column:1/-1;
-                        text-align:center;
-                        padding:40px 20px;
-                        color:var(--text-muted);
-                    "
-                >
-
-                    <h4>
-                        No active cooking gas listings found
-                    </h4>
-
-                    <p>
-                        New supplier listings will appear here.
-                    </p>
-
+                <div class="marketplace-empty-state">
+                    <h3>No active cooking gas listings found</h3>
+                    <p>New supplier listings will appear here.</p>
                 </div>
             `;
-
             return;
         }
 
-
-        // ====================================================
-        // FILTER VALUES
-        // ====================================================
-
-        const selectedSize =
-            filterSize
-                ? normalize(
-                    filterSize.value
-                )
-                : "";
-
-
-        const selectedCategory =
-            filterCategory
-                ? normalize(
-                    filterCategory.value
-                )
-                : "";
-
-
-        const selectedLocation =
-            filterLocation
-                ? normalize(
-                    filterLocation.value
-                )
-                : "";
-
-
-        const selectedBrand =
-            filterBrand
-                ? normalize(
-                    filterBrand.value
-                )
-                : "";
-
-
-        const searchQuery =
-            searchInput
-                ? normalize(
-                    searchInput.value
-                )
-                : "";
-
+        const selectedSize = filterSize ? normalize(filterSize.value) : "";
+        const selectedCategory = filterCategory ? normalize(filterCategory.value) : "";
+        const selectedLocation = filterLocation ? normalize(filterLocation.value) : "";
+        const selectedBrand = filterBrand ? normalize(filterBrand.value) : "";
+        const searchQuery = searchInput ? normalize(searchInput.value) : "";
 
         let matchCount = 0;
 
+        for (const listing of listingData) {
+            const { item, itemId, location } = listing;
 
-        // ====================================================
-        // PROCESS LISTINGS
-        // ====================================================
+            if (!sizeMatches(item, selectedSize)) continue;
+            if (!categoryMatches(item, selectedCategory)) continue;
+            if (!locationMatches(location, selectedLocation)) continue;
+            if (!brandMatches(item, selectedBrand)) continue;
 
-        for (
-            const listing of listingData
-        ) {
-
-            const {
-                item,
-                itemId,
-                location
-            } = listing;
-
-
-            // SIZE
-            if (
-                !sizeMatches(
-                    item,
-                    selectedSize
-                )
-            ) {
-                continue;
-            }
-
-
-            // CATEGORY
-            if (
-                !categoryMatches(
-                    item,
-                    selectedCategory
-                )
-            ) {
-                continue;
-            }
-
-
-            // LOCATION
-            if (
-                !locationMatches(
-                    location,
-                    selectedLocation
-                )
-            ) {
-                continue;
-            }
-
-
-            // BRAND
-            if (
-                !brandMatches(
-                    item,
-                    selectedBrand
-                )
-            ) {
-                continue;
-            }
-
-
-            // SEARCH
             if (searchQuery) {
-
                 const searchableText = [
-
                     item.title,
-
                     item.description,
-
                     location,
-
                     getListingBrand(item),
-
                     item.category,
-
                     item.size,
-
                     item.weight
-
                 ]
                     .filter(Boolean)
                     .map(normalize)
                     .join(" ");
 
-
-                if (
-                    !searchableText.includes(
-                        searchQuery
-                    )
-                ) {
-
-                    continue;
-                }
+                if (!searchableText.includes(searchQuery)) continue;
             }
-
 
             matchCount++;
 
-
-            // =================================================
-            // PRODUCT CARD
-            // =================================================
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.className =
-                "product-card";
-
-
-            // =================================================
-            // MAP PIN
-            // =================================================
+            const card = document.createElement("div");
+            card.className = "product-card";
 
             const mapPinSvg = `
-
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    style="
-                        vertical-align:middle;
-                        margin-right:4px;
-                        color:var(--primary);
-                    "
-                >
-
-                    <path
-                        d="
-                            M21 10
-                            c0 7-9 13-9 13
-                            S3 17 3 10
-                            a9 9 0 0 1 18 0z
-                        "
-                    ></path>
-
-                    <circle
-                        cx="12"
-                        cy="10"
-                        r="3"
-                    ></circle>
-
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;color:var(--primary);">
+                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
                 </svg>
             `;
 
-
-            // =================================================
-            // IMAGES
-            // =================================================
-
             let displayImages = [];
-
-
-            if (
-                Array.isArray(item.images) &&
-                item.images.length > 0
-            ) {
-
-                displayImages =
-                    item.images;
-
-            } else if (
-                Array.isArray(item.imageUrls) &&
-                item.imageUrls.length > 0
-            ) {
-
-                displayImages =
-                    item.imageUrls;
-
-            } else if (
-                item.imageUrl
-            ) {
-
-                displayImages = [
-                    item.imageUrl
-                ];
+            if (Array.isArray(item.images) && item.images.length > 0) {
+                displayImages = item.images;
+            } else if (Array.isArray(item.imageUrls) && item.imageUrls.length > 0) {
+                displayImages = item.imageUrls;
+            } else if (item.imageUrl) {
+                displayImages = [item.imageUrl];
             }
+            displayImages = [...new Set(displayImages)];
 
+            const title = item.title || "Cooking Gas";
+            const price = item.price !== undefined && item.price !== null && item.price !== "" ? item.price : "Price on request";
+            const size = item.size || item.weight || "Size not specified";
+            const description = item.description || "";
 
-            displayImages =
-                [
-                    ...new Set(
-                        displayImages
-                    )
-                ];
-
-
-            // =================================================
-            // DISPLAY VALUES
-            // =================================================
-
-            const title =
-                item.title ||
-                "Cooking Gas";
-
-
-            const price =
-                item.price !== undefined &&
-                item.price !== null &&
-                item.price !== ""
-                    ? item.price
-                    : "Price on request";
-
-
-            const size =
-                item.size ||
-                item.weight ||
-                "Size not specified";
-
-
-            const description =
-                item.description ||
-                "";
-
-
-            // =================================================
-            // IMAGE TICKER
-            // =================================================
-
-            const imageTicker =
-                createImageTicker(
-                    displayImages,
-                    title
-                );
-
-
-            // =================================================
-            // SAFE VALUES
-            // =================================================
-
-            const safeTitle =
-                escapeJS(
-                    title
-                );
-
-
-            const safeLocation =
-                escapeJS(
-                    location
-                );
-
-
-            const numericPrice =
-                Number(
-                    item.price
-                ) || 0;
-
-
-            // =================================================
-            // CARD
-            // =================================================
+            const imageTicker = createImageTicker(displayImages, title);
+            const safeTitle = escapeJS(title);
+            const safeLocation = escapeJS(location);
+            const numericPrice = Number(item.price) || 0;
 
             card.innerHTML = `
-
                 <div>
-
                     ${imageTicker}
-
-
-                    <div
-                        class="card-body"
-                    >
-
-                        <h4>
-                            ${escapeHTML(title)}
-                        </h4>
-
-
-                        <p
-                            class="price"
-                        >
-
-                            KES
-                            ${escapeHTML(price)}
-
-                            <span
-                                style="
-                                    font-size:0.8rem;
-                                    font-weight:normal;
-                                    color:var(--text-muted);
-                                "
-                            >
+                    <div class="card-body">
+                        <h4>${escapeHTML(title)}</h4>
+                        <p class="price">
+                            KES ${escapeHTML(price)}
+                            <span style="font-size:0.8rem;font-weight:normal;color:var(--text-muted);">
                                 (${escapeHTML(size)})
                             </span>
-
                         </p>
-
-
-                        <p
-                            class="location"
-                            title="Supplier registered location"
-                        >
-
-                            ${mapPinSvg}
-
-                            ${escapeHTML(
-                                location
-                            )}
-
+                        <p class="location" title="Supplier registered location">
+                            ${mapPinSvg} ${escapeHTML(location)}
                         </p>
-
-
-                        <p
-                            style="
-                                font-size:0.85rem;
-                                color:var(--text-muted);
-                                line-height:1.4;
-                            "
-                        >
-                            ${escapeHTML(
-                                description
-                            )}
+                        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.4;">
+                            ${escapeHTML(description)}
                         </p>
-
                     </div>
-
                 </div>
 
-
-                <div
-                    style="
-                        padding:0 1rem 1rem 1rem;
-                    "
-                >
-
+                <div style="padding:0 1rem 1rem 1rem;">
                     <button
                         class="btn-primary"
-                        onclick="
-                            window.addToListingCart(
-                                '${escapeJS(itemId)}',
-                                '${safeTitle}',
-                                ${numericPrice},
-                                '${safeLocation}'
-                            )
-                        "
+                        onclick="window.addToListingCart('${escapeJS(itemId)}', '${safeTitle}', ${numericPrice}, '${safeLocation}')"
                     >
                         Order Now
                     </button>
-
                 </div>
-
             `;
 
-
-            productGrid.appendChild(
-                card
-            );
+            productGrid.appendChild(card);
         }
 
-
-        // ====================================================
-        // NO RESULTS
-        // ====================================================
-
-        if (
-            matchCount === 0
-        ) {
-
+        if (matchCount === 0) {
             productGrid.innerHTML = `
-
-                <div
-                    style="
-                        grid-column:1/-1;
-                        text-align:center;
-                        padding:40px 20px;
-                        color:var(--text-muted);
-                    "
-                >
-
-                    <h4>
-                        No listings found
-                    </h4>
-
-                    <p>
-                        Try changing your location,
-                        brand, size or category filter.
-                    </p>
-
+                <div class="marketplace-empty-state">
+                    <h3>No listings found</h3>
+                    <p>Try changing your location, brand, size, or category filter.</p>
                 </div>
             `;
         }
-
-
     } catch (err) {
-
-        console.error(
-            "GasHubKE listings error:",
-            err
-        );
-
-
+        console.error("GasHubKE listings error:", err);
         productGrid.innerHTML = `
-
-            <div
-                style="
-                    grid-column:1/-1;
-                    text-align:center;
-                    padding:30px;
-                "
-            >
-
-                <p>
-                    Error loading platform inventory.
-                </p>
-
-                <small>
-                    ${escapeHTML(
-                        err.message ||
-                        "Please try again."
-                    )}
-                </small>
-
+            <div class="marketplace-empty-state">
+                <p>Error loading platform inventory.</p>
+                <small>${escapeHTML(err.message || "Please try again.")}</small>
             </div>
         `;
     }
@@ -2309,32 +755,11 @@ async function loadListings() {
 // ============================================================
 
 function clearFilters() {
-
-    if (filterLocation) {
-        filterLocation.value = "";
-    }
-
-
-    if (filterBrand) {
-        filterBrand.value = "";
-    }
-
-
-    if (filterSize) {
-        filterSize.value = "";
-    }
-
-
-    if (filterCategory) {
-        filterCategory.value = "";
-    }
-
-
-    if (searchInput) {
-        searchInput.value = "";
-    }
-
-
+    if (filterLocation) filterLocation.value = "";
+    if (filterBrand) filterBrand.value = "";
+    if (filterSize) filterSize.value = "";
+    if (filterCategory) filterCategory.value = "";
+    if (searchInput) searchInput.value = "";
     loadListings();
 }
 
@@ -2344,282 +769,45 @@ function clearFilters() {
 // ============================================================
 
 function initializeMarketplace() {
-
-    productGrid =
-        document.getElementById(
-            "productGrid"
-        );
-
-
-    filterSize =
-        document.getElementById(
-            "filterSize"
-        );
-
-
-    filterCategory =
-        document.getElementById(
-            "filterCategory"
-        );
-
-
-    filterLocation =
-        document.getElementById(
-            "filterLocation"
-        );
-
-
-    filterBrand =
-        document.getElementById(
-            "filterBrand"
-        );
-
-
-    clearFiltersBtn =
-        document.getElementById(
-            "clearFiltersBtn"
-        );
-
-
-    searchBtn =
-        document.getElementById(
-            "searchBtn"
-        );
-
-
-    searchInput =
-        document.getElementById(
-            "searchInput"
-        );
-
-
-    // --------------------------------------------------------
-    // CART
-    // --------------------------------------------------------
+    productGrid = document.getElementById("productGrid");
+    filterSize = document.getElementById("filterSize");
+    filterCategory = document.getElementById("filterCategory");
+    filterLocation = document.getElementById("filterLocation");
+    filterBrand = document.getElementById("filterBrand");
+    clearFiltersBtn = document.getElementById("clearFiltersBtn");
+    searchBtn = document.getElementById("searchBtn");
+    searchInput = document.getElementById("searchInput");
 
     updateCartUI();
 
-
-    // --------------------------------------------------------
-    // NAVIGATION
-    // --------------------------------------------------------
-
-    const homeLink =
-        document.getElementById(
-            "homeLink"
-        );
-
-
-    const cartLink =
-        document.getElementById(
-            "cartLink"
-        );
-
-
-    const hamburger =
-        document.querySelector(
-            ".hamburger"
-        );
-
-
-    const navLinks =
-        document.querySelector(
-            ".nav-links"
-        );
-
-
-    // --------------------------------------------------------
-    // HOME
-    // --------------------------------------------------------
-
-    if (homeLink) {
-
-        homeLink.addEventListener(
-            "click",
-            e => {
-
-                e.preventDefault();
-
-
-                switchView(
-                    "marketplaceView"
-                );
-
-
-                if (navLinks) {
-
-                    navLinks.classList.remove(
-                        "active"
-                    );
-                }
-            }
-        );
-    }
-
-
-    // --------------------------------------------------------
-    // CART
-    // --------------------------------------------------------
-
-    if (cartLink) {
-
-        cartLink.addEventListener(
-            "click",
-            e => {
-
-                e.preventDefault();
-
-
-                renderCartView();
-
-
-                switchView(
-                    "cartView"
-                );
-
-
-                if (navLinks) {
-
-                    navLinks.classList.remove(
-                        "active"
-                    );
-                }
-            }
-        );
-    }
-
-
-    // --------------------------------------------------------
-    // HAMBURGER
-    // --------------------------------------------------------
-
-    if (
-        hamburger &&
-        navLinks
-    ) {
-
-        hamburger.addEventListener(
-            "click",
-            e => {
-
-                e.preventDefault();
-
-
-                navLinks.classList.toggle(
-                    "active"
-                );
-            }
-        );
-    }
-
-
-    // --------------------------------------------------------
-    // FILTERS
-    // --------------------------------------------------------
-
-    if (filterSize) {
-
-        filterSize.addEventListener(
-            "change",
-            loadListings
-        );
-    }
-
-
-    if (filterCategory) {
-
-        filterCategory.addEventListener(
-            "change",
-            loadListings
-        );
-    }
-
-
-    if (filterLocation) {
-
-        filterLocation.addEventListener(
-            "change",
-            loadListings
-        );
-    }
-
-
-    if (filterBrand) {
-
-        filterBrand.addEventListener(
-            "change",
-            loadListings
-        );
-    }
-
-
-    // --------------------------------------------------------
-    // CLEAR
-    // --------------------------------------------------------
+    [filterSize, filterCategory, filterLocation, filterBrand].forEach(select => {
+        if (select) {
+            select.addEventListener("change", loadListings);
+        }
+    });
 
     if (clearFiltersBtn) {
-
-        clearFiltersBtn.addEventListener(
-            "click",
-            clearFilters
-        );
+        clearFiltersBtn.addEventListener("click", clearFilters);
     }
-
-
-    // --------------------------------------------------------
-    // SEARCH
-    // --------------------------------------------------------
 
     if (searchBtn) {
-
-        searchBtn.addEventListener(
-            "click",
-            loadListings
-        );
+        searchBtn.addEventListener("click", loadListings);
     }
-
 
     if (searchInput) {
-
-        searchInput.addEventListener(
-            "keypress",
-            e => {
-
-                if (
-                    e.key === "Enter"
-                ) {
-
-                    e.preventDefault();
-
-                    loadListings();
-                }
+        searchInput.addEventListener("keypress", e => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                loadListings();
             }
-        );
+        });
     }
-
-
-    // --------------------------------------------------------
-    // INITIAL LOAD
-    // --------------------------------------------------------
 
     loadListings();
 }
 
-
-// ============================================================
-// START
-// ============================================================
-
-if (
-    document.readyState === "loading"
-) {
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        initializeMarketplace
-    );
-
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeMarketplace);
 } else {
-
     initializeMarketplace();
 }
