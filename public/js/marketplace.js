@@ -11,11 +11,10 @@ import {
 // ============================================================
 // GAS HUB KE - MARKETPLACE.JS
 // Production Marketplace
-// Dynamic Firestore Location + Brand Filters & Cart Sync
+// Dynamic Firestore Location, Brand Filters & Vendor Delivery Offers
 // ============================================================
 
 const CART_STORAGE_KEY = "gas_cart";
-const DELIVERY_FEE_PER_ORDER = 200;
 
 let productGrid;
 let filterSize;
@@ -26,7 +25,7 @@ let clearFiltersBtn;
 let searchBtn;
 let searchInput;
 
-const supplierLocationCache = new Map();
+const supplierProfileCache = new Map();
 
 
 // ============================================================
@@ -67,6 +66,15 @@ function formatKES(amount) {
     return `KES ${(Number(amount) || 0).toLocaleString()}`;
 }
 
+function parseNumericFee(value) {
+    if (value === undefined || value === null || value === "") return null;
+    if (typeof value === "number" && Number.isFinite(value)) return Math.max(0, value);
+    const cleaned = String(value).replace(/[^\d.]/g, "");
+    if (!cleaned) return null;
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) ? Math.max(0, parsed) : null;
+}
+
 function showMarketplaceToast(message) {
     if (!message) return;
 
@@ -103,7 +111,7 @@ function showMarketplaceToast(message) {
 
 
 // ============================================================
-// LOCATION TEXT
+// SUPPLIER PROFILE, LOCATION & DELIVERY OFFER RESOLUTION
 // ============================================================
 
 function formatLocation(location) {
@@ -194,78 +202,155 @@ function extractSupplierLocation(profile) {
     return "";
 }
 
-async function getSupplierLocation(supplierId) {
-    if (!supplierId) return "";
+function extractDeliveryDetails(source) {
+    if (!source) return { fee: null, offer: "" };
+
+    const rawFee =
+        source.deliveryFee ??
+        source.delivery_fee ??
+        source.shippingFee ??
+        source.deliveryCost ??
+        source.deliveryCharge;
+
+    const fee = parseNumericFee(rawFee);
+
+    const offer = String(
+        source.deliveryOffer ||
+        source.delivery_offer ||
+        source.deliveryNote ||
+        source.deliveryTerms ||
+        ""
+    ).trim();
+
+    return { fee, offer };
+}
+
+async function getSupplierDetails(supplierId) {
+    if (!supplierId) {
+        return { location: "", businessName: "", deliveryFee: null, deliveryOffer: "" };
+    }
 
     const cacheKey = String(supplierId);
-    if (supplierLocationCache.has(cacheKey)) {
-        return supplierLocationCache.get(cacheKey);
+    if (supplierProfileCache.has(cacheKey)) {
+        return supplierProfileCache.get(cacheKey);
     }
+
+    const resolved = {
+        location: "",
+        businessName: "",
+        deliveryFee: null,
+        deliveryOffer: ""
+    };
 
     try {
         const supplierSnap = await getDoc(doc(db, "suppliers", cacheKey));
         if (supplierSnap.exists()) {
-            const location = extractSupplierLocation(supplierSnap.data());
-            if (location) {
-                supplierLocationCache.set(cacheKey, location);
-                return location;
-            }
+            const data = supplierSnap.data();
+            resolved.location = extractSupplierLocation(data) || resolved.location;
+            resolved.businessName = data.businessName || data.supplierName || data.name || resolved.businessName;
+            const delivery = extractDeliveryDetails(data);
+            if (delivery.fee !== null) resolved.deliveryFee = delivery.fee;
+            if (delivery.offer) resolved.deliveryOffer = delivery.offer;
         }
 
         const userSnap = await getDoc(doc(db, "users", cacheKey));
         if (userSnap.exists()) {
-            const location = extractSupplierLocation(userSnap.data());
-            if (location) {
-                supplierLocationCache.set(cacheKey, location);
-                return location;
+            const data = userSnap.data();
+            resolved.location = resolved.location || extractSupplierLocation(data);
+            resolved.businessName = resolved.businessName || data.businessName || data.supplierName || data.name || "";
+            const delivery = extractDeliveryDetails(data);
+            if (resolved.deliveryFee === null && delivery.fee !== null) {
+                resolved.deliveryFee = delivery.fee;
+            }
+            if (!resolved.deliveryOffer && delivery.offer) {
+                resolved.deliveryOffer = delivery.offer;
             }
         }
     } catch (error) {
-        console.warn("Unable to load supplier location:", supplierId, error);
+        console.warn("Unable to load supplier details:", supplierId, error);
     }
 
-    supplierLocationCache.set(cacheKey, "");
-    return "";
+    supplierProfileCache.set(cacheKey, resolved);
+    return resolved;
 }
 
-async function resolveListingLocation(item) {
-    if (item.supplierLocation) {
-        const location = formatLocation(item.supplierLocation);
-        if (location) return location;
-    }
-
-    const supplierId =
-        item.supplierId ||
-        item.supplierID ||
+function getListingVendorId(item) {
+    return String(
         item.vendorId ||
         item.vendorID ||
+        item.supplierId ||
+        item.supplierID ||
         item.sellerId ||
         item.sellerID ||
         item.ownerId ||
         item.ownerID ||
-        "";
+        ""
+    ).trim();
+}
 
-    if (supplierId) {
-        const supplierLocation = await getSupplierLocation(supplierId);
-        if (supplierLocation) return supplierLocation;
+async function resolveListingMeta(item) {
+    const vendorId = getListingVendorId(item);
+    const supplierDetails = vendorId
+        ? await getSupplierDetails(vendorId)
+        : { location: "", businessName: "", deliveryFee: null, deliveryOffer: "" };
+
+    // Resolve location
+    let location = "";
+    if (item.supplierLocation) {
+        location = formatLocation(item.supplierLocation);
+    }
+    if (!location && supplierDetails.location) {
+        location = supplierDetails.location;
+    }
+    if (!location) {
+        const legacyLocations = [
+            item.location,
+            item.town,
+            item.city,
+            item.county,
+            item.area,
+            item.deliveryLocation,
+            item.deliveryArea
+        ];
+        for (const candidate of legacyLocations) {
+            const formatted = formatLocation(candidate);
+            if (formatted) {
+                location = formatted;
+                break;
+            }
+        }
+    }
+    if (!location) {
+        location = "Location unavailable";
     }
 
-    const legacyLocations = [
-        item.location,
-        item.town,
-        item.city,
-        item.county,
-        item.area,
-        item.deliveryLocation,
-        item.deliveryArea
-    ];
+    // Resolve supplier name
+    const supplierName = String(
+        item.supplierName ||
+        item.businessName ||
+        supplierDetails.businessName ||
+        ""
+    ).trim();
 
-    for (const location of legacyLocations) {
-        const formatted = formatLocation(location);
-        if (formatted) return formatted;
-    }
+    // Resolve vendor delivery fee & offer (listing overrides supplier profile; defaults to 0 if free/unspecified)
+    const listingDelivery = extractDeliveryDetails(item);
+    const deliveryFee =
+        listingDelivery.fee !== null
+            ? listingDelivery.fee
+            : (supplierDetails.deliveryFee !== null ? supplierDetails.deliveryFee : 0);
 
-    return "Location unavailable";
+    const deliveryOffer =
+        listingDelivery.offer ||
+        supplierDetails.deliveryOffer ||
+        (deliveryFee === 0 ? "Free Delivery" : "");
+
+    return {
+        location,
+        vendorId,
+        supplierName,
+        deliveryFee,
+        deliveryOffer
+    };
 }
 
 
@@ -512,7 +597,7 @@ function createImageTicker(images, title) {
 
 
 // ============================================================
-// CART & ORDER SUMMARY HELPERS
+// CART & VENDOR-BASED DELIVERY CALCULATIONS
 // ============================================================
 
 function readCartStorage() {
@@ -541,13 +626,38 @@ function calculateCartTotals(cartItems) {
         return sum + price * qty;
     }, 0);
 
-    const deliveryFee = cartItems.length > 0 && subtotal > 0 ? DELIVERY_FEE_PER_ORDER : 0;
+    // Group delivery fee once per vendor (or per item if no vendorId)
+    const vendorFees = new Map();
+    cartItems.forEach(item => {
+        const groupKey = item.vendorId ? `vendor:${item.vendorId}` : `item:${item.id}`;
+        const itemFee = Math.max(0, Number(item.deliveryFee) || 0);
+        if (!vendorFees.has(groupKey)) {
+            vendorFees.set(groupKey, itemFee);
+        } else {
+            vendorFees.set(groupKey, Math.max(vendorFees.get(groupKey), itemFee));
+        }
+    });
+
+    let deliveryFee = 0;
+    vendorFees.forEach(fee => {
+        deliveryFee += fee;
+    });
+
     const total = subtotal + deliveryFee;
 
     return { subtotal, deliveryFee, total };
 }
 
-window.addToListingCart = function (id, title, price, location, vendorId = "", supplierName = "") {
+window.addToListingCart = function (
+    id,
+    title,
+    price,
+    location,
+    vendorId = "",
+    supplierName = "",
+    deliveryFee = 0,
+    deliveryOffer = ""
+) {
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
@@ -561,15 +671,14 @@ window.addToListingCart = function (id, title, price, location, vendorId = "", s
 
     const cart = readCartStorage();
     const existingIndex = cart.findIndex(item => String(item.id) === String(id));
+    const parsedDeliveryFee = Math.max(0, Number(deliveryFee) || 0);
 
     if (existingIndex > -1) {
         cart[existingIndex].quantity = (Number(cart[existingIndex].quantity) || 1) + 1;
-        if (vendorId && !cart[existingIndex].vendorId) {
-            cart[existingIndex].vendorId = vendorId;
-        }
-        if (supplierName && !cart[existingIndex].supplierName) {
-            cart[existingIndex].supplierName = supplierName;
-        }
+        cart[existingIndex].deliveryFee = parsedDeliveryFee;
+        if (deliveryOffer) cart[existingIndex].deliveryOffer = deliveryOffer;
+        if (vendorId && !cart[existingIndex].vendorId) cart[existingIndex].vendorId = vendorId;
+        if (supplierName && !cart[existingIndex].supplierName) cart[existingIndex].supplierName = supplierName;
     } else {
         cart.push({
             id,
@@ -578,6 +687,8 @@ window.addToListingCart = function (id, title, price, location, vendorId = "", s
             location,
             vendorId,
             supplierName,
+            deliveryFee: parsedDeliveryFee,
+            deliveryOffer: deliveryOffer || (parsedDeliveryFee === 0 ? "Free Delivery" : ""),
             quantity: 1
         });
     }
@@ -641,7 +752,11 @@ function renderCartView() {
     const { subtotal, deliveryFee, total } = calculateCartTotals(cart);
 
     if (cartSubtotal) cartSubtotal.textContent = formatKES(subtotal);
-    if (cartDelivery) cartDelivery.textContent = formatKES(deliveryFee);
+    if (cartDelivery) {
+        cartDelivery.textContent = cart.length === 0
+            ? "KES 0"
+            : (deliveryFee === 0 ? "Free (Vendor Offer)" : formatKES(deliveryFee));
+    }
     if (cartTotal) cartTotal.textContent = formatKES(total);
 
     if (!cartItemsList) return;
@@ -656,15 +771,19 @@ function renderCartView() {
             const itemPrice = Number(item.price) || 0;
             const quantity = Number(item.quantity) || 1;
             const lineTotal = itemPrice * quantity;
+            const itemDeliveryFee = Math.max(0, Number(item.deliveryFee) || 0);
+            const deliveryTag = item.deliveryOffer
+                ? escapeHTML(item.deliveryOffer)
+                : (itemDeliveryFee === 0 ? "Free Delivery" : `Delivery: ${formatKES(itemDeliveryFee)}`);
             const supplierLabel = item.supplierName ? ` · ${escapeHTML(item.supplierName)}` : "";
-            const locationLabel = item.location ? ` · ${escapeHTML(item.location)}` : "";
 
             return `
                 <div class="cart-item-row" style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;padding:0.85rem 0;border-bottom:1px solid #e2e8f0;">
                     <div>
                         <strong>${escapeHTML(item.title)}</strong>
                         <p style="font-size:0.85rem;color:#64748b;margin:0.25rem 0;">${formatKES(itemPrice)} each · Subtotal: ${formatKES(lineTotal)}</p>
-                        <small style="color:#64748b;">${escapeHTML(item.location || "")}${supplierLabel}</small>
+                        <small style="color:#64748b;display:block;">${escapeHTML(item.location || "")}${supplierLabel}</small>
+                        <small style="color:#16a34a;font-weight:600;display:inline-block;margin-top:0.2rem;">${deliveryTag}</small>
                     </div>
 
                     <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -686,6 +805,13 @@ function renderCartView() {
 }
 
 window.renderCartView = renderCartView;
+window.getGasCartSummary = function () {
+    const items = readCartStorage();
+    return {
+        items,
+        ...calculateCartTotals(items)
+    };
+};
 
 
 // ============================================================
@@ -704,8 +830,8 @@ async function loadListings() {
             querySnapshot.docs.map(async docSnap => {
                 const item = docSnap.data();
                 const itemId = docSnap.id;
-                const location = await resolveListingLocation(item);
-                return { item, itemId, location };
+                const meta = await resolveListingMeta(item);
+                return { item, itemId, ...meta };
             })
         );
 
@@ -731,7 +857,15 @@ async function loadListings() {
         let matchCount = 0;
 
         for (const listing of listingData) {
-            const { item, itemId, location } = listing;
+            const {
+                item,
+                itemId,
+                location,
+                vendorId,
+                supplierName,
+                deliveryFee,
+                deliveryOffer
+            } = listing;
 
             if (!sizeMatches(item, selectedSize)) continue;
             if (!categoryMatches(item, selectedCategory)) continue;
@@ -747,8 +881,8 @@ async function loadListings() {
                     item.category,
                     item.size,
                     item.weight,
-                    item.supplierName,
-                    item.businessName
+                    supplierName,
+                    deliveryOffer
                 ]
                     .filter(Boolean)
                     .map(normalize)
@@ -783,23 +917,16 @@ async function loadListings() {
             const price = item.price !== undefined && item.price !== null && item.price !== "" ? item.price : "Price on request";
             const size = item.size || item.weight || "Size not specified";
             const description = item.description || "";
-            const vendorId =
-                item.vendorId ||
-                item.vendorID ||
-                item.supplierId ||
-                item.supplierID ||
-                item.sellerId ||
-                item.sellerID ||
-                item.ownerId ||
-                item.ownerID ||
-                "";
-            const supplierName = item.supplierName || item.businessName || "";
+            const deliveryBadgeText = deliveryOffer
+                ? deliveryOffer
+                : (deliveryFee === 0 ? "Free Delivery" : `Delivery: ${formatKES(deliveryFee)}`);
 
             const imageTicker = createImageTicker(displayImages, title);
             const safeTitle = escapeJS(title);
             const safeLocation = escapeJS(location);
             const safeVendorId = escapeJS(vendorId);
             const safeSupplierName = escapeJS(supplierName);
+            const safeDeliveryOffer = escapeJS(deliveryOffer);
             const numericPrice = Number(item.price) || 0;
 
             card.innerHTML = `
@@ -816,6 +943,9 @@ async function loadListings() {
                         <p class="location" title="Supplier registered location">
                             ${mapPinSvg} ${escapeHTML(location)}
                         </p>
+                        <p style="font-size:0.8rem;font-weight:600;color:#16a34a;margin:0.2rem 0 0.45rem 0;">
+                            ${escapeHTML(deliveryBadgeText)}
+                        </p>
                         <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.4;">
                             ${escapeHTML(description)}
                         </p>
@@ -825,7 +955,7 @@ async function loadListings() {
                 <div style="padding:0 1rem 1rem 1rem;">
                     <button
                         class="btn-primary"
-                        onclick="window.addToListingCart('${escapeJS(itemId)}', '${safeTitle}', ${numericPrice}, '${safeLocation}', '${safeVendorId}', '${safeSupplierName}')"
+                        onclick="window.addToListingCart('${escapeJS(itemId)}', '${safeTitle}', ${numericPrice}, '${safeLocation}', '${safeVendorId}', '${safeSupplierName}', ${deliveryFee}, '${safeDeliveryOffer}')"
                     >
                         Order Now
                     </button>
