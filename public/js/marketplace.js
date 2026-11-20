@@ -11,8 +11,11 @@ import {
 // ============================================================
 // GAS HUB KE - MARKETPLACE.JS
 // Production Marketplace
-// Dynamic Firestore Location + Brand Filters
+// Dynamic Firestore Location + Brand Filters & Cart Sync
 // ============================================================
+
+const CART_STORAGE_KEY = "gas_cart";
+const DELIVERY_FEE_PER_ORDER = 200;
 
 let productGrid;
 let filterSize;
@@ -58,6 +61,44 @@ function escapeJS(value) {
         .replace(/'/g, "\\'")
         .replace(/\r/g, "")
         .replace(/\n/g, "\\n");
+}
+
+function formatKES(amount) {
+    return `KES ${(Number(amount) || 0).toLocaleString()}`;
+}
+
+function showMarketplaceToast(message) {
+    if (!message) return;
+
+    let toast = document.getElementById("gasHubMarketplaceToast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "gasHubMarketplaceToast";
+        toast.style.cssText = [
+            "position:fixed",
+            "bottom:20px",
+            "right:20px",
+            "z-index:99999",
+            "background:#0f172a",
+            "color:#ffffff",
+            "padding:10px 16px",
+            "border-radius:10px",
+            "font-size:14px",
+            "box-shadow:0 10px 25px rgba(0,0,0,0.22)",
+            "transition:opacity 0.2s ease",
+            "opacity:0",
+            "pointer-events:none"
+        ].join(";");
+        document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.style.opacity = "1";
+
+    clearTimeout(showMarketplaceToast._timer);
+    showMarketplaceToast._timer = setTimeout(() => {
+        toast.style.opacity = "0";
+    }, 2200);
 }
 
 
@@ -471,14 +512,46 @@ function createImageTicker(images, title) {
 
 
 // ============================================================
-// CART
+// CART & ORDER SUMMARY HELPERS
 // ============================================================
 
-window.addToListingCart = function (id, title, price, location) {
+function readCartStorage() {
+    try {
+        const raw = localStorage.getItem(CART_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        console.warn("Unable to read cart from localStorage:", error);
+        return [];
+    }
+}
+
+function writeCartStorage(nextCart) {
+    try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(nextCart));
+    } catch (error) {
+        console.warn("Unable to save cart to localStorage:", error);
+    }
+}
+
+function calculateCartTotals(cartItems) {
+    const subtotal = cartItems.reduce((sum, item) => {
+        const price = Number(item.price) || 0;
+        const qty = Number(item.quantity) || 0;
+        return sum + price * qty;
+    }, 0);
+
+    const deliveryFee = cartItems.length > 0 && subtotal > 0 ? DELIVERY_FEE_PER_ORDER : 0;
+    const total = subtotal + deliveryFee;
+
+    return { subtotal, deliveryFee, total };
+}
+
+window.addToListingCart = function (id, title, price, location, vendorId = "", supplierName = "") {
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
-        alert("Please sign in or create an account to add items to your cart.");
+        showMarketplaceToast("Please sign in or register to add items to your cart.");
         const authModal = document.getElementById("authModal");
         if (authModal) {
             authModal.style.display = "flex";
@@ -486,53 +559,70 @@ window.addToListingCart = function (id, title, price, location) {
         return;
     }
 
-    const cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
-    const existingIndex = cart.findIndex(item => item.id === id);
+    const cart = readCartStorage();
+    const existingIndex = cart.findIndex(item => String(item.id) === String(id));
 
     if (existingIndex > -1) {
-        cart[existingIndex].quantity += 1;
+        cart[existingIndex].quantity = (Number(cart[existingIndex].quantity) || 1) + 1;
+        if (vendorId && !cart[existingIndex].vendorId) {
+            cart[existingIndex].vendorId = vendorId;
+        }
+        if (supplierName && !cart[existingIndex].supplierName) {
+            cart[existingIndex].supplierName = supplierName;
+        }
     } else {
         cart.push({
             id,
             title,
             price: Number(price) || 0,
             location,
+            vendorId,
+            supplierName,
             quantity: 1
         });
     }
 
-    localStorage.setItem("gas_cart", JSON.stringify(cart));
+    writeCartStorage(cart);
     updateCartUI();
-    alert(`${title} added to your cart.`);
+    renderCartView();
+    showMarketplaceToast(`${title} added to cart.`);
 };
 
 window.updateCartQuantity = function (id, delta) {
-    const cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
-    const index = cart.findIndex(item => item.id === id);
+    const cart = readCartStorage();
+    const index = cart.findIndex(item => String(item.id) === String(id));
 
     if (index > -1) {
-        cart[index].quantity += Number(delta);
-        if (cart[index].quantity <= 0) {
+        const nextQty = (Number(cart[index].quantity) || 1) + Number(delta || 0);
+        if (nextQty <= 0) {
             cart.splice(index, 1);
+        } else {
+            cart[index].quantity = nextQty;
         }
     }
 
-    localStorage.setItem("gas_cart", JSON.stringify(cart));
+    writeCartStorage(cart);
     renderCartView();
     updateCartUI();
 };
 
 window.removeFromCart = function (id) {
-    let cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
-    cart = cart.filter(item => item.id !== id);
-    localStorage.setItem("gas_cart", JSON.stringify(cart));
+    const cart = readCartStorage().filter(item => String(item.id) !== String(id));
+    writeCartStorage(cart);
+    renderCartView();
+    updateCartUI();
+    showMarketplaceToast("Item removed from cart.");
+};
+
+window.clearListingCart = function () {
+    writeCartStorage([]);
     renderCartView();
     updateCartUI();
 };
 
 function updateCartUI() {
-    const cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
-    const totalCount = cart.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    const cart = readCartStorage();
+    const totalCount = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
     const cartCountEl = document.getElementById("cartCount");
     if (cartCountEl) {
@@ -544,54 +634,55 @@ function updateCartUI() {
 function renderCartView() {
     const cartItemsList = document.getElementById("cartItemsList");
     const cartSubtotal = document.getElementById("cartSubtotal");
+    const cartDelivery = document.getElementById("cartDelivery");
     const cartTotal = document.getElementById("cartTotal");
+
+    const cart = readCartStorage();
+    const { subtotal, deliveryFee, total } = calculateCartTotals(cart);
+
+    if (cartSubtotal) cartSubtotal.textContent = formatKES(subtotal);
+    if (cartDelivery) cartDelivery.textContent = formatKES(deliveryFee);
+    if (cartTotal) cartTotal.textContent = formatKES(total);
 
     if (!cartItemsList) return;
 
-    const cart = JSON.parse(localStorage.getItem("gas_cart")) || [];
-
     if (cart.length === 0) {
-        cartItemsList.innerHTML = "<p>Your cart is currently empty.</p>";
-        if (cartSubtotal) cartSubtotal.textContent = "KES 0";
-        if (cartTotal) cartTotal.textContent = "KES 200";
+        cartItemsList.innerHTML = `<p style="color:#64748b;padding:0.75rem 0;">Your cart is currently empty.</p>`;
         return;
     }
 
-    let html = "";
-    let subtotal = 0;
+    cartItemsList.innerHTML = cart
+        .map(item => {
+            const itemPrice = Number(item.price) || 0;
+            const quantity = Number(item.quantity) || 1;
+            const lineTotal = itemPrice * quantity;
+            const supplierLabel = item.supplierName ? ` · ${escapeHTML(item.supplierName)}` : "";
+            const locationLabel = item.location ? ` · ${escapeHTML(item.location)}` : "";
 
-    cart.forEach(item => {
-        const itemPrice = Number(item.price) || 0;
-        const quantity = Number(item.quantity) || 0;
-        subtotal += itemPrice * quantity;
+            return `
+                <div class="cart-item-row" style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;padding:0.85rem 0;border-bottom:1px solid #e2e8f0;">
+                    <div>
+                        <strong>${escapeHTML(item.title)}</strong>
+                        <p style="font-size:0.85rem;color:#64748b;margin:0.25rem 0;">${formatKES(itemPrice)} each · Subtotal: ${formatKES(lineTotal)}</p>
+                        <small style="color:#64748b;">${escapeHTML(item.location || "")}${supplierLabel}</small>
+                    </div>
 
-        html += `
-            <div class="cart-item-row" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-bottom:1px solid #e2e8f0;">
-                <div>
-                    <strong>${escapeHTML(item.title)}</strong>
-                    <p style="font-size:0.85rem;color:#64748b;margin:0.25rem 0;">KES ${itemPrice} each</p>
-                    <small style="color:#64748b;">${escapeHTML(item.location || "")}</small>
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <button type="button" class="btn-secondary" style="padding:2px 10px;" onclick="window.updateCartQuantity('${escapeJS(item.id)}', -1)">-</button>
+                        <span style="min-width:1.4rem;text-align:center;font-weight:600;">${quantity}</span>
+                        <button type="button" class="btn-secondary" style="padding:2px 10px;" onclick="window.updateCartQuantity('${escapeJS(item.id)}', 1)">+</button>
+                        <button
+                            type="button"
+                            onclick="window.removeFromCart('${escapeJS(item.id)}')"
+                            style="background:#ef4444;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-left:0.5rem;font-size:0.85rem;"
+                        >
+                            Remove
+                        </button>
+                    </div>
                 </div>
-
-                <div style="display:flex;align-items:center;gap:0.5rem;">
-                    <button type="button" class="btn-secondary" style="padding:2px 10px;" onclick="window.updateCartQuantity('${escapeJS(item.id)}', -1)">-</button>
-                    <span>${quantity}</span>
-                    <button type="button" class="btn-secondary" style="padding:2px 10px;" onclick="window.updateCartQuantity('${escapeJS(item.id)}', 1)">+</button>
-                    <button
-                        type="button"
-                        onclick="window.removeFromCart('${escapeJS(item.id)}')"
-                        style="background:#ef4444;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-left:0.5rem;font-size:0.85rem;"
-                    >
-                        Remove
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-
-    cartItemsList.innerHTML = html;
-    if (cartSubtotal) cartSubtotal.textContent = `KES ${subtotal}`;
-    if (cartTotal) cartTotal.textContent = `KES ${subtotal + 200}`;
+            `;
+        })
+        .join("");
 }
 
 window.renderCartView = renderCartView;
@@ -609,7 +700,6 @@ async function loadListings() {
     try {
         const querySnapshot = await getDocs(collection(db, "listings"));
 
-        // Resolve locations in parallel for fast initial loads
         const listingData = await Promise.all(
             querySnapshot.docs.map(async docSnap => {
                 const item = docSnap.data();
@@ -656,7 +746,9 @@ async function loadListings() {
                     getListingBrand(item),
                     item.category,
                     item.size,
-                    item.weight
+                    item.weight,
+                    item.supplierName,
+                    item.businessName
                 ]
                     .filter(Boolean)
                     .map(normalize)
@@ -691,10 +783,23 @@ async function loadListings() {
             const price = item.price !== undefined && item.price !== null && item.price !== "" ? item.price : "Price on request";
             const size = item.size || item.weight || "Size not specified";
             const description = item.description || "";
+            const vendorId =
+                item.vendorId ||
+                item.vendorID ||
+                item.supplierId ||
+                item.supplierID ||
+                item.sellerId ||
+                item.sellerID ||
+                item.ownerId ||
+                item.ownerID ||
+                "";
+            const supplierName = item.supplierName || item.businessName || "";
 
             const imageTicker = createImageTicker(displayImages, title);
             const safeTitle = escapeJS(title);
             const safeLocation = escapeJS(location);
+            const safeVendorId = escapeJS(vendorId);
+            const safeSupplierName = escapeJS(supplierName);
             const numericPrice = Number(item.price) || 0;
 
             card.innerHTML = `
@@ -720,7 +825,7 @@ async function loadListings() {
                 <div style="padding:0 1rem 1rem 1rem;">
                     <button
                         class="btn-primary"
-                        onclick="window.addToListingCart('${escapeJS(itemId)}', '${safeTitle}', ${numericPrice}, '${safeLocation}')"
+                        onclick="window.addToListingCart('${escapeJS(itemId)}', '${safeTitle}', ${numericPrice}, '${safeLocation}', '${safeVendorId}', '${safeSupplierName}')"
                     >
                         Order Now
                     </button>
@@ -779,6 +884,7 @@ function initializeMarketplace() {
     searchInput = document.getElementById("searchInput");
 
     updateCartUI();
+    renderCartView();
 
     [filterSize, filterCategory, filterLocation, filterBrand].forEach(select => {
         if (select) {
