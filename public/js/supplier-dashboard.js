@@ -20,7 +20,7 @@ import {
 
 // ============================================================
 // GAS HUB KE - SUPPLIER DASHBOARD / LISTINGS
-// Production Supplier Listing Management
+// Production Supplier Listing Management & Delivery Offers
 // ============================================================
 
 const auth = getAuth();
@@ -41,6 +41,19 @@ function escapeHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+function parseDeliveryFeeInput(rawValue) {
+    if (rawValue === undefined || rawValue === null) return 0;
+    const trimmed = String(rawValue).trim();
+    if (!trimmed) return 0;
+    const cleaned = trimmed.replace(/[^\d.]/g, "");
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+function formatKES(amount) {
+    return `KES ${(Number(amount) || 0).toLocaleString()}`;
 }
 
 
@@ -192,6 +205,17 @@ async function getCurrentUserSession() {
         businessName = auth.currentUser.displayName || "Vendor";
 
         try {
+            const supplierDocSnap = await getDoc(doc(db, "suppliers", uid));
+            if (supplierDocSnap.exists()) {
+                const sData = supplierDocSnap.data();
+                businessName =
+                    sData.businessName ||
+                    sData.supplierName ||
+                    sData.name ||
+                    businessName;
+                registeredLocation = extractRegisteredLocation(sData);
+            }
+
             const userDocSnap = await getDoc(doc(db, "users", uid));
             if (userDocSnap.exists()) {
                 const data = userDocSnap.data();
@@ -202,7 +226,9 @@ async function getCurrentUserSession() {
                     data.fullName ||
                     businessName;
 
-                registeredLocation = extractRegisteredLocation(data);
+                if (!registeredLocation.text) {
+                    registeredLocation = extractRegisteredLocation(data);
+                }
             }
         } catch (error) {
             console.error("Error fetching supplier profile:", error);
@@ -435,6 +461,11 @@ export async function loadSupplierDashboard(vendorId) {
                 formatLocation(item.location) ||
                 "Location unavailable";
 
+            const fee = parseDeliveryFeeInput(item.deliveryFee);
+            const offerText = item.deliveryOffer
+                ? escapeHTML(item.deliveryOffer)
+                : (fee === 0 ? "Free Delivery" : `Delivery: ${formatKES(fee)}`);
+
             card.innerHTML = `
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                     <div style="display:flex;align-items:center;">
@@ -443,6 +474,7 @@ export async function loadSupplierDashboard(vendorId) {
                             <h4 style="margin:0 0 0.25rem;font-weight:700;">${escapeHTML(item.title || "Cooking Gas")}</h4>
                             <p style="margin:0 0 0.25rem;color:#f97316;font-weight:600;">KES ${escapeHTML(item.price ?? "")}</p>
                             <p style="margin:0 0 0.25rem;color:#64748b;font-size:0.85rem;">Location: ${escapeHTML(listingLocation)}</p>
+                            <p style="margin:0 0 0.25rem;color:#16a34a;font-size:0.82rem;font-weight:600;">${offerText}</p>
                             <p style="font-size:0.85rem;color:#64748b;margin:0;">
                                 Size: ${escapeHTML(item.size || "Not specified")} | Category: ${escapeHTML(item.category || "Not specified")}
                             </p>
@@ -518,12 +550,16 @@ window.editListing = function (id) {
     const sizeInput = document.getElementById("supplierItemSize");
     const categoryInput = document.getElementById("supplierItemCategory");
     const priceInput = document.getElementById("supplierItemPrice");
+    const deliveryFeeInput = document.getElementById("supplierItemDeliveryFee");
+    const deliveryOfferInput = document.getElementById("supplierItemDeliveryOffer");
     const descriptionInput = document.getElementById("supplierItemDescription");
 
     if (titleInput) titleInput.value = item.title || "";
     if (sizeInput) sizeInput.value = item.size || "6kg";
     if (categoryInput) categoryInput.value = item.category || "refill";
     if (priceInput) priceInput.value = item.price || "";
+    if (deliveryFeeInput) deliveryFeeInput.value = item.deliveryFee ?? 0;
+    if (deliveryOfferInput) deliveryOfferInput.value = item.deliveryOffer || "";
     if (descriptionInput) descriptionInput.value = item.description || "";
 
     getCurrentUserSession().then(session => {
@@ -673,11 +709,13 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Validate form fields BEFORE disabling the submit button
         const title = document.getElementById("supplierItemTitle")?.value.trim() || "";
         const size = document.getElementById("supplierItemSize")?.value || "";
         const category = document.getElementById("supplierItemCategory")?.value || "";
         const price = parseFloat(document.getElementById("supplierItemPrice")?.value);
+        const deliveryFee = parseDeliveryFeeInput(document.getElementById("supplierItemDeliveryFee")?.value);
+        const deliveryOfferRaw = document.getElementById("supplierItemDeliveryOffer")?.value.trim() || "";
+        const deliveryOffer = deliveryOfferRaw || (deliveryFee === 0 ? "Free Delivery" : `Delivery: ${formatKES(deliveryFee)}`);
         const description = document.getElementById("supplierItemDescription")?.value.trim() || "";
 
         if (!title) {
@@ -728,7 +766,6 @@ document.addEventListener("DOMContentLoaded", () => {
             let imageUrls = [];
             if (imageInput && imageInput.files && imageInput.files.length > 0) {
                 for (const file of imageInput.files) {
-                    // Tighter compression keeps multi-image arrays safely under Firestore's 1 MiB limit
                     const compressedBase64 = await compressImage(file, 600, 0.55);
                     if (compressedBase64) {
                         imageUrls.push(compressedBase64);
@@ -757,6 +794,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 display: supplierLocation
             };
 
+            const listingPayload = {
+                title,
+                size,
+                category,
+                price,
+                deliveryFee,
+                deliveryOffer,
+                description,
+                location: supplierLocation,
+                supplierLocation: supplierLocationData,
+                supplierTown,
+                supplierCounty,
+                vendorId: userSession.uid,
+                supplierId: userSession.uid,
+                vendorName: userSession.businessName,
+                supplierName: userSession.businessName,
+                images: imageUrls,
+                updatedAt: new Date().toISOString()
+            };
+
             if (editingListingId) {
                 const listingRef = doc(db, "listings", editingListingId);
                 const existingSnap = await getDoc(listingRef);
@@ -774,41 +831,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                await updateDoc(listingRef, {
-                    title,
-                    size,
-                    category,
-                    price,
-                    description,
-                    location: supplierLocation,
-                    supplierLocation: supplierLocationData,
-                    vendorId: userSession.uid,
-                    supplierId: userSession.uid,
-                    vendorName: userSession.businessName,
-                    images: imageUrls,
-                    updatedAt: new Date().toISOString()
-                });
-
+                await updateDoc(listingRef, listingPayload);
                 alert("Listing updated successfully!");
             } else {
                 await addDoc(collection(db, "listings"), {
-                    vendorId: userSession.uid,
-                    supplierId: userSession.uid,
-                    vendorName: userSession.businessName,
-                    location: supplierLocation,
-                    supplierLocation: supplierLocationData,
-                    supplierTown,
-                    supplierCounty,
-                    title,
-                    size,
-                    category,
-                    price,
-                    description,
-                    images: imageUrls,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
+                    ...listingPayload,
+                    createdAt: new Date().toISOString()
                 });
-
                 alert("Listing published successfully!");
             }
 
