@@ -4,39 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GasHubKE - Kenya's Online Cooking Gas Hub</title>
-    <meta name="description" content="Fast, reliable cooking gas delivery. Find cooking gas prices, refills, cylinders, and accessories from verified local suppliers on GasHubKE.">
-    <meta name="keywords" content="GasHubKE, cooking gas delivery Kenya, gas refill near me, 6kg gas cylinder, 13kg gas price, LPG suppliers Kenya">
+    <title>GasHubKE - Kenya's Online Cooking Gas Hub | Cook • Connect • Save</title>
+    <meta name="description" content="Find, compare and order cooking gas refills, complete cylinders, and accessories from verified suppliers across all 47 counties in Kenya.">
+    <meta name="keywords" content="GasHubKE, cooking gas delivery Kenya, gas refill near me, ProGas, K-Gas, TotalEnergies, Menegas, Ola Mpishi, 6kg gas cylinder, 13kg gas price">
     <meta name="author" content="GasHubKE">
     <link rel="canonical" href="https://gashubke.com/">
-
-    <!-- OPEN GRAPH -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gashubke.com/">
-    <meta property="og:title" content="GasHubKE - Kenya's Online Cooking Gas Hub">
-    <meta property="og:description" content="Connect with trusted cooking gas suppliers and retailers for fast delivery on refills and cylinders.">
-    <meta property="og:image" content="https://gashubke.com/assets/og-banner.jpg">
-
-    <!-- TWITTER -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="GasHubKE - Cooking Gas Platform">
-    <meta name="twitter:description" content="Compare prices and order cooking gas cylinders and refills directly from verified local suppliers.">
-    <meta name="twitter:image" content="https://gashubke.com/assets/twitter-banner.jpg">
 
     <!-- MAIN CSS -->
     <link rel="stylesheet" href="./css/styles.css">
 
     <style>
-        :root {
-            --gh-navy: #0f172a;
-            --gh-slate: #1e293b;
-            --gh-orange: #f97316;
-            --gh-orange-dark: #ea580c;
-            --gh-orange-soft: #fff7ed;
-            --gh-border: #e2e8f0;
-            --gh-muted: #64748b;
-        }
-
         /* PAGE LOADER */
         #pageLoader {
             position: fixed;
@@ -54,7 +31,7 @@
             width: 50px;
             height: 50px;
             border: 4px solid #f1f5f9;
-            border-top-color: var(--gh-orange);
+            border-top-color: #f97316;
             border-radius: 50%;
             animation: gasHubSpin 0.8s linear infinite;
         }
@@ -63,489 +40,13 @@
             margin-top: 1rem;
             font-size: 0.95rem;
             font-weight: 500;
-            color: var(--gh-muted);
-            letter-spacing: 0.5px;
+            color: #64748b;
         }
 
         @keyframes gasHubSpin {
             to { transform: rotate(360deg); }
         }
-
-        /* HEADER */
-        .navbar {
-            position: relative;
-            width: 100%;
-            z-index: 5000;
-            background: var(--gh-navy);
-            color: #ffffff;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        /* HAMBURGER */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 30px;
-            height: 22px;
-            background: transparent;
-            border: none;
-            padding: 0;
-            margin-left: auto;
-            cursor: pointer;
-            z-index: 6000;
-        }
-
-        .hamburger span {
-            display: block;
-            width: 100%;
-            height: 3px;
-            background-color: #ffffff;
-            border-radius: 3px;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        .hamburger.open span:nth-child(1) {
-            transform: translateY(9.5px) rotate(45deg);
-        }
-
-        .hamburger.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.open span:nth-child(3) {
-            transform: translateY(-9.5px) rotate(-45deg);
-        }
-
-        /* DESKTOP NAVIGATION */
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            margin-left: auto;
-        }
-
-        .nav-links a {
-            font-weight: 500;
-            color: #e2e8f0;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--gh-orange);
-        }
-
-        /* SEARCH */
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 0.2rem 0.5rem;
-        }
-
-        .search-bar input {
-            border: none;
-            background: transparent;
-            color: #ffffff;
-            outline: none;
-            padding: 0.5rem;
-            width: 190px;
-        }
-
-        .search-bar input::placeholder {
-            color: #94a3b8;
-        }
-
-        /* HERO & DISCOVERY STRIP */
-        .marketplace-hero {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--gh-navy) 0%, var(--gh-slate) 100%);
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
-        }
-
-        .marketplace-hero img {
-            width: 100%;
-            max-height: 360px;
-            object-fit: cover;
-            display: block;
-            opacity: 0.92;
-        }
-
-        .discovery-strip {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-            padding: 0.85rem 1rem;
-            background: #ffffff;
-            border: 1px solid var(--gh-border);
-            border-radius: 14px;
-        }
-
-        .pill-group {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .pill-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--gh-muted);
-            margin-right: 0.25rem;
-        }
-
-        .quick-pill {
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid #cbd5e1;
-            background: #f8fafc;
-            color: var(--gh-slate);
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.18s ease;
-        }
-
-        .quick-pill:hover,
-        .quick-pill.active {
-            background: var(--gh-orange);
-            border-color: var(--gh-orange);
-            color: #ffffff;
-        }
-
-        /* MARKETPLACE */
-        #marketplaceView {
-            position: relative;
-        }
-
-        .floating-filter-bar {
-            position: sticky;
-            bottom: 22px;
-            width: min(1100px, calc(100% - 30px));
-            margin: 0 auto 22px;
-            z-index: 4000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.97);
-            border: 1px solid var(--gh-border);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14), 0 3px 8px rgba(15, 23, 42, 0.06);
-            backdrop-filter: blur(10px);
-            overflow-x: auto;
-            scrollbar-width: thin;
-        }
-
-        .floating-filter-bar h3 {
-            flex-shrink: 0;
-            margin: 0;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--gh-slate);
-        }
-
-        .filter-control {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .filter-control label {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--gh-muted);
-            white-space: nowrap;
-        }
-
-        .filter-control select {
-            min-width: 125px;
-            padding: 8px 30px 8px 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            background: #ffffff;
-            color: var(--gh-slate);
-            font-size: 0.82rem;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .filter-control select:focus {
-            border-color: var(--gh-orange);
-            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12);
-        }
-
-        .clear-filters-btn {
-            flex-shrink: 0;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: var(--gh-orange-soft);
-            color: var(--gh-orange-dark);
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s ease, transform 0.2s ease;
-        }
-
-        .clear-filters-btn:hover {
-            background: #ffedd5;
-            transform: translateY(-1px);
-        }
-
-        .product-grid {
-            padding-bottom: 20px;
-        }
-
-        /* AUTH MODAL ENHANCEMENTS */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.65);
-            z-index: 9000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            overflow-y: auto;
-        }
-
-        .modal-content {
-            background: #ffffff;
-            width: 100%;
-            max-width: 440px;
-            padding: 2rem;
-            border-radius: 16px;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
-        }
-
-        .modal-content input,
-        .modal-content select {
-            width: 100%;
-            padding: 0.75rem;
-            margin-bottom: 0.85rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            box-sizing: border-box;
-        }
-
-        .modal-content button[type="submit"] {
-            width: 100%;
-            padding: 0.85rem;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* READ-ONLY SUPPLIER LOCATION FIELD */
-        .readonly-location-group {
-            margin: 0.5rem 0 0.75rem;
-        }
-
-        .readonly-location-group label {
-            display: block;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 0.25rem;
-        }
-
-        .readonly-location-group input {
-            background-color: #f8fafc !important;
-            color: #475569 !important;
-            border: 1px solid #cbd5e1 !important;
-            cursor: not-allowed;
-        }
-
-        /* MOBILE NAVIGATION */
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 0.8rem 1rem !important;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .nav-links {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                display: none !important;
-                flex-direction: column !important;
-                align-items: stretch !important;
-                gap: 0 !important;
-                margin-left: 0 !important;
-                padding: 0.7rem 1rem 1rem;
-                background: var(--gh-navy);
-                border-bottom: 1px solid #1e293b;
-                box-shadow: 0 12px 25px rgba(15, 23, 42, 0.25);
-                z-index: 5000;
-            }
-
-            .nav-links.active {
-                display: flex !important;
-            }
-
-            .nav-links a {
-                display: flex !important;
-                align-items: center;
-                width: 100%;
-                min-height: 45px;
-                padding: 10px 8px;
-                border-bottom: 1px solid #1e293b;
-            }
-
-            .nav-links a:last-child {
-                border-bottom: none;
-            }
-
-            .search-bar {
-                width: 100%;
-                max-width: 180px;
-            }
-
-            .search-bar input {
-                width: 100%;
-            }
-
-            .logo-container {
-                max-width: 45%;
-            }
-
-            .logo-container img {
-                max-width: 100%;
-                height: 42px !important;
-            }
-
-            .floating-filter-bar {
-                position: sticky;
-                bottom: 14px;
-                width: calc(100% - 20px);
-                margin: 0 auto 14px;
-                padding: 10px;
-                border-radius: 14px;
-                gap: 8px;
-            }
-
-            .floating-filter-bar h3 {
-                display: none;
-            }
-
-            .filter-control {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 3px;
-            }
-
-            .filter-control label {
-                font-size: 0.7rem;
-            }
-
-            .filter-control select {
-                min-width: 110px;
-                max-width: 125px;
-                padding: 8px;
-                font-size: 0.75rem;
-            }
-
-            .clear-filters-btn {
-                padding: 8px 10px;
-            }
-
-            .product-grid {
-                padding-bottom: 20px !important;
-            }
-
-            .cart-container-grid {
-                grid-template-columns: 1fr !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .search-bar {
-                max-width: 125px;
-            }
-
-            .search-bar input {
-                width: 80px;
-            }
-
-            .floating-filter-bar {
-                width: calc(100% - 12px);
-                bottom: 8px;
-                margin-bottom: 8px;
-                padding: 8px;
-                gap: 6px;
-            }
-
-            .filter-control select {
-                min-width: 95px;
-                max-width: 105px;
-                font-size: 0.7rem;
-            }
-
-            .clear-filters-btn {
-                font-size: 0.7rem;
-                padding: 8px;
-            }
-        }
-
-        .filter-loading {
-            opacity: 0.65;
-            pointer-events: none;
-        }
-
-        .marketplace-empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--gh-muted);
-        }
-
-        .marketplace-empty-state h3 {
-            margin-bottom: 0.5rem;
-            color: var(--gh-slate);
-        }
-
-        button:focus-visible,
-        select:focus-visible,
-        input:focus-visible,
-        textarea:focus-visible,
-        a:focus-visible {
-            outline: 3px solid rgba(249, 115, 22, 0.35);
-            outline-offset: 2px;
-        }
     </style>
-
-    <!-- STRUCTURED DATA -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "GasHubKE",
-        "url": "https://gashubke.com/",
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://gashubke.com/?s={search_term_string}",
-            "query-input": "required name=search_term_string"
-        }
-    }
-    </script>
 </head>
 
 <body>
@@ -556,358 +57,527 @@
     <div class="spinner-text">Connecting to GasHubKE...</div>
 </div>
 
-<!-- HEADER -->
-<header class="navbar" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;gap:1rem;">
-    <!-- LOGO -->
-    <div class="logo-container" style="flex-shrink:0;">
-        <img
-            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCn2P7iGjo3L7Z3HhNU7IzWmeWJ7I5zCEI7KoA37r5vzjGik90FsoK6CzRqS5ftSvpcx5K1paC9TrTk7Q7vZRXzQAq22oT6xxzk6DXAd6iqQi26E9GRfCBw2lWCoPOrh4eZUw-hjCeoWY7pQ_Hm0TTJIBNcE2mDlHwjGyIu3vJNBL_X0W_lA8IPnPuld7d/s1024/c8a8a399-e65d-4bf1-881c-b67c58904ac7.jpeg"
-            alt="GasHubKE Logo"
-            style="height:45px;object-fit:contain;border-radius:6px;"
-        >
-    </div>
-
-    <!-- SEARCH -->
-    <div class="search-bar">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 8px;flex-shrink:0;">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="search" id="searchInput" placeholder="Search county, town, gas..." aria-label="Search listings">
-        <button id="searchBtn" type="button" style="display:none;">Search</button>
-    </div>
-
-    <!-- HAMBURGER -->
-    <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-
-    <!-- NAVIGATION -->
-    <nav class="nav-links" id="navLinks" aria-label="Main Navigation">
-        <a href="#" id="homeLink">Marketplace</a>
-        <a href="#" id="supplierDashboardNavLink" style="display:none;">Supplier Dashboard</a>
-        <a href="#" id="customerOrdersNavLink" style="display:none;">My Orders</a>
-
-        <!-- CART -->
-        <a href="#" id="cartLink" style="display:flex;align-items:center;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="9" cy="21" r="1"></circle>
-                <circle cx="20" cy="21" r="1"></circle>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            <span id="cartCount" style="margin-left:4px;font-weight:bold;color:#f97316;">0</span>
+<!-- TOP NAVIGATION BAR -->
+<header class="navbar">
+    <div class="navbar-inner">
+        <!-- BRAND LOGO -->
+        <a href="#" id="brandLogoLink" class="brand-logo" aria-label="GasHubKE Home">
+            <span class="brand-icon-ring">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 3h6v2H9V3zm1 2h4v1.5c1.8.7 3 2.4 3 4.5v7a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-7c0-2.1 1.2-3.8 3-4.5V5z" fill="#0f172a"/>
+                    <path d="M12 10.5c1.4 1.6 2.2 2.8 2.2 4.1a2.2 2.2 0 1 1-4.4 0c0-1.3.8-2.5 2.2-4.1z" fill="#f97316"/>
+                </svg>
+            </span>
+            <span class="brand-wordmark">GasHub<span>KE</span></span>
         </a>
 
-        <!-- AUTH -->
-        <a href="#" id="authLink">Sign In</a>
-    </nav>
+        <!-- DESKTOP & MOBILE NAV LINKS -->
+        <nav class="nav-links" id="navLinks" aria-label="Main Navigation">
+            <a href="#" id="homeLink" class="nav-item active">Marketplace</a>
+            <a href="#" id="supplierDashboardNavLink" class="nav-item" style="display:none;">Supplier Dashboard</a>
+            <a href="#" id="customerOrdersNavLink" class="nav-item" style="display:none;">My Orders</a>
+            <a href="#" id="settingsNavLink" class="nav-item">Settings</a>
+        </nav>
+
+        <!-- RIGHT ACTIONS: CART + USER + HAMBURGER -->
+        <div class="nav-actions">
+            <a href="#" id="cartLink" class="nav-cart-btn" aria-label="Shopping Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span id="cartCount" class="cart-badge">0</span>
+            </a>
+
+            <a href="#" id="authLink" class="nav-auth-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span id="authLinkText">Sign In</span>
+            </a>
+
+            <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
 </header>
 
-<!-- MAIN -->
-<main class="container" style="max-width:1200px;margin:0 auto;padding:2rem 1rem;">
+<!-- MAIN CONTENT -->
+<main class="container">
 
-<!-- MARKETPLACE -->
-<section id="marketplaceView" class="view">
-    <div class="marketplace-hero">
-        <img
-            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh8uq4DI719eig6sC9_cfJDkFaIR3iwExvGT-H5L1M7MoJIGhgw074jS1k9ojqoUIqBNx9TSQsBe0RZRBKvvvczHrzvn2az1dRde5mru8rCg-8Jg8aKkX4zD4a9jlP3oYP4cWVUreaIoa2pfg8f0F3cfmUAi_FfRg1bOfoqnbNN_nH5l_AiIyAwCqO-8u8/s1536/file_00000000a5dc81f4a878f3cd5eb7f1cf.png"
-            alt="GasHubKE Cooking Gas Marketplace"
-        >
-    </div>
+    <!-- ============================================================
+         VIEW 1: MARKETPLACE
+    ============================================================ -->
+    <section id="marketplaceView" class="view">
 
-    <!-- QUICK CATEGORY & POPULAR BRAND STRIP -->
-    <div class="discovery-strip" aria-label="Quick category and brand shortcuts">
-        <div class="pill-group">
-            <span class="pill-label">Category:</span>
-            <button type="button" class="quick-pill active" data-quick-category="">All</button>
-            <button type="button" class="quick-pill" data-quick-category="refill">Refill</button>
-            <button type="button" class="quick-pill" data-quick-category="cylinder_complete">Cylinder Complete</button>
-            <button type="button" class="quick-pill" data-quick-category="accessories">Accessories</button>
-        </div>
+        <!-- HERO BANNER (ACTUALIZED FROM VISUALISATION) -->
+        <div class="gh-hero-card">
+            <div class="gh-hero-content">
+                <div class="gh-hero-top-tags">
+                    <span class="gh-pill-badge">Reliable • Safe • Affordable</span>
+                    <span class="gh-counties-badge">SERVING ALL 47 COUNTIES</span>
+                </div>
 
-        <div class="pill-group">
-            <span class="pill-label">Popular Brands:</span>
-            <button type="button" class="quick-pill" data-quick-brand="ProGas">ProGas</button>
-            <button type="button" class="quick-pill" data-quick-brand="K-Gas">K-Gas</button>
-            <button type="button" class="quick-pill" data-quick-brand="Ola Mpishi">Ola Mpishi</button>
-            <button type="button" class="quick-pill" data-quick-brand="TotalEnergies">TotalEnergies</button>
-            <button type="button" class="quick-pill" data-quick-brand="Menegas">Menegas</button>
-        </div>
-    </div>
+                <h1>Cooking Gas Made Easy</h1>
+                <p>Order your LPG refills, complete cylinders, and accessories from verified suppliers across Kenya.</p>
 
-    <!-- DYNAMIC FILTER BAR -->
-    <div class="floating-filter-bar" id="floatingFilterBar">
-        <h3>Filter Gas</h3>
-
-        <div class="filter-control">
-            <label for="filterLocation">Location</label>
-            <select id="filterLocation" aria-label="Filter by location">
-                <option value="">All Locations</option>
-            </select>
-        </div>
-
-        <div class="filter-control">
-            <label for="filterBrand">Brand</label>
-            <select id="filterBrand" aria-label="Filter by gas brand">
-                <option value="">All Brands</option>
-            </select>
-        </div>
-
-        <div class="filter-control">
-            <label for="filterSize">Size</label>
-            <select id="filterSize" aria-label="Filter by cylinder size">
-                <option value="">All Sizes</option>
-                <option value="3kg">3 Kg</option>
-                <option value="6kg">6 Kg</option>
-                <option value="13kg">13 Kg</option>
-                <option value="50kg">50 Kg</option>
-            </select>
-        </div>
-
-        <div class="filter-control">
-            <label for="filterCategory">Category</label>
-            <select id="filterCategory" aria-label="Filter by category">
-                <option value="">All Categories</option>
-                <option value="refill">Gas Refill</option>
-                <option value="cylinder_complete">Complete Cylinder</option>
-                <option value="accessories">Accessories</option>
-            </select>
-        </div>
-
-        <button type="button" id="clearFiltersBtn" class="clear-filters-btn">Clear</button>
-    </div>
-
-    <!-- PRODUCT GRID -->
-    <div
-        class="product-grid"
-        id="productGrid"
-        aria-live="polite"
-        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.5rem;"
-    ></div>
-</section>
-
-<!-- SUPPLIER DASHBOARD -->
-<section id="supplierDashboardView" class="view" style="display:none;">
-    <h2>Supplier Dashboard & Analytics</h2>
-
-    <div class="supplier-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem;">
-        <div class="card" style="padding:1.25rem;">
-            <h4 style="font-size:.9rem;color:#64748b;">Total Orders Received</h4>
-            <p id="statTotalOrders" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
-        </div>
-
-        <div class="card" style="padding:1.25rem;">
-            <h4 style="font-size:.9rem;color:#64748b;">Active Listings</h4>
-            <p id="statActiveListings" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
-        </div>
-
-        <div class="card" style="padding:1.25rem;">
-            <h4 style="font-size:.9rem;color:#64748b;">Total Revenue (KES)</h4>
-            <p id="statRevenue" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
-        </div>
-    </div>
-
-    <!-- SUPPLIER TABS -->
-    <div class="supplier-tabs" style="margin-bottom:1rem;display:flex;gap:1rem;">
-        <button type="button" class="btn-primary" id="tabListingsBtn" onclick="window.switchSupplierTab('listings')">
-            Manage Inventory
-        </button>
-        <button type="button" class="btn-secondary" id="tabOrdersBtn" onclick="window.switchSupplierTab('orders')" style="background:#e2e8f0;color:#1e293b;">
-            Customer Orders
-        </button>
-    </div>
-
-    <!-- SUPPLIER LISTINGS -->
-    <div id="supplierListingsTabContent">
-        <form id="supplierListingForm" class="card" style="margin-bottom:1.5rem;">
-            <h3>Post New Listing</h3>
-
-            <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. TotalEnergies 13kg Gas Refill)" required>
-
-            <select id="supplierItemSize" required>
-                <option value="3kg">3 Kg</option>
-                <option value="6kg">6 Kg</option>
-                <option value="13kg" selected>13 Kg</option>
-                <option value="50kg">50 Kg</option>
-            </select>
-
-            <select id="supplierItemCategory" required>
-                <option value="refill">Gas Refill</option>
-                <option value="cylinder_complete">Complete Cylinder</option>
-                <option value="accessories">Accessories</option>
-            </select>
-
-            <input type="number" id="supplierItemPrice" placeholder="Price (KES)" min="1" step="1" required>
-
-            <input type="number" id="supplierItemDeliveryFee" placeholder="Delivery Fee Offer (KES, 0 for Free Delivery)" min="0" step="1">
-
-            <input type="text" id="supplierItemDeliveryOffer" placeholder="Delivery Offer Note (e.g. Free delivery in Ruiru)">
-
-            <!-- Registered Location Preview (populated automatically by supplier-dashboard.js) -->
-            <div class="readonly-location-group">
-                <label for="supplierItemLocation">Registered Business Location</label>
-                <input type="text" id="supplierItemLocation" value="Loading registered location..." readonly>
-            </div>
-
-            <label for="supplierItemImage" style="font-size:.9rem;color:#64748b;margin-top:.5rem;display:block;">
-                Product Images (Max 5)
-            </label>
-            <input type="file" id="supplierItemImage" accept="image/*" multiple>
-
-            <textarea id="supplierItemDescription" placeholder="Description & delivery terms" required></textarea>
-
-            <button type="submit" class="btn-primary">Publish Listing</button>
-        </form>
-
-        <!-- MY LISTINGS -->
-        <div class="my-listings">
-            <h3>Your Active Listings</h3>
-            <div id="supplierListingsGrid" style="margin-top:1rem;"></div>
-        </div>
-    </div>
-
-    <!-- SUPPLIER ORDERS -->
-    <div id="supplierOrdersTabContent" style="display:none;">
-        <div class="card">
-            <h3>Incoming Customer Orders</h3>
-            <div id="supplierOrdersList" style="margin-top:1rem;">
-                <p>No customer orders received yet.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CUSTOMER ORDERS -->
-<section id="customerOrdersView" class="view" style="display:none;">
-    <h2>My Orders & Account Portal</h2>
-    <div class="card" style="padding:1.5rem;margin-top:1rem;">
-        <h3>Order History</h3>
-        <div id="customerOrdersList" style="margin-top:1rem;">
-            <p>You have not placed any orders yet.</p>
-        </div>
-    </div>
-</section>
-
-<!-- CART -->
-<section id="cartView" class="view" style="display:none;">
-    <h2>Your Shopping Cart & Checkout</h2>
-    <div class="cart-container-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:2rem;">
-        <div class="cart-items-card card" style="padding:1.5rem;">
-            <h3>Review Items</h3>
-            <div id="cartItemsList" style="margin-top:1rem;">
-                <p>Your cart is currently empty.</p>
-            </div>
-        </div>
-
-        <div class="cart-summary-card card" style="padding:1.5rem;">
-            <h3>Order Summary</h3>
-            <div class="summary-row" style="margin-top:1rem;display:flex;justify-content:space-between;">
-                <span>Subtotal</span>
-                <span id="cartSubtotal">KES 0</span>
-            </div>
-            <div class="summary-row" style="display:flex;justify-content:space-between;margin-top:.5rem;">
-                <span>Supplier Delivery</span>
-                <span id="cartDelivery">KES 0</span>
-            </div>
-            <hr style="margin:1rem 0;border:0;border-top:1px solid #e2e8f0;">
-            <div class="summary-row total-row" style="display:flex;justify-content:space-between;font-size:1.2rem;">
-                <strong>Total</strong>
-                <strong id="cartTotal">KES 0</strong>
-            </div>
-
-            <form id="checkoutForm" style="margin-top:1.5rem;">
-                <h4 style="margin-bottom:.75rem;font-size:.95rem;">Delivery Details</h4>
-                <input type="text" id="deliveryName" placeholder="Full Name" style="width:100%;padding:.5rem;margin-bottom:.5rem;border-radius:4px;border:1px solid #cbd5e1;" required>
-                <input type="tel" id="deliveryPhone" placeholder="Phone Number (e.g. 0712345678)" style="width:100%;padding:.5rem;margin-bottom:.5rem;border-radius:4px;border:1px solid #cbd5e1;" required>
-                <input type="text" id="deliveryAddress" placeholder="Delivery Location / Estate / House No." style="width:100%;padding:.5rem;margin-bottom:1rem;border-radius:4px;border:1px solid #cbd5e1;" required>
-                <button type="submit" class="btn-primary" style="width:100%;padding:.75rem;">
-                    Place Order & Pay via M-Pesa
-                </button>
-            </form>
-        </div>
-    </div>
-</section>
-
-<!-- AUTH MODAL -->
-<div id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" style="display:none;">
-    <div class="modal-content">
-        <span id="closeModal" class="close" role="button" tabindex="0" aria-label="Close modal">&times;</span>
-        <h2 id="authModalTitle">Sign In</h2>
-
-        <form id="authForm">
-            <input type="email" id="authEmail" placeholder="Email Address" autocomplete="email" required>
-            <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password" required>
-
-            <!-- REGISTRATION FIELDS -->
-            <div id="vendorFields" style="display:none;">
-                <select id="userRole" aria-label="Account Type">
-                    <option value="customer">Customer</option>
-                    <option value="vendor">Supplier / Retailer</option>
-                </select>
-
-                <div id="supplierExtraFields" style="display:none;">
-                    <input type="text" id="businessName" placeholder="Business / Supplier Name">
-
-                    <select id="supplierCounty" aria-label="Supplier County">
-                        <option value="">Select County</option>
-                    </select>
-
-                    <select id="supplierArea" aria-label="Supplier Town or Area" disabled>
-                        <option value="">Select County First</option>
-                    </select>
+                <!-- HERO SEARCH BAR -->
+                <div class="gh-hero-search">
+                    <span class="gh-search-pin" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </span>
+                    <input
+                        type="search"
+                        id="searchInput"
+                        placeholder="Search by county, town, brand or gas size..."
+                        aria-label="Search by county, town or gas"
+                    >
+                    <button id="searchBtn" type="button" class="gh-hero-search-btn" aria-label="Search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <button type="submit" id="authSubmitBtn" class="btn-primary">Sign In</button>
+            <div class="gh-hero-visual">
+                <img
+                    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh8uq4DI719eig6sC9_cfJDkFaIR3iwExvGT-H5L1M7MoJIGhgw074jS1k9ojqoUIqBNx9TSQsBe0RZRBKvvvczHrzvn2az1dRde5mru8rCg-8Jg8aKkX4zD4a9jlP3oYP4cWVUreaIoa2pfg8f0F3cfmUAi_FfRg1bOfoqnbNN_nH5l_AiIyAwCqO-8u8/s1536/file_00000000a5dc81f4a878f3cd5eb7f1cf.png"
+                    alt="GasHubKE Cooking Gas Cylinders"
+                >
+            </div>
+        </div>
 
-            <p id="toggleAuthMode" style="cursor:pointer;margin-top:1rem;font-size:.9rem;text-align:center;color:#f97316;font-weight:600;">
-                Need an account? Register
-            </p>
-        </form>
+        <!-- CATEGORY CARDS (REFILL / CYLINDER COMPLETE / ACCESSORIES) -->
+        <div class="gh-category-grid" aria-label="Product Categories">
+            <button type="button" class="gh-category-card active" data-quick-category="">
+                <span class="gh-cat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                    </svg>
+                </span>
+                <span>All Gas Products</span>
+            </button>
+
+            <button type="button" class="gh-category-card" data-quick-category="refill">
+                <span class="gh-cat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 3h6v2H9zM8 7h8a2 2 0 0 1 2 2v9a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V9a2 2 0 0 1 2-2z"></path>
+                        <path d="M12 11c1 1.2 1.5 2 1.5 3a1.5 1.5 0 0 1-3 0c0-1 .5-1.8 1.5-3z"></path>
+                    </svg>
+                </span>
+                <span>Refill</span>
+            </button>
+
+            <button type="button" class="gh-category-card" data-quick-category="cylinder_complete">
+                <span class="gh-cat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 2h8v3H8zM7 6h10a2 2 0 0 1 2 2v10a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8a2 2 0 0 1 2-2z"></path>
+                        <circle cx="12" cy="13" r="2"></circle>
+                    </svg>
+                </span>
+                <span>Cylinder Complete</span>
+            </button>
+
+            <button type="button" class="gh-category-card" data-quick-category="accessories">
+                <span class="gh-cat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="7"></circle>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path>
+                    </svg>
+                </span>
+                <span>Accessories</span>
+            </button>
+        </div>
+
+        <!-- POPULAR BRANDS ROW -->
+        <div class="gh-brands-section">
+            <div class="gh-section-header">
+                <h3>Popular Brands</h3>
+                <button type="button" id="resetBrandBtn" class="gh-link-btn">View All</button>
+            </div>
+
+            <div class="gh-brands-grid">
+                <button type="button" class="gh-brand-tile" data-quick-brand="ProGas">
+                    <span class="gh-brand-badge" style="background:#fff7ed;color:#ea580c;">PRO</span>
+                    <span class="gh-brand-name">ProGas</span>
+                </button>
+
+                <button type="button" class="gh-brand-tile" data-quick-brand="K-Gas">
+                    <span class="gh-brand-badge" style="background:#eff6ff;color:#1d4ed8;">K-GAS</span>
+                    <span class="gh-brand-name">K-Gas</span>
+                </button>
+
+                <button type="button" class="gh-brand-tile" data-quick-brand="Ola Mpishi">
+                    <span class="gh-brand-badge" style="background:#fef2f2;color:#dc2626;">OLA</span>
+                    <span class="gh-brand-name">Ola Mpishi</span>
+                </button>
+
+                <button type="button" class="gh-brand-tile" data-quick-brand="TotalEnergies">
+                    <span class="gh-brand-badge" style="background:#f0fdf4;color:#15803d;">TE</span>
+                    <span class="gh-brand-name">TotalEnergies</span>
+                </button>
+
+                <button type="button" class="gh-brand-tile" data-quick-brand="Menegas">
+                    <span class="gh-brand-badge" style="background:#f0f9ff;color:#0369a1;">MENE</span>
+                    <span class="gh-brand-name">Menegas</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- LIVE MARKETPLACE LISTINGS HEADER -->
+        <div class="gh-section-header" style="margin-top:1.5rem;">
+            <h3>Available Cooking Gas Near You</h3>
+            <span style="font-size:0.82rem;color:#64748b;">Seller Handles Delivery • No Platform Delivery Fee</span>
+        </div>
+
+        <!-- PRODUCT GRID -->
+        <div class="product-grid" id="productGrid" aria-live="polite"></div>
+
+        <!-- FLOATING FILTER BAR -->
+        <div class="floating-filter-bar" id="floatingFilterBar">
+            <h3>Filter Gas</h3>
+
+            <div class="filter-control">
+                <label for="filterLocation">Location</label>
+                <select id="filterLocation" aria-label="Filter by location">
+                    <option value="">All Locations</option>
+                </select>
+            </div>
+
+            <div class="filter-control">
+                <label for="filterBrand">Brand</label>
+                <select id="filterBrand" aria-label="Filter by gas brand">
+                    <option value="">All Brands</option>
+                </select>
+            </div>
+
+            <div class="filter-control">
+                <label for="filterSize">Size</label>
+                <select id="filterSize" aria-label="Filter by cylinder size">
+                    <option value="">All Sizes</option>
+                    <option value="3kg">3 Kg</option>
+                    <option value="6kg">6 Kg</option>
+                    <option value="13kg">13 Kg</option>
+                    <option value="50kg">50 Kg</option>
+                </select>
+            </div>
+
+            <div class="filter-control">
+                <label for="filterCategory">Category</label>
+                <select id="filterCategory" aria-label="Filter by category">
+                    <option value="">All Categories</option>
+                    <option value="refill">Gas Refill</option>
+                    <option value="cylinder_complete">Complete Cylinder</option>
+                    <option value="accessories">Accessories</option>
+                </select>
+            </div>
+
+            <button type="button" id="clearFiltersBtn" class="clear-filters-btn">Clear</button>
+        </div>
+
+        <!-- TRUST & PLATFORM VALUE PILLARS (ACTUALIZED FROM VISUALISATION) -->
+        <section class="gh-pillars-section" aria-label="Why Choose GasHubKE">
+            <div class="gh-pillars-grid">
+                <div class="gh-pillar-card">
+                    <span class="gh-pillar-icon">🛡️</span>
+                    <div>
+                        <h4>Verified Suppliers</h4>
+                        <p>Only trusted and verified local LPG suppliers.</p>
+                    </div>
+                </div>
+
+                <div class="gh-pillar-card">
+                    <span class="gh-pillar-icon">📍</span>
+                    <div>
+                        <h4>Nearest Search</h4>
+                        <p>Find suppliers near you across all 47 counties.</p>
+                    </div>
+                </div>
+
+                <div class="gh-pillar-card">
+                    <span class="gh-pillar-icon">💳</span>
+                    <div>
+                        <h4>M-PESA Payments</h4>
+                        <p>Safe and secure checkout via M-PESA.</p>
+                    </div>
+                </div>
+
+                <div class="gh-pillar-card">
+                    <span class="gh-pillar-icon">🚚</span>
+                    <div>
+                        <h4>Seller Handles Delivery</h4>
+                        <p>Suppliers deliver directly to your doorstep.</p>
+                    </div>
+                </div>
+
+                <div class="gh-pillar-card">
+                    <span class="gh-pillar-icon">🏷️</span>
+                    <div>
+                        <h4>No Platform Fee</h4>
+                        <p>Zero platform delivery markup—vendors set offers.</p>
+                    </div>
+                </div>
+
+                <div class="gh-pillar-card">
+                    <span class="gh-pillar-icon">⚖️</span>
+                    <div>
+                        <h4>Transparent Pricing</h4>
+                        <p>Compare cylinder & refill offers side by side.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- ============================================================
+         VIEW 2: SUPPLIER DASHBOARD
+    ============================================================ -->
+    <section id="supplierDashboardView" class="view" style="display:none;">
+        <h2>Supplier Dashboard & Analytics</h2>
+
+        <div class="supplier-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem;">
+            <div class="card" style="padding:1.25rem;">
+                <h4 style="font-size:.9rem;color:#64748b;">Total Orders Received</h4>
+                <p id="statTotalOrders" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
+            </div>
+
+            <div class="card" style="padding:1.25rem;">
+                <h4 style="font-size:.9rem;color:#64748b;">Active Listings</h4>
+                <p id="statActiveListings" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
+            </div>
+
+            <div class="card" style="padding:1.25rem;">
+                <h4 style="font-size:.9rem;color:#64748b;">Total Revenue (KES)</h4>
+                <p id="statRevenue" style="font-size:1.5rem;font-weight:bold;margin-top:.5rem;color:var(--primary);">0</p>
+            </div>
+        </div>
+
+        <div class="supplier-tabs" style="margin-bottom:1rem;display:flex;gap:1rem;">
+            <button type="button" class="btn-primary" id="tabListingsBtn" onclick="window.switchSupplierTab('listings')">
+                Manage Inventory
+            </button>
+            <button type="button" class="btn-secondary" id="tabOrdersBtn" onclick="window.switchSupplierTab('orders')" style="background:#e2e8f0;color:#1e293b;">
+                Customer Orders
+            </button>
+        </div>
+
+        <div id="supplierListingsTabContent">
+            <form id="supplierListingForm" class="card" style="margin-bottom:1.5rem;">
+                <h3>Post New Listing</h3>
+
+                <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. ProGas 13kg Refill)" required>
+
+                <select id="supplierItemSize" required>
+                    <option value="3kg">3 Kg</option>
+                    <option value="6kg">6 Kg</option>
+                    <option value="13kg" selected>13 Kg</option>
+                    <option value="50kg">50 Kg</option>
+                </select>
+
+                <select id="supplierItemCategory" required>
+                    <option value="refill">Gas Refill</option>
+                    <option value="cylinder_complete">Complete Cylinder</option>
+                    <option value="accessories">Accessories</option>
+                </select>
+
+                <input type="number" id="supplierItemPrice" placeholder="Price (KES)" min="1" step="1" required>
+
+                <input type="number" id="supplierItemDeliveryFee" placeholder="Delivery Fee Offer (KES, 0 for Free Delivery)" min="0" step="1">
+
+                <input type="text" id="supplierItemDeliveryOffer" placeholder="Delivery Offer Note (e.g. Free delivery within town)">
+
+                <div class="readonly-location-group">
+                    <label for="supplierItemLocation">Registered Business Location</label>
+                    <input type="text" id="supplierItemLocation" value="Loading registered location..." readonly>
+                </div>
+
+                <label for="supplierItemImage" style="font-size:.9rem;color:#64748b;margin-top:.5rem;display:block;">
+                    Product Images (Max 5)
+                </label>
+                <input type="file" id="supplierItemImage" accept="image/*" multiple>
+
+                <textarea id="supplierItemDescription" placeholder="Description & delivery terms" required></textarea>
+
+                <button type="submit" class="btn-primary">Publish Listing</button>
+            </form>
+
+            <div class="my-listings">
+                <h3>Your Active Listings</h3>
+                <div id="supplierListingsGrid" style="margin-top:1rem;"></div>
+            </div>
+        </div>
+
+        <div id="supplierOrdersTabContent" style="display:none;">
+            <div class="card" style="padding:1.5rem;">
+                <h3>Incoming Customer Orders</h3>
+                <div id="supplierOrdersList" style="margin-top:1rem;">
+                    <p>No customer orders received yet.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         VIEW 3: CUSTOMER ORDERS ("MY ORDERS")
+    ============================================================ -->
+    <section id="customerOrdersView" class="view" style="display:none;">
+        <h2>My Orders & Account Portal</h2>
+        <div class="card" style="padding:1.5rem;margin-top:1rem;">
+            <h3>Order History</h3>
+            <div id="customerOrdersList" style="margin-top:1rem;">
+                <p>You have not placed any orders yet.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         VIEW 4: SHOPPING CART & CHECKOUT
+    ============================================================ -->
+    <section id="cartView" class="view" style="display:none;">
+        <h2>Your Shopping Cart & Checkout</h2>
+        <div class="cart-container-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:2rem;">
+            <div class="cart-items-card card" style="padding:1.5rem;">
+                <h3>Review Items</h3>
+                <div id="cartItemsList" style="margin-top:1rem;">
+                    <p>Your cart is currently empty.</p>
+                </div>
+            </div>
+
+            <div class="cart-summary-card card" style="padding:1.5rem;">
+                <h3>Order Summary</h3>
+                <div class="summary-row" style="margin-top:1rem;display:flex;justify-content:space-between;">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal">KES 0</span>
+                </div>
+                <div class="summary-row" style="display:flex;justify-content:space-between;margin-top:.5rem;">
+                    <span>Supplier Delivery</span>
+                    <span id="cartDelivery">KES 0</span>
+                </div>
+                <hr style="margin:1rem 0;border:0;border-top:1px solid #e2e8f0;">
+                <div class="summary-row total-row" style="display:flex;justify-content:space-between;font-size:1.2rem;">
+                    <strong>Total</strong>
+                    <strong id="cartTotal">KES 0</strong>
+                </div>
+
+                <form id="checkoutForm" style="margin-top:1.5rem;">
+                    <h4 style="margin-bottom:.75rem;font-size:.95rem;">Delivery & M-Pesa Details</h4>
+                    <input type="text" id="deliveryName" placeholder="Full Name" required>
+                    <input type="tel" id="deliveryPhone" placeholder="M-Pesa Phone (e.g. 0712345678)" required>
+                    <input type="text" id="deliveryAddress" placeholder="Delivery Location / Estate / House No." required>
+                    <button type="submit" class="btn-primary" style="width:100%;padding:.75rem;">
+                        Place Order & Pay via M-Pesa
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         AUTH MODAL
+    ============================================================ -->
+    <div id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" style="display:none;">
+        <div class="modal-content">
+            <span id="closeModal" class="close" role="button" tabindex="0" aria-label="Close modal">&times;</span>
+            <h2 id="authModalTitle">Sign In</h2>
+
+            <form id="authForm">
+                <input type="email" id="authEmail" placeholder="Email Address" autocomplete="email" required>
+                <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password" required>
+
+                <div id="vendorFields" style="display:none;">
+                    <select id="userRole" aria-label="Account Type">
+                        <option value="customer">Customer</option>
+                        <option value="vendor">Supplier / Retailer</option>
+                    </select>
+
+                    <div id="supplierExtraFields" style="display:none;">
+                        <input type="text" id="businessName" placeholder="Business / Supplier Name">
+
+                        <select id="supplierCounty" aria-label="Supplier County">
+                            <option value="">Select County</option>
+                        </select>
+
+                        <select id="supplierArea" aria-label="Supplier Town or Area" disabled>
+                            <option value="">Select County First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" id="authSubmitBtn" class="btn-primary">Sign In</button>
+
+                <p id="toggleAuthMode" style="cursor:pointer;margin-top:1rem;font-size:.9rem;text-align:center;color:#f97316;font-weight:600;">
+                    Need an account? Register
+                </p>
+            </form>
+        </div>
     </div>
-</div>
 
 </main>
 
-<!-- FOOTER -->
-<footer class="site-footer" style="background:var(--gh-navy);color:#fff;padding:3rem 1rem 1rem;">
-    <div class="footer-container" style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2rem;justify-content:space-between;">
-        <div class="footer-col" style="max-width:300px;">
-            <h3 style="margin-bottom:1rem;">GasHubKE <span style="color:#f97316;font-size:.85rem;font-weight:600;">Cook • Connect • Save</span></h3>
+<!-- BOTTOM TRUST BAR & FOOTER -->
+<footer class="site-footer">
+    <div class="gh-footer-cta-bar">
+        <div class="gh-footer-cta-inner">
+            <div class="gh-footer-stats">
+                <div><strong>Customers</strong><span>Find & order easily</span></div>
+                <div><strong>Suppliers</strong><span>List & grow your business</span></div>
+                <div><strong>Trusted</strong><span>Safe, reliable, transparent</span></div>
+            </div>
+            <button type="button" id="footerGetStartedBtn" class="gh-cta-pill-btn">
+                Start Today &rarr;
+            </button>
+        </div>
+    </div>
+
+    <div class="footer-container">
+        <div class="footer-col" style="max-width:320px;">
+            <h3>GasHub<span>KE</span></h3>
+            <p class="footer-tagline">Cook • Connect • Save</p>
             <p style="color:#cbd5e1;line-height:1.5;font-size:.9rem;">
-                Connecting verified cooking gas suppliers, retailers, and households with fast and reliable service across all 47 counties in Kenya.
+                Kenya's online cooking gas hub connecting verified suppliers, retailers, and households across all 47 counties.
             </p>
         </div>
 
         <div class="footer-col">
-            <h4 style="margin-bottom:1rem;">Quick Links</h4>
-            <ul style="list-style:none;padding:0;">
-                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">About Us</a></li>
-                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Supplier Guidelines</a></li>
-                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Safety & Compliance</a></li>
-                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Contact Support</a></li>
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="#" id="footerMarketplaceLink">Marketplace</a></li>
+                <li><a href="#" id="footerBecomeSupplierLink">Become a Supplier</a></li>
+                <li><a href="#">Safety & Compliance</a></li>
+                <li><a href="#">Contact Support</a></li>
             </ul>
         </div>
 
         <div class="footer-col">
-            <h4 style="margin-bottom:1rem;">Legal</h4>
-            <ul style="list-style:none;padding:0;">
-                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Privacy Policy</a></li>
-                <li style="margin-bottom:.5rem;"><a href="#" style="color:#94a3b8;text-decoration:none;">Terms of Service</a></li>
+            <h4>Legal</h4>
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
             </ul>
         </div>
     </div>
 
-    <div class="footer-bottom" style="text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #334155;color:#94a3b8;font-size:.85rem;">
-        <p>&copy; <span id="currentYear"></span> GasHubKE. All rights reserved.</p>
+    <div class="footer-bottom">
+        <p>&copy; <span id="currentYear"></span> GasHubKE — Cooking Gas, Made Simple. All rights reserved.</p>
     </div>
 </footer>
 
-<!-- UI JAVASCRIPT -->
+<!-- UI NAVIGATION & INTERACTION SCRIPT -->
 <script>
-    /* PAGE LOADER */
     window.addEventListener('load', () => {
         const loader = document.getElementById('pageLoader');
         if (!loader) return;
@@ -917,52 +587,48 @@
         }, 400);
     });
 
-    /* YEAR */
     const yearElement = document.getElementById('currentYear');
     if (yearElement) {
         yearElement.textContent = new Date().getFullYear();
     }
 
-    /* MOBILE HAMBURGER */
     document.addEventListener('DOMContentLoaded', () => {
         const hamburgerBtn = document.getElementById('hamburgerBtn');
         const navLinks = document.getElementById('navLinks');
 
-        if (!hamburgerBtn || !navLinks) return;
-
-        hamburgerBtn.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            const isOpen = navLinks.classList.toggle('active');
-            hamburgerBtn.classList.toggle('open', isOpen);
-            hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
-        });
-
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                hamburgerBtn.classList.remove('open');
-                hamburgerBtn.setAttribute('aria-expanded', 'false');
+        if (hamburgerBtn && navLinks) {
+            hamburgerBtn.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                const isOpen = navLinks.classList.toggle('active');
+                hamburgerBtn.classList.toggle('open', isOpen);
+                hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
             });
-        });
 
-        document.addEventListener('click', (event) => {
-            if (!hamburgerBtn.contains(event.target) && !navLinks.contains(event.target)) {
-                navLinks.classList.remove('active');
-                hamburgerBtn.classList.remove('open');
-                hamburgerBtn.setAttribute('aria-expanded', 'false');
-            }
-        });
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    hamburgerBtn.classList.remove('open');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                });
+            });
 
-        /* QUICK CATEGORY & POPULAR BRAND PILLS */
+            document.addEventListener('click', event => {
+                if (!hamburgerBtn.contains(event.target) && !navLinks.contains(event.target)) {
+                    navLinks.classList.remove('active');
+                    hamburgerBtn.classList.remove('open');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        /* CATEGORY CARDS -> FILTER SYNC */
         const filterCategory = document.getElementById('filterCategory');
-        const filterBrand = document.getElementById('filterBrand');
-
-        document.querySelectorAll('[data-quick-category]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const value = btn.getAttribute('data-quick-category') || '';
-                document.querySelectorAll('[data-quick-category]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+        document.querySelectorAll('[data-quick-category]').forEach(card => {
+            card.addEventListener('click', () => {
+                const value = card.getAttribute('data-quick-category') || '';
+                document.querySelectorAll('[data-quick-category]').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
                 if (filterCategory) {
                     filterCategory.value = value;
                     filterCategory.dispatchEvent(new Event('change', { bubbles: true }));
@@ -970,11 +636,15 @@
             });
         });
 
-        document.querySelectorAll('[data-quick-brand]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const value = btn.getAttribute('data-quick-brand') || '';
-                const isAlreadyActive = btn.classList.contains('active');
-                document.querySelectorAll('[data-quick-brand]').forEach(b => b.classList.remove('active'));
+        /* POPULAR BRANDS TILES -> FILTER SYNC */
+        const filterBrand = document.getElementById('filterBrand');
+        const resetBrandBtn = document.getElementById('resetBrandBtn');
+
+        document.querySelectorAll('[data-quick-brand]').forEach(tile => {
+            tile.addEventListener('click', () => {
+                const value = tile.getAttribute('data-quick-brand') || '';
+                const isAlreadyActive = tile.classList.contains('active');
+                document.querySelectorAll('[data-quick-brand]').forEach(t => t.classList.remove('active'));
 
                 if (!filterBrand) return;
 
@@ -985,11 +655,45 @@
                         opt => opt.value.trim().toLowerCase() === value.trim().toLowerCase()
                     );
                     filterBrand.value = matchedOption ? matchedOption.value : value;
-                    btn.classList.add('active');
+                    tile.classList.add('active');
                 }
                 filterBrand.dispatchEvent(new Event('change', { bubbles: true }));
             });
         });
+
+        if (resetBrandBtn && filterBrand) {
+            resetBrandBtn.addEventListener('click', () => {
+                document.querySelectorAll('[data-quick-brand]').forEach(t => t.classList.remove('active'));
+                filterBrand.value = '';
+                filterBrand.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        }
+
+        /* FOOTER CTAS */
+        const footerGetStartedBtn = document.getElementById('footerGetStartedBtn');
+        const footerBecomeSupplierLink = document.getElementById('footerBecomeSupplierLink');
+        const footerMarketplaceLink = document.getElementById('footerMarketplaceLink');
+
+        [footerGetStartedBtn, footerBecomeSupplierLink].forEach(el => {
+            if (!el) return;
+            el.addEventListener('click', event => {
+                event.preventDefault();
+                const modal = document.getElementById('authModal');
+                const toggle = document.getElementById('toggleAuthMode');
+                if (modal) modal.style.display = 'flex';
+                if (toggle && toggle.textContent.includes('Register')) {
+                    toggle.click();
+                }
+            });
+        });
+
+        if (footerMarketplaceLink) {
+            footerMarketplaceLink.addEventListener('click', event => {
+                event.preventDefault();
+                window.switchView('marketplaceView');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
     });
 
     /* VIEW MANAGEMENT */
@@ -1005,12 +709,18 @@
         if (target) {
             target.style.display = 'block';
         }
+        document.querySelectorAll('.nav-links .nav-item').forEach(link => {
+            link.classList.remove('active');
+        });
+        if (viewId === 'marketplaceView') document.getElementById('homeLink')?.classList.add('active');
+        if (viewId === 'supplierDashboardView') document.getElementById('supplierDashboardNavLink')?.classList.add('active');
+        if (viewId === 'customerOrdersView') document.getElementById('customerOrdersNavLink')?.classList.add('active');
     };
 
     /* LOGIN / LOGOUT UI */
     const supplierDashboardNavLink = document.getElementById('supplierDashboardNavLink');
     const customerOrdersNavLink = document.getElementById('customerOrdersNavLink');
-    const authLink = document.getElementById('authLink');
+    const authLinkText = document.getElementById('authLinkText');
     const authModal = document.getElementById('authModal');
     const closeModal = document.getElementById('closeModal');
 
@@ -1026,74 +736,60 @@
             if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
         }
 
-        if (authLink) authLink.textContent = 'Sign Out';
+        if (authLinkText) authLinkText.textContent = 'Sign Out';
     };
 
     window.handlePostLogoutUI = function () {
         window.switchView('marketplaceView');
         if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
         if (customerOrdersNavLink) customerOrdersNavLink.style.display = 'none';
-        if (authLink) authLink.textContent = 'Sign In';
+        if (authLinkText) authLinkText.textContent = 'Sign In';
     };
 
-    /* NAVIGATION LINKS */
-    const homeLink = document.getElementById('homeLink');
-    if (homeLink) {
-        homeLink.addEventListener('click', (event) => {
+    ['homeLink', 'brandLogoLink'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', event => {
             event.preventDefault();
             window.switchView('marketplaceView');
         });
-    }
+    });
 
-    const cartLink = document.getElementById('cartLink');
-    if (cartLink) {
-        cartLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            if (typeof window.renderCartView === 'function') {
-                window.renderCartView();
-            }
-            window.switchView('cartView');
-        });
-    }
+    document.getElementById('cartLink')?.addEventListener('click', event => {
+        event.preventDefault();
+        if (typeof window.renderCartView === 'function') {
+            window.renderCartView();
+        }
+        window.switchView('cartView');
+    });
 
-    if (supplierDashboardNavLink) {
-        supplierDashboardNavLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            window.switchView('supplierDashboardView');
-            if (typeof window.refreshSupplierDashboard === 'function') {
-                window.refreshSupplierDashboard();
-            }
-        });
-    }
+    supplierDashboardNavLink?.addEventListener('click', event => {
+        event.preventDefault();
+        window.switchView('supplierDashboardView');
+        if (typeof window.refreshSupplierDashboard === 'function') {
+            window.refreshSupplierDashboard();
+        }
+    });
 
-    if (customerOrdersNavLink) {
-        customerOrdersNavLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            window.switchView('customerOrdersView');
-        });
-    }
+    customerOrdersNavLink?.addEventListener('click', event => {
+        event.preventDefault();
+        window.switchView('customerOrdersView');
+        if (typeof window.loadCustomerOrders === 'function') {
+            window.loadCustomerOrders();
+        }
+    });
 
-    /* MODAL CLOSE HANDLERS */
     if (closeModal && authModal) {
         closeModal.addEventListener('click', () => {
             authModal.style.display = 'none';
         });
-
-        closeModal.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                authModal.style.display = 'none';
-            }
-        });
     }
 
-    window.addEventListener('click', (event) => {
+    window.addEventListener('click', event => {
         if (event.target === authModal) {
             authModal.style.display = 'none';
         }
     });
 
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && authModal && authModal.style.display === 'flex') {
             authModal.style.display = 'none';
         }
@@ -1104,9 +800,9 @@
 <script type="module" src="./js/firebase-config.js"></script>
 <script type="module" src="./js/counties.js"></script>
 <script type="module" src="./js/auth.js"></script>
-<script type="module" src="./js/cart.js"></script>
 <script type="module" src="./js/marketplace.js"></script>
 <script type="module" src="./js/supplier-dashboard.js"></script>
+<script type="module" src="./js/orders.js"></script>
 
 </body>
 </html>
