@@ -79,7 +79,7 @@
             <a href="#" id="settingsNavLink" class="nav-item">Settings</a>
         </nav>
 
-        <!-- RIGHT ACTIONS: CART + USER + HAMBURGER -->
+        <!-- RIGHT ACTIONS: CART + PROFILE/AUTH TOGGLE + HAMBURGER -->
         <div class="nav-actions">
             <a href="#" id="cartLink" class="nav-cart-btn" aria-label="Shopping Cart">
                 <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -90,13 +90,20 @@
                 <span id="cartCount" class="cart-badge">0</span>
             </a>
 
-            <a href="#" id="authLink" class="nav-auth-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span id="authLinkText">Sign In</span>
-            </a>
+            <div class="gh-profile-wrapper" style="position:relative;">
+                <a href="#" id="authLink" class="nav-auth-btn" aria-haspopup="true" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span id="authLinkText">Sign In</span>
+                </a>
+
+                <div id="profileDropdownMenu" class="gh-profile-dropdown" style="display:none;">
+                    <button type="button" id="dropdownSettingsBtn" class="gh-dropdown-item">Settings &amp; Profile</button>
+                    <button type="button" id="dropdownAuthActionBtn" class="gh-dropdown-item">Sign In / Register</button>
+                </div>
+            </div>
 
             <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
                 <span></span>
@@ -115,7 +122,7 @@
     ============================================================ -->
     <section id="marketplaceView" class="view">
 
-        <!-- HERO BANNER (ACTUALIZED FROM VISUALISATION) -->
+        <!-- HERO BANNER -->
         <div class="gh-hero-card">
             <div class="gh-hero-content">
                 <div class="gh-hero-top-tags">
@@ -157,7 +164,7 @@
             </div>
         </div>
 
-        <!-- CATEGORY CARDS (REFILL / CYLINDER COMPLETE / ACCESSORIES) -->
+        <!-- CATEGORY CARDS -->
         <div class="gh-category-grid" aria-label="Product Categories">
             <button type="button" class="gh-category-card active" data-quick-category="">
                 <span class="gh-cat-icon">
@@ -271,6 +278,7 @@
                     <option value="">All Sizes</option>
                     <option value="3kg">3 Kg</option>
                     <option value="6kg">6 Kg</option>
+                    <option value="12.5kg">12.5 Kg</option>
                     <option value="13kg">13 Kg</option>
                     <option value="50kg">50 Kg</option>
                 </select>
@@ -289,7 +297,7 @@
             <button type="button" id="clearFiltersBtn" class="clear-filters-btn">Clear</button>
         </div>
 
-        <!-- TRUST & PLATFORM VALUE PILLARS (ACTUALIZED FROM VISUALISATION) -->
+        <!-- TRUST & PLATFORM VALUE PILLARS -->
         <section class="gh-pillars-section" aria-label="Why Choose GasHubKE">
             <div class="gh-pillars-grid">
                 <div class="gh-pillar-card">
@@ -379,11 +387,12 @@
             <form id="supplierListingForm" class="card" style="margin-bottom:1.5rem;">
                 <h3>Post New Listing</h3>
 
-                <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. ProGas 13kg Refill)" required>
+                <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. TotalEnergies 12.5kg Refill)" required>
 
                 <select id="supplierItemSize" required>
                     <option value="3kg">3 Kg</option>
                     <option value="6kg">6 Kg</option>
+                    <option value="12.5kg">12.5 Kg</option>
                     <option value="13kg" selected>13 Kg</option>
                     <option value="50kg">50 Kg</option>
                 </select>
@@ -526,6 +535,70 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         PRODUCT DETAIL / READ MORE MODAL
+    ============================================================ -->
+    <div id="productDetailModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle" style="display:none;">
+        <div class="gh-detail-modal-card">
+            <span id="closeDetailModal" class="close" role="button" tabindex="0" aria-label="Close product details">&times;</span>
+
+            <div class="gh-detail-image-wrap">
+                <img id="detailMainImage" src="" alt="Gas Cylinder">
+                <span id="detailSizeBadge" class="gh-detail-size-badge" style="display:none;"></span>
+            </div>
+
+            <div id="detailThumbRow" class="gh-detail-thumbs" style="display:none;"></div>
+
+            <h2 id="detailTitle" class="gh-detail-title">TOTALENERGIES</h2>
+            <div class="gh-detail-accent-bar"></div>
+
+            <p id="detailPrice" class="gh-detail-price">KSh 0</p>
+            <p id="detailMeta" class="gh-detail-meta"></p>
+
+            <div class="gh-detail-size-row">
+                <label for="detailSizeSelect">Size</label>
+                <select id="detailSizeSelect" aria-label="Select Cylinder Size">
+                    <option value="3kg">3 Kg</option>
+                    <option value="6kg">6 Kg</option>
+                    <option value="12.5kg">12.5 Kg</option>
+                    <option value="13kg">13 Kg</option>
+                    <option value="50kg">50 Kg</option>
+                </select>
+            </div>
+
+            <div class="gh-detail-actions">
+                <button type="button" id="detailAddToCartBtn" class="gh-detail-btn-dark">
+                    &#128722; Add to Cart
+                </button>
+                <button type="button" id="detailViewCartBtn" class="gh-detail-btn-dark">
+                    &#128065; View Cart
+                </button>
+                <button type="button" id="detailCheckoutBtn" class="gh-detail-btn-dark gh-detail-btn-full">
+                    &#128179; Checkout
+                </button>
+            </div>
+
+            <div class="gh-detail-share" aria-label="Share product">
+                <a id="shareFb" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-fb" title="Share on Facebook">f</a>
+                <a id="shareTw" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-tw" title="Share on X / Twitter">&#120143;</a>
+                <a id="sharePin" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-pin" title="Share on Pinterest">P</a>
+                <a id="shareIn" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-in" title="Share on LinkedIn">in</a>
+                <a id="shareWa" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-wa" title="Share on WhatsApp">WA</a>
+            </div>
+
+            <div class="gh-detail-readmore">
+                <div class="gh-readmore-heading">READ MORE</div>
+                <div class="gh-readmore-underline"></div>
+                <p id="detailDescription" class="gh-detail-description"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING BACK TO TOP BUTTON -->
+    <button type="button" id="backToTopBtn" class="gh-back-to-top" aria-label="Back to top" title="Back to top">
+        &#8963;
+    </button>
+
 </main>
 
 <!-- BOTTOM TRUST BAR & FOOTER -->
@@ -622,7 +695,6 @@
             });
         }
 
-        /* CATEGORY CARDS -> FILTER SYNC */
         const filterCategory = document.getElementById('filterCategory');
         document.querySelectorAll('[data-quick-category]').forEach(card => {
             card.addEventListener('click', () => {
@@ -636,7 +708,6 @@
             });
         });
 
-        /* POPULAR BRANDS TILES -> FILTER SYNC */
         const filterBrand = document.getElementById('filterBrand');
         const resetBrandBtn = document.getElementById('resetBrandBtn');
 
@@ -669,7 +740,6 @@
             });
         }
 
-        /* FOOTER CTAS */
         const footerGetStartedBtn = document.getElementById('footerGetStartedBtn');
         const footerBecomeSupplierLink = document.getElementById('footerBecomeSupplierLink');
         const footerMarketplaceLink = document.getElementById('footerMarketplaceLink');
@@ -696,7 +766,6 @@
         }
     });
 
-    /* VIEW MANAGEMENT */
     window.hideAllViews = function () {
         document.querySelectorAll('.view').forEach(view => {
             view.style.display = 'none';
@@ -717,7 +786,6 @@
         if (viewId === 'customerOrdersView') document.getElementById('customerOrdersNavLink')?.classList.add('active');
     };
 
-    /* LOGIN / LOGOUT UI */
     const supplierDashboardNavLink = document.getElementById('supplierDashboardNavLink');
     const customerOrdersNavLink = document.getElementById('customerOrdersNavLink');
     const authLinkText = document.getElementById('authLinkText');
@@ -736,7 +804,7 @@
             if (supplierDashboardNavLink) supplierDashboardNavLink.style.display = 'none';
         }
 
-        if (authLinkText) authLinkText.textContent = 'Sign Out';
+        if (authLinkText) authLinkText.textContent = 'Account';
     };
 
     window.handlePostLogoutUI = function () {
