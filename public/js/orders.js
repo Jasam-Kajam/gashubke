@@ -222,20 +222,6 @@ function groupCartItemsByVendor(items) {
 
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutForm = document.getElementById("checkoutForm");
-    const settingsNavLink = document.getElementById("settingsNavLink");
-
-    if (settingsNavLink) {
-        settingsNavLink.addEventListener("click", async event => {
-            event.preventDefault();
-            const user = auth.currentUser;
-            if (!user) {
-                const authModal = document.getElementById("authModal");
-                if (authModal) authModal.style.display = "flex";
-                return;
-            }
-            await showSupplierProfileForm(user);
-        });
-    }
 
     onAuthStateChanged(auth, user => {
         if (user) {
