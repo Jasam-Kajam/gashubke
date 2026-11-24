@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="./css/styles.css">
 
     <style>
-        /* PAGE LOADER */
         #pageLoader {
             position: fixed;
             inset: 0;
@@ -79,7 +78,7 @@
             <a href="#" id="settingsNavLink" class="nav-item">Settings</a>
         </nav>
 
-        <!-- RIGHT ACTIONS: CART + PROFILE/AUTH TOGGLE + HAMBURGER -->
+        <!-- RIGHT ACTIONS: CART + PROFILE TOGGLE + HAMBURGER -->
         <div class="nav-actions">
             <a href="#" id="cartLink" class="nav-cart-btn" aria-label="Shopping Cart">
                 <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -301,7 +300,7 @@
         <section class="gh-pillars-section" aria-label="Why Choose GasHubKE">
             <div class="gh-pillars-grid">
                 <div class="gh-pillar-card">
-                    <span class="gh-pillar-icon">🛡️</span>
+                    <span class="gh-pillar-icon">&#128737;&#65039;</span>
                     <div>
                         <h4>Verified Suppliers</h4>
                         <p>Only trusted and verified local LPG suppliers.</p>
@@ -309,7 +308,7 @@
                 </div>
 
                 <div class="gh-pillar-card">
-                    <span class="gh-pillar-icon">📍</span>
+                    <span class="gh-pillar-icon">&#128205;</span>
                     <div>
                         <h4>Nearest Search</h4>
                         <p>Find suppliers near you across all 47 counties.</p>
@@ -317,7 +316,7 @@
                 </div>
 
                 <div class="gh-pillar-card">
-                    <span class="gh-pillar-icon">💳</span>
+                    <span class="gh-pillar-icon">&#128179;</span>
                     <div>
                         <h4>M-PESA Payments</h4>
                         <p>Safe and secure checkout via M-PESA.</p>
@@ -325,7 +324,7 @@
                 </div>
 
                 <div class="gh-pillar-card">
-                    <span class="gh-pillar-icon">🚚</span>
+                    <span class="gh-pillar-icon">&#128666;</span>
                     <div>
                         <h4>Seller Handles Delivery</h4>
                         <p>Suppliers deliver directly to your doorstep.</p>
@@ -333,7 +332,7 @@
                 </div>
 
                 <div class="gh-pillar-card">
-                    <span class="gh-pillar-icon">🏷️</span>
+                    <span class="gh-pillar-icon">&#127991;&#65039;</span>
                     <div>
                         <h4>No Platform Fee</h4>
                         <p>Zero platform delivery markup—vendors set offers.</p>
@@ -341,10 +340,10 @@
                 </div>
 
                 <div class="gh-pillar-card">
-                    <span class="gh-pillar-icon">⚖️</span>
+                    <span class="gh-pillar-icon">&#9878;&#65039;</span>
                     <div>
                         <h4>Transparent Pricing</h4>
-                        <p>Compare cylinder & refill offers side by side.</p>
+                        <p>Compare cylinder &amp; refill offers side by side.</p>
                     </div>
                 </div>
             </div>
@@ -355,7 +354,7 @@
          VIEW 2: SUPPLIER DASHBOARD
     ============================================================ -->
     <section id="supplierDashboardView" class="view" style="display:none;">
-        <h2>Supplier Dashboard & Analytics</h2>
+        <h2>Supplier Dashboard &amp; Analytics</h2>
 
         <div class="supplier-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem;">
             <div class="card" style="padding:1.25rem;">
@@ -387,7 +386,7 @@
             <form id="supplierListingForm" class="card" style="margin-bottom:1.5rem;">
                 <h3>Post New Listing</h3>
 
-                <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. TotalEnergies 12.5kg Refill)" required>
+                <input type="text" id="supplierItemTitle" placeholder="Product Title (e.g. ProGas 13kg Refill)" required>
 
                 <select id="supplierItemSize" required>
                     <option value="3kg">3 Kg</option>
@@ -419,7 +418,7 @@
                 </label>
                 <input type="file" id="supplierItemImage" accept="image/*" multiple>
 
-                <textarea id="supplierItemDescription" placeholder="Description & delivery terms" required></textarea>
+                <textarea id="supplierItemDescription" placeholder="Description &amp; delivery terms" required></textarea>
 
                 <button type="submit" class="btn-primary">Publish Listing</button>
             </form>
@@ -444,7 +443,7 @@
          VIEW 3: CUSTOMER ORDERS ("MY ORDERS")
     ============================================================ -->
     <section id="customerOrdersView" class="view" style="display:none;">
-        <h2>My Orders & Account Portal</h2>
+        <h2>My Orders &amp; Account Portal</h2>
         <div class="card" style="padding:1.5rem;margin-top:1rem;">
             <h3>Order History</h3>
             <div id="customerOrdersList" style="margin-top:1rem;">
@@ -457,7 +456,7 @@
          VIEW 4: SHOPPING CART & CHECKOUT
     ============================================================ -->
     <section id="cartView" class="view" style="display:none;">
-        <h2>Your Shopping Cart & Checkout</h2>
+        <h2>Your Shopping Cart &amp; Checkout</h2>
         <div class="cart-container-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:2rem;">
             <div class="cart-items-card card" style="padding:1.5rem;">
                 <h3>Review Items</h3>
@@ -483,12 +482,12 @@
                 </div>
 
                 <form id="checkoutForm" style="margin-top:1.5rem;">
-                    <h4 style="margin-bottom:.75rem;font-size:.95rem;">Delivery & M-Pesa Details</h4>
+                    <h4 style="margin-bottom:.75rem;font-size:.95rem;">Delivery &amp; M-Pesa Details</h4>
                     <input type="text" id="deliveryName" placeholder="Full Name" required>
                     <input type="tel" id="deliveryPhone" placeholder="M-Pesa Phone (e.g. 0712345678)" required>
                     <input type="text" id="deliveryAddress" placeholder="Delivery Location / Estate / House No." required>
                     <button type="submit" class="btn-primary" style="width:100%;padding:.75rem;">
-                        Place Order & Pay via M-Pesa
+                        Place Order &amp; Pay via M-Pesa
                     </button>
                 </form>
             </div>
@@ -580,7 +579,7 @@
 
             <div class="gh-detail-share" aria-label="Share product">
                 <a id="shareFb" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-fb" title="Share on Facebook">f</a>
-                <a id="shareTw" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-tw" title="Share on X / Twitter">&#120143;</a>
+                <a id="shareTw" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-tw" title="Share on X / Twitter">𝕏</a>
                 <a id="sharePin" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-pin" title="Share on Pinterest">P</a>
                 <a id="shareIn" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-in" title="Share on LinkedIn">in</a>
                 <a id="shareWa" href="#" target="_blank" rel="noopener noreferrer" class="gh-share-btn gh-share-wa" title="Share on WhatsApp">WA</a>
@@ -594,20 +593,20 @@
         </div>
     </div>
 
-    <!-- FLOATING BACK TO TOP BUTTON -->
-    <button type="button" id="backToTopBtn" class="gh-back-to-top" aria-label="Back to top" title="Back to top">
-        &#8963;
-    </button>
-
 </main>
+
+<!-- FLOATING BACK TO TOP BUTTON -->
+<button type="button" id="backToTopBtn" class="gh-back-to-top" aria-label="Back to top" title="Back to top">
+    &#8963;
+</button>
 
 <!-- BOTTOM TRUST BAR & FOOTER -->
 <footer class="site-footer">
     <div class="gh-footer-cta-bar">
         <div class="gh-footer-cta-inner">
             <div class="gh-footer-stats">
-                <div><strong>Customers</strong><span>Find & order easily</span></div>
-                <div><strong>Suppliers</strong><span>List & grow your business</span></div>
+                <div><strong>Customers</strong><span>Find &amp; order easily</span></div>
+                <div><strong>Suppliers</strong><span>List &amp; grow your business</span></div>
                 <div><strong>Trusted</strong><span>Safe, reliable, transparent</span></div>
             </div>
             <button type="button" id="footerGetStartedBtn" class="gh-cta-pill-btn">
@@ -630,7 +629,7 @@
             <ul>
                 <li><a href="#" id="footerMarketplaceLink">Marketplace</a></li>
                 <li><a href="#" id="footerBecomeSupplierLink">Become a Supplier</a></li>
-                <li><a href="#">Safety & Compliance</a></li>
+                <li><a href="#">Safety &amp; Compliance</a></li>
                 <li><a href="#">Contact Support</a></li>
             </ul>
         </div>
@@ -858,8 +857,10 @@
     });
 
     document.addEventListener('keydown', event => {
-        if (event.key === 'Escape' && authModal && authModal.style.display === 'flex') {
-            authModal.style.display = 'none';
+        if (event.key === 'Escape') {
+            if (authModal && authModal.style.display === 'flex') authModal.style.display = 'none';
+            const detailModal = document.getElementById('productDetailModal');
+            if (detailModal && detailModal.style.display === 'flex') detailModal.style.display = 'none';
         }
     });
 </script>
