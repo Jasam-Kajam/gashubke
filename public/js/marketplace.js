@@ -5,7 +5,7 @@ import {
     getDocs,
     getDoc,
     doc
-} from "[https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js)";
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 
 // ============================================================
@@ -919,11 +919,11 @@ window.openProductDetail = function (itemId) {
     const shareIn = document.getElementById("shareIn");
     const shareWa = document.getElementById("shareWa");
 
-    if (shareFb) shareFb.href = `[https://www.facebook.com/sharer/sharer.php?u=$](https://www.facebook.com/sharer/sharer.php?u=$){pageUrl}`;
-    if (shareTw) shareTw.href = `[https://twitter.com/intent/tweet?text=$](https://twitter.com/intent/tweet?text=$){shareText}&url=${pageUrl}`;
-    if (sharePin) sharePin.href = `[https://pinterest.com/pin/create/button/?url=$](https://pinterest.com/pin/create/button/?url=$){pageUrl}&description=${shareText}`;
-    if (shareIn) shareIn.href = `[https://www.linkedin.com/sharing/share-offsite/?url=$](https://www.linkedin.com/sharing/share-offsite/?url=$){pageUrl}`;
-    if (shareWa) shareWa.href = `[https://wa.me/?text=$](https://wa.me/?text=$){shareText}%20${pageUrl}`;
+    if (shareFb) shareFb.href = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`;
+    if (shareTw) shareTw.href = `https://twitter.com/intent/tweet?text=${shareText}&url=${pageUrl}`;
+    if (sharePin) sharePin.href = `https://pinterest.com/pin/create/button/?url=${pageUrl}&description=${shareText}`;
+    if (shareIn) shareIn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
+    if (shareWa) shareWa.href = `https://wa.me/?text=${shareText}%20${pageUrl}`;
 
     const addBtn = document.getElementById("detailAddToCartBtn");
     const viewCartBtn = document.getElementById("detailViewCartBtn");
@@ -983,7 +983,7 @@ window.openProductDetail = function (itemId) {
 async function loadListings() {
     if (!productGrid) return;
 
-    productGrid.innerHTML = `<p>Loading gas suppliers & inventory...</p>`;
+    productGrid.innerHTML = `<p>Loading gas suppliers &amp; inventory...</p>`;
 
     try {
         const querySnapshot = await getDocs(collection(db, "listings"));
@@ -1061,7 +1061,7 @@ async function loadListings() {
             card.className = "product-card";
 
             const mapPinSvg = `
-                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;color:var(--primary);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;color:var(--primary);">
                     <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                 </svg>
