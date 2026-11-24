@@ -22,10 +22,16 @@ import {
 
 
 /* =========================================================
-   AUTH UI ELEMENTS
+   AUTH & PROFILE DROPDOWN UI ELEMENTS
 ========================================================= */
 
 const authLink = document.getElementById("authLink");
+const authLinkText = document.getElementById("authLinkText");
+const profileDropdownMenu = document.getElementById("profileDropdownMenu");
+const dropdownSettingsBtn = document.getElementById("dropdownSettingsBtn");
+const dropdownAuthActionBtn = document.getElementById("dropdownAuthActionBtn");
+const settingsNavLink = document.getElementById("settingsNavLink");
+
 const authModal = document.getElementById("authModal");
 const closeModal = document.getElementById("closeModal");
 const authForm = document.getElementById("authForm");
@@ -65,6 +71,59 @@ function buildLocation(town = "", county = "") {
     town = String(town || "").trim();
     county = String(county || "").trim();
     return [town, county].filter(Boolean).join(", ");
+}
+
+function showAuthToast(message) {
+    if (!message) return;
+
+    let toast = document.getElementById("gasHubAuthToast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "gasHubAuthToast";
+        toast.style.cssText = [
+            "position:fixed",
+            "bottom:20px",
+            "left:20px",
+            "z-index:99999",
+            "background:#0f172a",
+            "color:#ffffff",
+            "padding:10px 16px",
+            "border-radius:10px",
+            "font-size:14px",
+            "box-shadow:0 10px 25px rgba(0,0,0,0.22)",
+            "transition:opacity 0.2s ease",
+            "opacity:0",
+            "pointer-events:none"
+        ].join(";");
+        document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.style.opacity = "1";
+
+    clearTimeout(showAuthToast._timer);
+    showAuthToast._timer = setTimeout(() => {
+        toast.style.opacity = "0";
+    }, 2400);
+}
+
+function syncProfileDropdownState() {
+    const loggedIn = Boolean(auth.currentUser);
+    if (authLinkText) {
+        authLinkText.textContent = loggedIn ? "Account" : "Sign In";
+    }
+    if (dropdownAuthActionBtn) {
+        dropdownAuthActionBtn.textContent = loggedIn ? "Sign Out" : "Sign In / Register";
+    }
+}
+
+function closeProfileDropdown() {
+    if (profileDropdownMenu) {
+        profileDropdownMenu.style.display = "none";
+    }
+    if (authLink) {
+        authLink.setAttribute("aria-expanded", "false");
+    }
 }
 
 
@@ -225,7 +284,7 @@ export async function updateUserProfile({
     town = String(town).trim();
     county = String(county).trim();
 
-    if (!businessName) throw new Error("Please enter your business name.");
+    if (!businessName) throw new Error("Please enter your business or display name.");
     if (!town) throw new Error("Please select your town.");
     if (!county) throw new Error("Please select your county.");
 
@@ -246,6 +305,7 @@ export async function updateUserProfile({
         email: user.email || existingData.email || "",
         role,
         businessName,
+        supplierName: businessName,
         town,
         county,
         supplierTown: town,
@@ -263,6 +323,10 @@ export async function updateUserProfile({
     };
 
     await setDoc(userRef, updatedData, { merge: true });
+
+    if (isSupplierRole(role)) {
+        await setDoc(doc(db, "suppliers", user.uid), updatedData, { merge: true });
+    }
 
     return {
         uid: user.uid,
@@ -316,7 +380,7 @@ export async function getCurrentUserProfile() {
 
 
 /* =========================================================
-   SUPPLIER PROFILE COMPLETION FORM
+   PROFILE / SETTINGS MODAL FORM
 ========================================================= */
 
 export async function showSupplierProfileForm(user) {
@@ -337,15 +401,15 @@ export async function showSupplierProfileForm(user) {
         <div class="gasHubSupplierProfileCard">
             <div class="gasHubSupplierProfileHeader">
                 <div>
-                    <h2>Complete Supplier Profile</h2>
-                    <p>Add your business name and registered supplier location.</p>
+                    <h2>Account &amp; Location Settings</h2>
+                    <p>Update your business/display name and county/town location.</p>
                 </div>
             </div>
 
             <form id="gasHubSupplierProfileForm">
                 <div class="gasHubProfileField">
-                    <label for="profileBusinessName">Business Name</label>
-                    <input type="text" id="profileBusinessName" class="form-control" placeholder="Enter business name" required>
+                    <label for="profileBusinessName">Business or Display Name</label>
+                    <input type="text" id="profileBusinessName" class="form-control" placeholder="Enter business or display name" required>
                 </div>
 
                 <div class="gasHubProfileField">
@@ -369,9 +433,14 @@ export async function showSupplierProfileForm(user) {
 
                 <div id="gasHubSupplierProfileError" class="gasHubProfileError" style="display:none;"></div>
 
-                <button type="submit" id="saveSupplierProfileBtn" class="btn btn-primary w-100">
-                    Save Profile
-                </button>
+                <div style="display:flex;gap:0.65rem;">
+                    <button type="button" id="cancelSupplierProfileBtn" class="btn-secondary" style="flex:1;min-height:48px;">
+                        Close
+                    </button>
+                    <button type="submit" id="saveSupplierProfileBtn" class="btn btn-primary" style="flex:2;">
+                        Save Settings
+                    </button>
+                </div>
             </form>
         </div>
     `;
@@ -399,7 +468,7 @@ export async function showSupplierProfileForm(user) {
         }
         .gasHubSupplierProfileHeader h2 {
             margin: 0 0 6px;
-            color: #1e293b;
+            color: #0f172a;
             font-size: 24px;
             font-weight: 700;
         }
@@ -414,7 +483,7 @@ export async function showSupplierProfileForm(user) {
         .gasHubProfileField label {
             display: block;
             margin-bottom: 7px;
-            color: #1e293b;
+            color: #0f172a;
             font-weight: 600;
             font-size: 14px;
         }
@@ -452,7 +521,6 @@ export async function showSupplierProfileForm(user) {
             font-size: 14px;
         }
         #saveSupplierProfileBtn {
-            width: 100%;
             min-height: 48px;
             border: 0;
             border-radius: 10px;
@@ -484,7 +552,19 @@ export async function showSupplierProfileForm(user) {
     const townSelect = document.getElementById("profileTown");
     const preview = document.getElementById("profileLocationPreview");
     const errorBox = document.getElementById("gasHubSupplierProfileError");
+    const cancelButton = document.getElementById("cancelSupplierProfileBtn");
     const saveButton = document.getElementById("saveSupplierProfileBtn");
+
+    function closeProfileOverlay() {
+        profileCompletionOpen = false;
+        overlay.remove();
+        document.getElementById("gasHubSupplierProfileStyles")?.remove();
+    }
+
+    cancelButton?.addEventListener("click", closeProfileOverlay);
+    overlay.addEventListener("click", e => {
+        if (e.target === overlay) closeProfileOverlay();
+    });
 
     let existingData = {};
     try {
@@ -494,7 +574,7 @@ export async function showSupplierProfileForm(user) {
             existingData = profileDoc.data();
         }
     } catch (error) {
-        console.warn("Could not load existing supplier profile:", error);
+        console.warn("Could not load existing profile:", error);
     }
 
     const existingSupplierLocation = existingData.supplierLocation || {};
@@ -537,7 +617,7 @@ export async function showSupplierProfileForm(user) {
         const town = townSelect.value.trim();
 
         if (!businessName) {
-            errorBox.textContent = "Please enter your business name.";
+            errorBox.textContent = "Please enter your business or display name.";
             errorBox.style.display = "block";
             businessNameInput.focus();
             return;
@@ -558,28 +638,25 @@ export async function showSupplierProfileForm(user) {
         }
 
         saveButton.disabled = true;
-        saveButton.textContent = "Saving Profile...";
+        saveButton.textContent = "Saving Settings...";
 
         try {
-            await updateUserProfile({ businessName, town, county });
-
-            profileCompletionOpen = false;
-            overlay.remove();
-
-            const styles = document.getElementById("gasHubSupplierProfileStyles");
-            if (styles) styles.remove();
-
-            alert("Supplier profile updated successfully!");
+            const updated = await updateUserProfile({ businessName, town, county });
+            closeProfileOverlay();
+            showAuthToast("Settings saved successfully.");
 
             if (typeof window.handlePostLoginUI === "function") {
-                window.handlePostLoginUI("supplier");
+                window.handlePostLoginUI(updated.role);
+            }
+            if (typeof window.refreshSupplierDashboard === "function") {
+                window.refreshSupplierDashboard();
             }
         } catch (error) {
-            console.error("Supplier profile update error:", error);
-            errorBox.textContent = error.message || "Unable to save your supplier profile.";
+            console.error("Profile update error:", error);
+            errorBox.textContent = error.message || "Unable to save your settings.";
             errorBox.style.display = "block";
             saveButton.disabled = false;
-            saveButton.textContent = "Save Profile";
+            saveButton.textContent = "Save Settings";
         }
     });
 }
@@ -623,14 +700,14 @@ function ensureForgotPasswordButton() {
 async function handleForgotPassword() {
     const email = document.getElementById("authEmail")?.value.trim() || "";
     if (!email) {
-        alert("Enter your email address first.");
+        showAuthToast("Enter your email address first.");
         document.getElementById("authEmail")?.focus();
         return;
     }
 
     try {
         await sendPasswordResetEmail(auth, email);
-        alert("Password reset email sent. Please check your inbox and spam folder.");
+        showAuthToast("Password reset email sent. Check your inbox or spam.");
     } catch (error) {
         console.error("Password reset error:", error);
         let message = "Unable to send password reset email.";
@@ -663,19 +740,55 @@ ensureForgotPasswordButton();
 
 
 /* =========================================================
-   AUTH LINK (SIGN IN / SIGN OUT)
+   PROFILE ICON TOGGLE, SETTINGS & SIGN IN / SIGN OUT
 ========================================================= */
 
 if (authLink) {
-    authLink.addEventListener("click", async event => {
+    authLink.addEventListener("click", event => {
         event.preventDefault();
+        event.stopPropagation();
+        syncProfileDropdownState();
 
+        if (!profileDropdownMenu) {
+            if (auth.currentUser) {
+                signOut(auth).catch(console.error);
+            } else if (authModal) {
+                authModal.style.display = "flex";
+            }
+            return;
+        }
+
+        const isOpen = profileDropdownMenu.style.display === "block";
+        profileDropdownMenu.style.display = isOpen ? "none" : "block";
+        authLink.setAttribute("aria-expanded", String(!isOpen));
+    });
+}
+
+if (dropdownSettingsBtn) {
+    dropdownSettingsBtn.addEventListener("click", async () => {
+        closeProfileDropdown();
+        const user = auth.currentUser;
+        if (!user) {
+            showAuthToast("Sign in first to open Settings.");
+            if (authModal) authModal.style.display = "flex";
+            return;
+        }
+        await showSupplierProfileForm(user);
+    });
+}
+
+if (dropdownAuthActionBtn) {
+    dropdownAuthActionBtn.addEventListener("click", async () => {
+        closeProfileDropdown();
         if (auth.currentUser) {
             try {
                 await signOut(auth);
+                setAuthMode(false);
                 if (typeof window.handlePostLogoutUI === "function") {
                     window.handlePostLogoutUI();
                 }
+                syncProfileDropdownState();
+                showAuthToast("Signed out.");
             } catch (error) {
                 console.error("Logout error:", error);
                 alert("Unable to sign out. Please try again.");
@@ -685,6 +798,31 @@ if (authLink) {
         }
     });
 }
+
+if (settingsNavLink) {
+    settingsNavLink.addEventListener("click", async event => {
+        event.preventDefault();
+        closeProfileDropdown();
+        const user = auth.currentUser;
+        if (!user) {
+            showAuthToast("Sign in first to manage Settings.");
+            if (authModal) authModal.style.display = "flex";
+            return;
+        }
+        await showSupplierProfileForm(user);
+    });
+}
+
+document.addEventListener("click", event => {
+    if (
+        profileDropdownMenu &&
+        profileDropdownMenu.style.display === "block" &&
+        !profileDropdownMenu.contains(event.target) &&
+        !authLink?.contains(event.target)
+    ) {
+        closeProfileDropdown();
+    }
+});
 
 
 /* =========================================================
@@ -738,7 +876,7 @@ if (authForm) {
         const password = document.getElementById("authPassword")?.value || "";
 
         if (!email || !password) {
-            alert("Please enter your email and password.");
+            showAuthToast("Please enter your email and password.");
             return;
         }
 
@@ -771,6 +909,7 @@ if (authForm) {
                     email: user.email || email,
                     role,
                     businessName,
+                    supplierName: supplierAccount ? businessName : "",
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
                 };
@@ -794,6 +933,9 @@ if (authForm) {
 
                 try {
                     await setDoc(doc(db, "users", user.uid), userData, { merge: true });
+                    if (supplierAccount) {
+                        await setDoc(doc(db, "suppliers", user.uid), userData, { merge: true });
+                    }
                 } catch (profileSaveError) {
                     console.error("Initial profile save failed:", profileSaveError);
                     if (supplierAccount) {
@@ -820,13 +962,17 @@ if (authForm) {
                     }
                 }
 
-                alert("Registration successful!");
                 authForm.reset();
                 setAuthMode(false);
                 if (authModal) authModal.style.display = "none";
+                syncProfileDropdownState();
+                showAuthToast("Registration successful!");
 
                 if (typeof window.handlePostLoginUI === "function") {
                     window.handlePostLoginUI(role);
+                }
+                if (supplierAccount && typeof window.refreshSupplierDashboard === "function") {
+                    window.refreshSupplierDashboard();
                 }
 
             } else {
@@ -835,12 +981,16 @@ if (authForm) {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 const role = userDoc.exists() ? (userDoc.data().role || "customer") : "customer";
 
-                alert("Signed in successfully!");
                 authForm.reset();
                 if (authModal) authModal.style.display = "none";
+                syncProfileDropdownState();
+                showAuthToast("Signed in successfully!");
 
                 if (typeof window.handlePostLoginUI === "function") {
                     window.handlePostLoginUI(role);
+                }
+                if (isSupplierRole(role) && typeof window.refreshSupplierDashboard === "function") {
+                    window.refreshSupplierDashboard();
                 }
             }
 
@@ -897,6 +1047,8 @@ if (authForm) {
 ========================================================= */
 
 onAuthStateChanged(auth, async user => {
+    syncProfileDropdownState();
+
     if (!user) {
         if (!profileCompletionOpen && typeof window.handlePostLogoutUI === "function") {
             window.handlePostLogoutUI();
