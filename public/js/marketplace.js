@@ -5,13 +5,13 @@ import {
     getDocs,
     getDoc,
     doc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+} from "[https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js)";
 
 
 // ============================================================
 // GAS HUB KE - MARKETPLACE.JS
-// Production Marketplace
-// Dynamic Firestore Location, Brand Filters & Vendor Delivery Offers
+// Dynamic Location & Brand Filters, Vendor Delivery Offers,
+// Multi-Image Card Scrolling & Product Detail Modal
 // ============================================================
 
 const CART_STORAGE_KEY = "gas_cart";
@@ -26,6 +26,7 @@ let searchBtn;
 let searchInput;
 
 const supplierProfileCache = new Map();
+const listingCache = new Map();
 
 
 // ============================================================
@@ -294,7 +295,6 @@ async function resolveListingMeta(item) {
         ? await getSupplierDetails(vendorId)
         : { location: "", businessName: "", deliveryFee: null, deliveryOffer: "" };
 
-    // Resolve location
     let location = "";
     if (item.supplierLocation) {
         location = formatLocation(item.supplierLocation);
@@ -324,15 +324,14 @@ async function resolveListingMeta(item) {
         location = "Location unavailable";
     }
 
-    // Resolve supplier name
     const supplierName = String(
         item.supplierName ||
         item.businessName ||
+        item.vendorName ||
         supplierDetails.businessName ||
         ""
     ).trim();
 
-    // Resolve vendor delivery fee & offer (listing overrides supplier profile; defaults to 0 if free/unspecified)
     const listingDelivery = extractDeliveryDetails(item);
     const deliveryFee =
         listingDelivery.fee !== null
@@ -499,10 +498,10 @@ function categoryMatches(item, selectedCategory) {
 
 
 // ============================================================
-// IMAGE TICKER
+// MULTI-IMAGE HORIZONTAL SCROLL TICKER
 // ============================================================
 
-function createImageTicker(images, title) {
+function createImageTicker(images, title, itemId = "") {
     if (!Array.isArray(images)) return "";
 
     const validImages = [
@@ -518,26 +517,9 @@ function createImageTicker(images, title) {
 
     const tickerId = "ticker-" + Math.random().toString(36).substring(2, 12);
 
-    if (validImages.length === 1) {
-        return `
-            <div id="${tickerId}" class="listing-image-ticker">
-                <div class="listing-image-track">
-                    <div class="listing-image-slide active">
-                        <img
-                            src="${escapeHTML(validImages[0])}"
-                            alt="${escapeHTML(title)}"
-                            loading="lazy"
-                            onerror="this.style.display='none';"
-                        >
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     const slides = validImages
         .map((image, index) => `
-            <div class="listing-image-slide ${index === 0 ? "active" : ""}" data-slide="${index}">
+            <div class="listing-image-slide" data-slide="${index}" onclick="window.openProductDetail('${escapeJS(itemId)}')">
                 <img
                     src="${escapeHTML(image)}"
                     alt="${escapeHTML(title)} - Photo ${index + 1}"
@@ -547,6 +529,14 @@ function createImageTicker(images, title) {
             </div>
         `)
         .join("");
+
+    if (validImages.length === 1) {
+        return `
+            <div id="${tickerId}" class="listing-image-ticker">
+                <div class="listing-image-track">${slides}</div>
+            </div>
+        `;
+    }
 
     const indicators = validImages
         .map((_, index) => `
@@ -566,31 +556,65 @@ function createImageTicker(images, title) {
         const ticker = document.getElementById(tickerId);
         if (!ticker) return;
 
+        const track = ticker.querySelector(".listing-image-track");
         const tickerSlides = ticker.querySelectorAll(".listing-image-slide");
         const tickerDots = ticker.querySelectorAll(".listing-image-dot");
         const counter = ticker.querySelector(".listing-image-counter");
 
+        if (!track || tickerSlides.length <= 1) return;
+
         let currentIndex = 0;
+        let isPaused = false;
+        let scrollDebounce;
+
+        function updateIndicators(idx) {
+            tickerDots.forEach((dot, dIdx) => dot.classList.toggle("active", dIdx === idx));
+            if (counter) counter.textContent = `${idx + 1} / ${tickerSlides.length}`;
+        }
+
+        function scrollToSlide(index) {
+            const total = tickerSlides.length;
+            currentIndex = ((index % total) + total) % total;
+            const slideWidth = track.clientWidth || track.getBoundingClientRect().width || 1;
+            track.scrollLeft = currentIndex * slideWidth;
+            updateIndicators(currentIndex);
+        }
+
+        tickerDots.forEach((dot, idx) => {
+            dot.addEventListener("click", event => {
+                event.stopPropagation();
+                scrollToSlide(idx);
+            });
+        });
+
+        track.addEventListener("scroll", () => {
+            clearTimeout(scrollDebounce);
+            scrollDebounce = setTimeout(() => {
+                const slideWidth = track.clientWidth || 1;
+                const nearest = Math.round(track.scrollLeft / slideWidth);
+                if (nearest >= 0 && nearest < tickerSlides.length && nearest !== currentIndex) {
+                    currentIndex = nearest;
+                    updateIndicators(currentIndex);
+                }
+            }, 90);
+        }, { passive: true });
+
+        track.addEventListener("pointerenter", () => { isPaused = true; });
+        track.addEventListener("pointerleave", () => { isPaused = false; });
+        track.addEventListener("touchstart", () => { isPaused = true; }, { passive: true });
+        track.addEventListener("touchend", () => { isPaused = false; }, { passive: true });
 
         const timer = setInterval(() => {
             if (!document.body.contains(ticker)) {
                 clearInterval(timer);
                 return;
             }
-
-            tickerSlides[currentIndex]?.classList.remove("active");
-            tickerDots[currentIndex]?.classList.remove("active");
-
-            currentIndex = (currentIndex + 1) % tickerSlides.length;
-
-            tickerSlides[currentIndex]?.classList.add("active");
-            tickerDots[currentIndex]?.classList.add("active");
-
-            if (counter) {
-                counter.textContent = `${currentIndex + 1} / ${tickerSlides.length}`;
+            if (!isPaused) {
+                const nextIdx = (currentIndex + 1) % tickerSlides.length;
+                scrollToSlide(nextIdx);
             }
         }, 3000);
-    }, 100);
+    }, 80);
 
     return html;
 }
@@ -626,7 +650,6 @@ function calculateCartTotals(cartItems) {
         return sum + price * qty;
     }, 0);
 
-    // Group delivery fee once per vendor (or per item if no vendorId)
     const vendorFees = new Map();
     cartItems.forEach(item => {
         const groupKey = item.vendorId ? `vendor:${item.vendorId}` : `item:${item.id}`;
@@ -738,7 +761,7 @@ function updateCartUI() {
     const cartCountEl = document.getElementById("cartCount");
     if (cartCountEl) {
         cartCountEl.textContent = String(totalCount);
-        cartCountEl.style.display = totalCount > 0 ? "inline-block" : "none";
+        cartCountEl.style.display = totalCount > 0 ? "inline-flex" : "none";
     }
 }
 
@@ -815,6 +838,145 @@ window.getGasCartSummary = function () {
 
 
 // ============================================================
+// PRODUCT DETAIL / READ MORE MODAL
+// ============================================================
+
+window.openProductDetail = function (itemId) {
+    const entry = listingCache.get(String(itemId));
+    if (!entry) return;
+
+    const { item, location, vendorId, supplierName, deliveryFee, deliveryOffer } = entry;
+    const modal = document.getElementById("productDetailModal");
+    if (!modal) return;
+
+    const images = Array.isArray(item.images) && item.images.length > 0
+        ? [...new Set(item.images.filter(Boolean))]
+        : (item.imageUrl ? [item.imageUrl] : []);
+
+    const mainImg = document.getElementById("detailMainImage");
+    const thumbRow = document.getElementById("detailThumbRow");
+    const sizeBadge = document.getElementById("detailSizeBadge");
+    const titleEl = document.getElementById("detailTitle");
+    const priceEl = document.getElementById("detailPrice");
+    const metaEl = document.getElementById("detailMeta");
+    const sizeSelect = document.getElementById("detailSizeSelect");
+    const descEl = document.getElementById("detailDescription");
+
+    const title = item.title || "Cooking Gas";
+    const price = Number(item.price) || 0;
+    const sizeText = item.size || item.weight || "13kg";
+
+    if (mainImg) {
+        mainImg.src = images[0] || "";
+        mainImg.alt = title;
+    }
+
+    if (sizeBadge) {
+        sizeBadge.textContent = sizeText.toUpperCase();
+        sizeBadge.style.display = sizeText ? "inline-block" : "none";
+    }
+
+    if (thumbRow) {
+        if (images.length > 1) {
+            thumbRow.style.display = "flex";
+            thumbRow.innerHTML = images.map((imgUrl, idx) => `
+                <button type="button" class="gh-detail-thumb-btn ${idx === 0 ? "active" : ""}" data-thumb="${escapeHTML(imgUrl)}">
+                    <img src="${escapeHTML(imgUrl)}" alt="Thumbnail ${idx + 1}">
+                </button>
+            `).join("");
+            thumbRow.querySelectorAll(".gh-detail-thumb-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    thumbRow.querySelectorAll(".gh-detail-thumb-btn").forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    if (mainImg) mainImg.src = btn.getAttribute("data-thumb") || "";
+                });
+            });
+        } else {
+            thumbRow.style.display = "none";
+            thumbRow.innerHTML = "";
+        }
+    }
+
+    if (titleEl) titleEl.textContent = title.toUpperCase();
+    if (priceEl) priceEl.textContent = formatKES(price);
+    if (metaEl) {
+        const offerLabel = deliveryOffer || (deliveryFee === 0 ? "Free Delivery" : `Delivery: ${formatKES(deliveryFee)}`);
+        metaEl.textContent = `${location}${supplierName ? ` • ${supplierName}` : ""} • ${offerLabel}`;
+    }
+    if (sizeSelect) {
+        const matched = [...sizeSelect.options].find(o => o.value.toLowerCase() === String(sizeText).toLowerCase());
+        sizeSelect.value = matched ? matched.value : "13kg";
+    }
+    if (descEl) {
+        descEl.textContent = item.description || "Verified LPG cylinder/refill available through GasHubKE suppliers.";
+    }
+
+    const pageUrl = encodeURIComponent(window.location.href);
+    const shareText = encodeURIComponent(`${title} (${sizeText}) - ${formatKES(price)} on GasHubKE`);
+    const shareFb = document.getElementById("shareFb");
+    const shareTw = document.getElementById("shareTw");
+    const sharePin = document.getElementById("sharePin");
+    const shareIn = document.getElementById("shareIn");
+    const shareWa = document.getElementById("shareWa");
+
+    if (shareFb) shareFb.href = `[https://www.facebook.com/sharer/sharer.php?u=$](https://www.facebook.com/sharer/sharer.php?u=$){pageUrl}`;
+    if (shareTw) shareTw.href = `[https://twitter.com/intent/tweet?text=$](https://twitter.com/intent/tweet?text=$){shareText}&url=${pageUrl}`;
+    if (sharePin) sharePin.href = `[https://pinterest.com/pin/create/button/?url=$](https://pinterest.com/pin/create/button/?url=$){pageUrl}&description=${shareText}`;
+    if (shareIn) shareIn.href = `[https://www.linkedin.com/sharing/share-offsite/?url=$](https://www.linkedin.com/sharing/share-offsite/?url=$){pageUrl}`;
+    if (shareWa) shareWa.href = `[https://wa.me/?text=$](https://wa.me/?text=$){shareText}%20${pageUrl}`;
+
+    const addBtn = document.getElementById("detailAddToCartBtn");
+    const viewCartBtn = document.getElementById("detailViewCartBtn");
+    const checkoutBtn = document.getElementById("detailCheckoutBtn");
+
+    if (addBtn) {
+        addBtn.onclick = () => {
+            const chosenSize = sizeSelect ? sizeSelect.value : sizeText;
+            window.addToListingCart(
+                itemId,
+                `${title} (${chosenSize})`,
+                price,
+                location,
+                vendorId,
+                supplierName,
+                deliveryFee,
+                deliveryOffer
+            );
+        };
+    }
+
+    if (viewCartBtn) {
+        viewCartBtn.onclick = () => {
+            modal.style.display = "none";
+            if (typeof window.renderCartView === "function") window.renderCartView();
+            if (typeof window.switchView === "function") window.switchView("cartView");
+        };
+    }
+
+    if (checkoutBtn) {
+        checkoutBtn.onclick = () => {
+            const chosenSize = sizeSelect ? sizeSelect.value : sizeText;
+            window.addToListingCart(
+                itemId,
+                `${title} (${chosenSize})`,
+                price,
+                location,
+                vendorId,
+                supplierName,
+                deliveryFee,
+                deliveryOffer
+            );
+            modal.style.display = "none";
+            if (typeof window.renderCartView === "function") window.renderCartView();
+            if (typeof window.switchView === "function") window.switchView("cartView");
+        };
+    }
+
+    modal.style.display = "flex";
+};
+
+
+// ============================================================
 // LOAD LISTINGS
 // ============================================================
 
@@ -831,7 +993,9 @@ async function loadListings() {
                 const item = docSnap.data();
                 const itemId = docSnap.id;
                 const meta = await resolveListingMeta(item);
-                return { item, itemId, ...meta };
+                const record = { item, itemId, ...meta };
+                listingCache.set(String(itemId), record);
+                return record;
             })
         );
 
@@ -897,7 +1061,7 @@ async function loadListings() {
             card.className = "product-card";
 
             const mapPinSvg = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;color:var(--primary);">
+                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;color:var(--primary);">
                     <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                 </svg>
@@ -921,7 +1085,7 @@ async function loadListings() {
                 ? deliveryOffer
                 : (deliveryFee === 0 ? "Free Delivery" : `Delivery: ${formatKES(deliveryFee)}`);
 
-            const imageTicker = createImageTicker(displayImages, title);
+            const imageTicker = createImageTicker(displayImages, title, itemId);
             const safeTitle = escapeJS(title);
             const safeLocation = escapeJS(location);
             const safeVendorId = escapeJS(vendorId);
@@ -933,7 +1097,7 @@ async function loadListings() {
                 <div>
                     ${imageTicker}
                     <div class="card-body">
-                        <h4>${escapeHTML(title)}</h4>
+                        <h4 style="cursor:pointer;" onclick="window.openProductDetail('${escapeJS(itemId)}')">${escapeHTML(title)}</h4>
                         <p class="price">
                             KES ${escapeHTML(price)}
                             <span style="font-size:0.8rem;font-weight:normal;color:var(--text-muted);">
@@ -952,12 +1116,20 @@ async function loadListings() {
                     </div>
                 </div>
 
-                <div style="padding:0 1rem 1rem 1rem;">
+                <div style="padding:0 1rem 1rem 1rem;display:flex;gap:0.45rem;">
                     <button
+                        type="button"
                         class="btn-primary"
                         onclick="window.addToListingCart('${escapeJS(itemId)}', '${safeTitle}', ${numericPrice}, '${safeLocation}', '${safeVendorId}', '${safeSupplierName}', ${deliveryFee}, '${safeDeliveryOffer}')"
                     >
-                        Order Now
+                        Add to Cart
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        onclick="window.openProductDetail('${escapeJS(itemId)}')"
+                    >
+                        Details
                     </button>
                 </div>
             `;
@@ -995,6 +1167,10 @@ function clearFilters() {
     if (filterSize) filterSize.value = "";
     if (filterCategory) filterCategory.value = "";
     if (searchInput) searchInput.value = "";
+    document.querySelectorAll('[data-quick-brand]').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('[data-quick-category]').forEach(c => {
+        c.classList.toggle('active', (c.getAttribute('data-quick-category') || '') === '');
+    });
     loadListings();
 }
 
@@ -1038,6 +1214,22 @@ function initializeMarketplace() {
             }
         });
     }
+
+    const detailModal = document.getElementById("productDetailModal");
+    const closeDetailModal = document.getElementById("closeDetailModal");
+    const backToTopBtn = document.getElementById("backToTopBtn");
+
+    closeDetailModal?.addEventListener("click", () => {
+        if (detailModal) detailModal.style.display = "none";
+    });
+
+    detailModal?.addEventListener("click", e => {
+        if (e.target === detailModal) detailModal.style.display = "none";
+    });
+
+    backToTopBtn?.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
 
     loadListings();
 }
